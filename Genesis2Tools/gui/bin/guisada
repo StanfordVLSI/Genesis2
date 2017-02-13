@@ -1,0 +1,258 @@
+#!/bin/csh -f
+
+unset SDBG
+
+if (0) then
+echo "Hello I am Carne Guisada"
+echo
+echo "I see the following parms:"
+echo
+echo "  " $1
+echo
+endif
+
+if ($#argv == 0) then
+  echo
+  echo "Usage: $0:t existing-design.xml"
+  echo "OR:    $0:t existing-design.xml new-design-name"
+  echo "OR:    $0:t 'newdesign=mydesign&curdesign=tgt0.js&modpath=top&...'"
+  echo "OR:    $0:t --help"
+  echo
+  exit;
+endif
+
+if ("$1" == "--help") goto HELP
+if ("$1" == "-h") goto HELP
+
+# BUG/TODO is this really how we want to do this??  Yes I think so.
+if (! $?CHIPGEN) then
+  echo
+  echo "ERROR: Env var 'CHIPGEN' not set; thus cannot call opendesign.pl or updatedesign.pl"
+  echo
+  exit;
+endif
+
+# If $1 is an xml file and $1 is EMPTY, resubmit as something like
+# set curdesign = $1:r
+# set newdesign = $2
+# E.g. guisada "newdesign=$newdesign&curdesign=..%2F$1.js&modpath=top"
+# E.g. guisada "newdesign=tmp&curdesign=..%2Fempty_design.js&modpath=top"
+
+
+if ("$1:e" == "xml") goto OPENDESIGN
+# else
+goto UPDATEDESIGN
+
+exit
+##############################################################################
+OPENDESIGN:
+
+if ($#argv < 1) then
+  echo
+  echo "Usage:   $0 <basedesign.xml> [newdesignname(.xml)]"
+  echo "Example: $0 tgt0-baseline.xml mydesign"
+  echo; exit
+endif
+
+set xmlfile = "$1"
+if ($#argv == 2) then
+    set newdname = "$2";
+else
+    echo
+    echo -n 'Please make up a name for your new design (default = "mydesign"): '
+    set newdname = $<;
+    if ("$newdname" == "") then
+        set newdname = "mydesign"
+    endif
+endif
+
+if ("$newdname:e" == "xml") set newdname = "$newdname:r" # Strip off .xml extension
+
+# Should be in same directory as xmlfile
+if ("$xmlfile" != "$xmlfile:t") then
+  echo "You should be in same directory as xml file"
+  echo "Try this:"
+  echo
+  echo "    cd '$xmlfile:h'"
+  echo "    $0 '$xmlfile:t'"
+  echo
+endif
+
+if (! -e "$xmlfile") then
+  echo "ERROR: Cannot find design '$xmlfile'"
+  echo; exit
+endif
+
+# Somehow this never kicks in...?
+# I guess because gui never generates "design.xml" it generates "design-<timestamp>.xml"
+#if (-e "$newdname") then
+#  echo "ERROR: Don't want to overwrite existing design '$newdname'"
+#  echo "Either pick a new name or delete existing '$newdname' and try again."
+#  echo; exit
+#endif
+
+# Build scratch dir if necessary; cd to scratch directory.
+if (! -d scratch) mkdir scratch
+cd scratch
+
+#  setenv GUI_STANDALONE_PHP_ID $$ # Initial value for php id.
+
+# Call opendesign.pl -standalone ../$xmlfile
+# Where is opendesign.pl?  $CHIPGEN/bin/Genesis2Tools/gui/cgi, right?
+set logfile = opendesign-$$.log
+$CHIPGEN/bin/Genesis2Tools/gui/cgi/opendesign.pl -standalone ../$xmlfile $newdname | tee $logfile | grep -v GUI_STANDALONE
+
+if ($?SDBG) echo "Back in ${0:t}"
+
+#  # opendesign calls build_php, which prints a line e.g. "GUI_STANDALONE_PHP mydesign-9614.php"
+#  # opendesign calls build_php, which prints a line e.g. "GUI_STANDALONE_PHP mydesign.php"
+#  set phpfile = `\
+#    cat $logfile |\
+#    sed -n '/^GUI_STANDALONE_PHP /p' |\
+#    sed 's/GUI_STANDALONE_PHP //'\
+#  `
+set phpfile = $newdname.php  # As chosen on command line above.
+#mv $logfile $phpfile.log
+
+mv $logfile   $phpfile:r.$$.log
+set logfile = $phpfile:r.$$.log
+
+
+
+echo "Built phpfile = 'scratch/$phpfile';"
+
+# Let's send the output to e.g. "mydesign.htm"
+set htmlfile = "$phpfile:r".htm
+
+#/usr/bin/php $phpfile > $htmlfile
+(echo; echo "BUILD_HTML") >> $logfile
+(/usr/bin/php $phpfile > $htmlfile) |& tee -a $logfile
+
+echo "Used phpfile 'scratch/$phpfile' to build htmlfile 'scratch/$htmlfile'"
+echo "For results and errors see logfile 'scratch/$logfile'\n\n"
+echo
+echo "Now: point your *local* browser to:"
+echo "file://`pwd`/$htmlfile"
+echo
+echo "For your convenience, now executing: firefox 'file://`pwd`/$htmlfile'"
+echo
+# Firefox streams a bunch of ALSA error messages to the screen (why?)
+exec firefox file://`pwd`/$htmlfile |& grep -v ALSA &
+
+exit
+##############################################################################
+
+UPDATEDESIGN:
+
+# E.g. guisada 46722 'newdesign=mydesign&curdesign=..%2Ftgt0-baseline.js\
+# NO!
+# E.g. guisada 'newdesign=mydesign&curdesign=..%2Ftgt0-baseline.js\
+#               &modpath=top&DBG=0&MODE=VERIF&ASSERTION=ON\
+#               &QUAD_ID=0&TILE_ID=0&NUM_PROCESSOR=1&NUM_MEM_MATS=1'"
+
+# There better be a scratch directory
+if (! -d scratch) then
+  echo "ERROR: I don't see a scratch/ directory; are we in the right place?"
+  echo
+  exit
+endif
+cd scratch
+
+
+setenv GUI_STANDALONE 1
+#setenv GUI_STANDALONE_PHP_ID "$1"  # php id passed along from prev
+#setenv QUERY_STRING "$2"
+setenv QUERY_STRING "$1"
+
+if (0) then
+  echo "Now call updatedesign.pl with env variable GUI_STANDALONE == 1"
+  echo
+endif
+
+#setenv GUI_STANDALONE_DIR `pwd`
+
+if (0) then
+  # Uncomment if-clause for testing
+  set tmp = ""
+  set tmp = "$tmp"'newdesign=bigdummy'
+  set tmp = "$tmp"'&curdesign=..%2Ftgt0-baseline.js'
+  set tmp = "$tmp"'&modpath=top'
+  set tmp = "$tmp"'&DBG=1'
+  set tmp = "$tmp"'&MODE=VERIF'
+  set tmp = "$tmp"'&ASSERTION=ON'
+  set tmp = "$tmp"'&QUAD_ID=0'
+  set tmp = "$tmp"'&TILE_ID=0'
+  set tmp = "$tmp"'&NUM_PROCESSOR=1'
+  set tmp = "$tmp"'&NUM_MEM_MATS=1'
+
+  setenv QUERY_STRING "$tmp"
+endif
+
+if ($?SDBG) echo $QUERY_STRING
+
+set logfile = opendesign-$$.log
+$CHIPGEN/bin/Genesis2Tools/gui/cgi/updatedesign.pl | tee $logfile | grep -v GUI_STANDALONE
+echo
+
+if ($?SDBG) echo "Okay now back in guisada\n\n"
+
+# updatedesign calls build_php, which prints an informational 
+# line to the logfile e.g. "GUI_STANDALONE_PHP mydesign.php"
+
+set phpfile = `\
+    cat $logfile |\
+    sed -n '/^GUI_STANDALONE_PHP /p' |\
+    sed 's/GUI_STANDALONE_PHP //'\
+  `
+mv $logfile   $phpfile:r.$$.log
+set logfile = $phpfile:r.$$.log
+
+echo "Found phpfile = 'scratch/$logfile'; will overwrite with new info."
+
+set htmlfile = "$phpfile:r".htm
+
+(echo; echo "BUILD_HTML") >> $logfile
+(/usr/bin/php $phpfile > $htmlfile) |& tee -a $logfile
+
+echo "Used phpfile 'scratch/$phpfile' to build htmlfile 'scratch/$htmlfile'"
+echo "For results and errors see logfile 'scratch/$logfile'"
+echo
+echo "Now: point your *local* browser to:"
+echo "file://`pwd`/$htmlfile"
+echo
+echo "(Or just refresh the page\!)"
+echo
+echo "For your convenience, now executing: firefox 'file://`pwd`/$htmlfile'"
+echo
+# Firefox streams a bunch of ALSA error messages to the screen (why?)
+exec firefox file://`pwd`/$htmlfile |& grep -v ALSA &
+
+exit
+##############################################################################
+HELP:
+echo
+echo '1. Make sure $CHIPGEN/bin is in your path.  One way to test this is'
+echo "to type '$0:t' at your command prompt and see if anything happens."
+echo
+echo "2. Cd to the directory containing your design.  The directory should have a"
+echo "working Genesis makefile and at least one existing parm file 'parms.xml'."
+echo "In particular, the following command should work correctly, producing a new"
+echo "parm file 'newparms.xml' using the existing file 'parms.xml':"
+echo
+echo "  make -f ./Makefile gen GENESIS_CFG_XML=parms.xml GENESIS_HIERARCHY=newparms"
+echo
+echo "3. Choose a unique name for your design e.g. 'fma3'."
+echo "Then enter the following command and follow the instructions:"
+echo
+echo "  $0:t parms.xml fma3"
+echo
+echo "NOTES:"
+echo "  The GUI will produce a change file 'SysCfgs/fma3-<timestamp>-changes.xml'"
+echo "  and a new fully-elaborated parm file 'fma3-<timestamp>.xml'"
+echo
+echo "  If the design directory contains a tiny parm file 'tiny_parms.xml' then the"
+echo "  change file will also be tiny; otherwise it will be fully elaborated (BIG)."
+echo
+echo "  Enjoy the standalone GUI\!"
+echo
+

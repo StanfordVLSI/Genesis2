@@ -1,0 +1,44 @@
+========================================================================
+Obsolete(?):
+add to CONFIG:
+  "#INSTALL_SITE Stanford results in e.g. "Welcome to Chip Generator at Stanford""
+  "INSTALL_SITE Stanford # CMU should change to "CMU"
+  - and then use it in updatedesign.csh instead of "if -e steveri"
+CMU site should use title "Welcome to CG at CMU"
+
+
+-----------------------------------------------------------------------------
+GUI for CMU
+
+Unpack the tarball such that <path> is the name of the top-level
+directory containing "index.htm".  For instance, on our machine <path>
+is "/home/steveri/ig" and the full pathname for index.htm is
+"/home/steveri/ig/index.htm".
+
+Use symbolic links to connect the top-level directory to your 
+web server e.g. in our installation we did
+
+  % ln -s /home/steveri/ig /var/www/homepage/ig 
+
+such that the URL "http://www-vlsi.stanford.edu/ig" takes you to
+"index.htm" and starts the gui.
+
+Similarly, connect the <path>/cgi subdirectory to your web server's
+cgi-bin directory; for instance, in our installation this is
+accomplished by
+
+  % ln -s /home/steveri/ig/cgi /usr/lib/cgi-bin/ig
+
+The GUI calls an "update" perl script using the URL 
+"/cgi-bin/ig/updatedesign.pl" (see "Button_SubmitChanges.js).
+You can test this by visiting the URL; e.g. if you visit
+"http://www-vlsi.stanford.edu/cgi-bin/ig/updatedesign.pl"
+you'll see a valid error message output:
+"ERROR: new design name is null."  This indicates that the
+perl script is in the right place (for Stanford's installation!)
+
+At this point you may have to mess around with permissions a bit to
+get everything working...good luck with that.
+
+http://genesis2.stanford.edu/mediawiki/index.php/InteractiveGenesis2GUI#Interactive_Genesis2_GUI
+------------------------------------------------------------------------

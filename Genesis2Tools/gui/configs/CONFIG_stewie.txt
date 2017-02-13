@@ -1,0 +1,17 @@
+# one two three testing the comments
+
+# E.g. STEWIE_BASE_HREF_HERE = http://neva-2:8080
+# E.g. STEWIE_DIR_HERE            = /tmp/stewie
+
+SERVER_URL      STEWIE_BASE_HREF_HERE
+
+CGI_DIR         STEWIE_DIR_HERE/cgi     # Where the cgi files live on the server
+CGI_URL         /cgi                    # How to access cgi files from the web
+
+GUI_HOME_DIR    STEWIE_DIR_HERE
+GUI_HOME_URL    /                       # Relative to where stewie runs.  Right!??
+
+#DESIGN_LIST     /home/steveri/gui/configs/design_list_stanford.txt
+DESIGN_LIST     STEWIE_DIR_HERE/configs/design_list_stanford.txt
+
+#END#

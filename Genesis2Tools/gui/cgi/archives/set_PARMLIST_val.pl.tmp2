@@ -1,0 +1,74 @@
+use strict;
+
+my $DBG9 = 1;
+
+my %PARMLIST;
+
+test_set_PARMLIST_val();
+
+sub test_set_PARMLIST_val {
+    $DBG9 = 1;
+    set_PARMLIST_val("a.b.c", "abc", \%PARMLIST );
+    set_PARMLIST_val("a.b.e", "abe", \%PARMLIST );
+    set_PARMLIST_val("d",     "17d", \%PARMLIST );
+    print "\n";
+
+    print "PARMLIST{a}{b}{c} = $PARMLIST{a}{b}{c}\n";
+    print "PARMLIST{a}{b}{e} = $PARMLIST{a}{b}{e}\n";
+    print "PARMLIST{d}.....  = $PARMLIST{d}\n";
+    print "\n";
+    print "PARMLIST{a}{c}..  = $PARMLIST{a}{c}\n";
+    print "\n";
+}
+
+sub set_PARMLIST_val {
+    my $field = shift(@_);
+    my $value = shift(@_);
+    my $plr = shift @_; # Reference to hash %PARMLIST
+    my $DBG = shift @_;
+
+    #################################################################
+    # E.g. if $field = "a.b.c"
+    #         $value = "17"
+    #         $plr = \%PARMLIST
+    # then set $PARMLIST{a}{b}{c} = 17
+
+    my @pe = split /\./ , $field;
+
+    if ($DBG9) {
+	print "# getparms() $#pe: ";
+	print "PARMLIST";
+	for (my $i = 0; $i <= $#pe; $i++) { print "{$pe[$i]}"; }
+	print " = $value\n";
+    }
+
+    my $ptr = $plr;
+
+    while ($#pe > 1) {
+	my %hashtmp;
+	$ptr->{$pe[0]} = \%hashtmp;
+
+	$ptr = $ptr->{$pe[0]}; # $ptr = PARMLIST{a} then PARMLIST{a}{b}
+	shift @pe;
+    }
+    $ptr->{$pe[0]} = $value;
+    return;
+
+
+
+
+
+
+    while ($#pe > 5) {
+	$ptr = $ptr->{$pe[0]}{$pe[1]}{$pe[2]}{$pe[3]}{$pe[4]};
+	shift @pe; shift @pe; shift @pe; shift @pe; shift @pe;
+    }
+    if ($#pe == 0) {         $ptr->{$pe[0]} = $value;                                 }
+    elsif ($#pe == 1) {      $ptr->{$pe[0]}{$pe[1]} = $value;                         }
+    elsif ($#pe == 2) {      $ptr->{$pe[0]}{$pe[1]}{$pe[2]} = $value;                 }
+    elsif ($#pe == 3) {      $ptr->{$pe[0]}{$pe[1]}{$pe[2]}{$pe[3]} = $value;         }
+    elsif ($#pe == 4) {      $ptr->{$pe[0]}{$pe[1]}{$pe[2]}{$pe[3]}{$pe[4]} = $value; }
+#    print "\n";
+
+
+}

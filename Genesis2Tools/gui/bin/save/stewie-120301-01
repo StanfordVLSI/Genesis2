@@ -1,0 +1,124 @@
+#! /bin/bash
+# No #! directive means /bin/sh...right???
+
+#  stewie kill
+#    - finds and kills running stewie server(s)
+#  stewie start <portno>
+#    - starts a new stewie server on port "portno" (default=first available)
+#  stewie restart <portno>
+#    - kill existing server and restart
+#
+# DONE
+#  stewie setup . 
+#    - (assumes running from unpacked tarball)
+#    - link CONFIG.TXT => configs/CONFIG_stewie.txt
+#    - link index.htm => configs/index_stewie.htm
+#  stewie clone /tmp/foo
+#    - same as "setup" except builds a new installation in indicated directory
+
+#echo $*
+
+stewie_help () {
+#  echo "i got your help right HERE";
+  cmd=`basename $0`
+  cmd=${0##*/}
+
+  echo "Usage:"
+  echo
+  echo "  $cmd clone <olddir> <newdir> # clone existing installation olddir and put it in newdir"
+  echo "  $cmd setup <dir>             # ready the stewie install at location <dir> (default=self)"
+  echo "  $cmd start [port]            # start stewie on indicated port (default = next avail)"
+  echo "  $cmd list                    # Find and list running stewie servers"
+  echo "  $cmd kill                    # kill existing stewie server(s)"
+  echo "  $cmd restart [port]          # kill and then restart (see above)"
+  echo
+  echo "For more help: $cmd help command"
+  echo
+}
+
+
+if `test \( $# -eq 0 \)`; then stewie_help; exit; fi
+
+#set -v
+
+case "$1" in
+
+    (clone) {
+        olddir=$2; newdir=$3;
+        echo -n "Clone from \"$olddir\" to \"$newdir\", right (<CR> to continue)? "
+        read DUMMY; echo
+        
+      # Make sure destination does not yet exist
+        if `test -e $newdir`; then
+            echo "Oops looks like $newdir already exists and I don't want to write over it."
+            echo "Please delete $newdir and try again."
+            exit;
+        fi
+
+        tarball=/tmp/gui.tar.bz2
+
+      # Build an up-to-date tarfile (creates $tarball)
+        $olddir/configs/install/build_tarfile.sh
+
+      # Expand the tarball to create /tmp/gui-unpack-$$/gui
+        mkdir /tmp/gui-unpack-$$
+        cd /tmp/gui-unpack-$$
+        tar xjf $tarball || exit
+        /bin/rm $tarball          # Finished w/tarball
+
+        echo "Okay copying gui to its new home \"$newdir\""; echo;
+        mv gui $newdir
+
+      # Clean up your mess
+        /bin/rm -rf /tmp/gui-unpack-$$
+
+      # Don't forget to set up the new stewie in its new directory.
+        echo "Now executing: $newdir/bin/stewie setup $newdir"
+        cd $newdir; ./bin/stewie setup $newdir
+
+        exit;
+    };;
+
+    (setup) {
+        f=index.htm
+        if `test -e $f`; then
+            echo "WARNING: Deleting existing $f"; rm $f; fi
+
+        f=CONFIGS.TXT
+        if `test -e $f`; then
+            echo "WARNING: Deleting existing $f"; rm $f; fi
+
+        ln -s configs/index_stewie.htm  index.htm
+        ln -s configs/CONFIG_stewie.txt CONFIGS.TXT
+
+        echo; echo "New links:"; echo
+        ls -l index.htm
+        ls -l CONFIGS.TXT
+        echo
+        exit;
+    };;
+    
+    (list) {
+        ps ux | egrep 'perl .*[/]stewie.pl';
+        exit;
+    };;
+
+    (kill) {
+        procs=`ps x | egrep 'perl .*[/]stewie.pl' | awk '{print $1}'`;
+        echo "kill -9 $procs"
+        echo "Really do it (y or n)? "
+        exit;
+    };;
+
+
+  (phone) echo I see a phone;;
+esac
+
+
+
+
+#exit;
+#
+#HELP:
+#echo "i got your help right HERE"
+#

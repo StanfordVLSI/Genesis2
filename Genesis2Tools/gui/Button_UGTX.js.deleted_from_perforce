@@ -1,0 +1,25 @@
+<script type="text/javascript"><!--
+
+Button_UGTX = new function() {
+
+  this.Init = Init;
+
+  var turnon =  '"Use-and-Generate-Tiny-XML" is OFF.  Click here to change it.';
+  var turnoff =  '"Use-and-Generate-Tiny-XML" is ON.  Click here to change it.';
+
+  function Init() {
+    document.getElementById("ugtxbutton" ).value = UGTX? turnoff : turnon;
+    document.getElementById("ugtxbutton" ).onclick = ToggleDebug;
+  }
+
+  function ToggleDebug(e) {
+    if (UGTX==0) {
+      UGTX = 1; document.getElementById("ugtxbutton" ).value = turnoff;
+    }
+    else if (UGTX==1) {
+      UGTX = 0; document.getElementById("ugtxbutton" ).value = turnon;
+    }
+  }
+}
+
+//--></script>

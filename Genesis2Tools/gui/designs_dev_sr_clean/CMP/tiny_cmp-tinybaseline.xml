@@ -1,0 +1,20 @@
+<HierarchyTop>
+  <BaseModuleName>top</BaseModuleName>
+  <ImmutableParameters></ImmutableParameters>
+  <InstanceName>top</InstanceName>
+  <Parameters>
+    <ParameterItem>
+      <Doc></Doc>
+      <Name>NUM_PROCESSOR</Name>
+      <Range></Range>
+      <Val>1</Val>
+    </ParameterItem>
+    <ParameterItem>
+      <Doc></Doc>
+      <Name>NUM_MEM_MATS</Name>
+      <Range></Range>
+      <Val>1</Val>
+    </ParameterItem>
+  </Parameters>
+  <UniqueModuleName>top</UniqueModuleName>
+</HierarchyTop>

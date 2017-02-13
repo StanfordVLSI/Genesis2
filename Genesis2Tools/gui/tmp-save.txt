@@ -1,0 +1,132 @@
+<script type="text/javascript"><!--
+
+ModuleNavigator = new function () {
+
+  var DBG9 = 0;
+
+  ///////////////////////////////////////////////////////////////////////
+  // EXPORTED functions and data:                                      //
+  ///////////////////////////////////////////////////////////////////////
+
+  this.UpModule      = UpModule;    // Pop out to enclosing module.  
+  this.DownModule    = DownModule;  // DownModule("dut") => Push into submodule "dut"
+  this.OpenTopModule = DownModule;  // OpenTopModule("top") == DownModule("top")
+  this.OpenSubmodule = DownModule; 
+  this.GotoModule    = GotoModule;  // GotoModule("top.DUT") => push into "cgtop" then "DUT"
+
+  this.GetSubmodule = GetSubmodule;
+
+  this.curpathstring = curpathstring;
+
+  ///////////////////////////////////////////////////////////////////////
+  // PRIVATE functions and data:                                       //
+  ///////////////////////////////////////////////////////////////////////
+
+  var path = new Array();     // path[0] = top;   path[1] = top.subInstances.dut; etc.
+  var curpathnum = 1;
+  var curmodule = "";
+
+  // E.g. curpathstring() might return "top.dut.regfile"
+  function curpathstring() {
+    var rval = path[0].InstanceName;
+    for (var i = -1; i >= curpathnum; i--) {
+      rval = rval + "." + path[i].InstanceName;
+    }
+    return rval;
+  }
+
+  function UpModule() {
+    if (IsTopModule()) {
+      alert("No way up from here, we're at the top.  (So why is there an UP button!??)"); // TODO?
+      return;
+    }
+
+      // Don't do it!!!  If there are outstanding changes to be processed.
+      if (SublistMgmt.CurDepth() != 0) {
+          alert("You appear to have unprocessed changes at this level;\n" +
+                "please 'Submit' or 'Cancel' changes before navigating away...")
+          return;
+      }
+
+    if (DBG9) alert("ups we goes! leaving " + curpathstring() + " curpathnum = " + curpathnum);
+
+    m = path[++curpathnum];
+    ModuleNavigatorHistory.RecordHistory("up", m); DrawNewModule(m);
+  }
+
+  function DownModule(modname) {
+
+      if (DBG9) {
+          alert("hello i am downmodule" +
+                "\ni have been asked to find modname " + modname +
+                "\nand guess what cgtop.BaseModuleName = " + cgtop.BaseModuleName);
+      }
+
+      //////////////////////////////////////////////////////////////////////////////
+      //var m = cgtop; if (modname != "top") { m = GetSubmodule(modname); }
+
+      // BUG/TODO oh this is horrible, horrible.
+      // Will probably break if:
+      //  - any module other than top has the name "top"
+      //  - any module other than top has the same name as the top
+      //    module (e.g. two modules in the hierarchy named (top_FMA))
+      //
+      // Latest FloatingPointGen breaks in updatedesign.pl
+      // if don't have (modname == cgtop.BaseModuleName) test
+      // because cgtop.BaseModuleName != "top"
+      //
+      // It breaks in opendesign.pl if don't have (modname == "top") test
+      // because opendesign always tries to open toplevel module as "top"
+      //
+      var m;
+      if      (modname == "top")                { m = cgtop; } // For opendesign.pl
+      else if (modname == cgtop.BaseModuleName) { m = cgtop; } // E.g. "top_FMA"
+      else                                      { m = GetSubmodule(modname); }
+      //////////////////////////////////////////////////////////////////////////////
+
+      if (DBG9) if (m != cgtop) alert("going down. leaving " + curpathstring());
+
+      path[--curpathnum] = m;
+      ModuleNavigatorHistory.RecordHistory("dn", m); DrawNewModule(m);
+  }
+
+  // GotoModule("top.DUT") => push into "cgtop" then "DUT"
+  function GotoModule(path) {
+
+    // Always start at the top!
+    var skiptop = false;
+    while (! IsTopModule()) { skiptop = true; UpModule(); }
+
+    // split the string on dot boundaries like so: "top.DUT" => {"top", "DUT"}
+    var path_array = path.split(".");    // E.g. "top.DUT" => {"top", "DUT"}
+    if (skiptop) { path_array.shift(); } // "skiptop" means we're already at "top"
+    for (var i in path_array) {
+      var p = path_array[i];
+      if (DBG9) {alert("GotoModule says: " + p);}
+      DownModule(p);
+    }
+  }
+
+  function IsTopModule() { return (curpathnum>=0); }
+
+  function DrawNewModule(m) {
+    curmodule = m;                          // Update curmodule.
+    if (DBG9) alert("entering " + curpathstring());
+    Draw.Screen(m);
+  }
+
+  //GetSubmodule("dut") looks for a submodule "dut" within the currently-open module
+  function GetSubmodule(submodname) {
+    if (typeof curmodule.SubInstances == undefined) { alert("ERROR oops no more submodules"); return; }
+
+    if (0) alert("Looking for submod " + submodname);
+    for (si in curmodule.SubInstances) {
+      if (submodname == si) {
+        if (0) alert("GetSubmodule found " + curmodule.SubInstances[si].InstanceName);
+	return curmodule.SubInstances[si];
+      }
+    }
+    alert("ERROR could not find submod " + submodname);
+  }
+}
+//--></script>

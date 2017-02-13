@@ -1,0 +1,38 @@
+"I think that the next step would then have to be to add a download
+button that gives the user a tar file with both the final xml config
+and all the Verilog files (since she needs it for the class).
+Thanks, Ofer."
+
+Three things to try, from
+http://stackoverflow.com/questions/349067/download-a-file-using-javascript
+
+1.
+location.href = your_url;
+
+2.
+function exportmasterfile()
+{   var url='../documenten/Master-File.xls';    
+    window.open(url,'Download');  
+}
+
+3.
+window.location = your_url
+
+4.
+document.location = url;
+
+Drver is:
+<head>
+<script type="text/javascript" src="overzicht.js"></script>
+</head>
+
+Set fs=Server.CreateObject("Scripting.FileSystemObject")
+
+if (fs.FileExists("c:\file.xls"))=true then   //fake filename D:
+    response.write("<input type='button' value='Download Masterfile' 
+                    class='button' onclick='exportmasterfile();' /><br />")
+else
+    response.write("Masterfile not found. <br />")
+end if
+
+set fs=nothing

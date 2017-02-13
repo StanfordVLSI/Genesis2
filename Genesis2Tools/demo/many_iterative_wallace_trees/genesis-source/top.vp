@@ -1,0 +1,87 @@
+// Top module for simulation // 
+
+// Parameters:
+//; my $widths = parameter(name=>'WALLACES_WIDTHS', val=>[2, 5, 16, 32, 64], 
+//;                        doc=>"List of wallace trees to generate");
+
+module `mname` ();
+
+   int seed;
+   
+   //; foreach my $N (@{$widths}) {
+   logic [`$N-1`:0]     multiplier_`$N`;
+   logic [`$N-1`:0] 	multiplicand_`$N`;
+   logic [`$N-1`:0] 	pp_`$N`[`$N-1`:0];
+   logic [`2*$N-1`:0] 	sum_`$N`;
+   logic [`2*$N-1`:0] 	carry_`$N`;
+   logic [`2*$N-1`:0] 	total_`$N`;
+   logic [`2*$N-1`:0] 	expected_`$N`;
+   
+
+   assign total_`$N` = sum_`$N` + carry_`$N`;
+   assign expected_`$N` = multiplier_`$N` * multiplicand_`$N`;
+
+   // Generate partial products
+   //;   foreach my $i (0..$N-1){
+   assign pp_`$N`[`$i`] = (multiplicand_`$N`[`$i`] == 1'b1) ? multiplier_`$N` : `$N`'b0;
+   //;   } # end of "foreach my $i..."
+
+   // Instantiate the wallace tree here
+   //; my $wallace = generate('wallace', "wallace_$N", N=>$N);
+   `$wallace->instantiate()` 
+     (.pp(pp_`$N`),
+      .sum(sum_`$N`),
+      .carry(carry_`$N`));
+   
+   // EXAMPLE: For demonstration of clones
+   // ========================================
+   //; my $wallace_clone = clone($wallace, "clone_of_wallce_$N");
+   `$wallace_clone->instantiate()` 
+     (.pp(pp_`$N`),
+      .sum(/* I'll ignore the outputs here*/),
+      .carry(/* I'll ignore the outputs here*/));   
+   // ========================================
+   
+   initial begin
+      int i;
+      #`$N`;
+      $display("%t: AGENT `$N` IS ALIVE -- NOW RUN TESTS...", $time);
+      for (i=0; i<100; i++) begin
+	 multiplier_`$N` = $random(seed);
+	 multiplicand_`$N` = $random(seed);
+	 #100;
+	 assert (expected_`$N`== total_`$N`)
+	   $display("%t: Agent `$N`: Calculating 0x%h * 0x%h -- Expected:0x%h -- Found: 0x%h", 
+		    $time,multiplier_`$N`, multiplicand_`$N`, expected_`$N`, total_`$N`);else
+	     $fatal("%t: SVA ERROR  Agent `$N`: Calculating 0x%h * 0x%h -- Expected:0x%h -- Found: 0x%h", 
+		    $time,multiplier_`$N`, multiplicand_`$N`, expected_`$N`, total_`$N`);
+      end // for (i=0; i<10; i++)
+      #100;
+      $display("%t: AGENT `$N` IS DONE", $time);
+   end
+   //; } # end of "foreach my $N..."
+   
+
+   // general intialization procedure
+   initial begin
+      int dummy;
+      // if this is a "+wave" run, it must record all signals
+      if ( $test$plusargs("wave") ) 
+	begin
+           $display("%t: Starting Wave Capture",$time);
+           //         levels  instance
+           $vcdpluson(0,        top);
+	   $vcdplusmemon(0,     top);
+        end
+      // find the seed for this run
+      if ( $test$plusargs("seed") ) 
+	begin
+	   $value$plusargs("seed=%d", seed);
+	end else begin
+           seed = 12345;
+	end
+      $display("%t:\tUsing seed %d",$time, seed);
+      dummy = $random(seed);
+   end
+      
+endmodule : `mname`

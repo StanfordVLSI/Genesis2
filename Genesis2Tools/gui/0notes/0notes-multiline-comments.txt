@@ -1,0 +1,15 @@
+To test: go to tile_official=>DUT=>p0
+parameter TIE_DATA_WIDTH has multiple-line comment
+look for "Width of" in source
+
+
+CONTEXT:
+  working on multiline comments
+  see xml2js.csh
+  compare samples/regression,multiline etc.
+
+  % cd ~/gui/xml-decoder
+  % xml2js.csh samples/regression.xml > tmp-regression.js
+  % xml2js.csh samples/multiline.xml > tmp-multiline.js
+  % diff tmp-{regression,multiline}.js
+  % p4 diff xml-decoder/xml2js.csh

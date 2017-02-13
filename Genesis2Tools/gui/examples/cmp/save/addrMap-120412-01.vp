@@ -1,0 +1,134 @@
+/*************************************************************************
+ ** From Perforce:
+ **
+ ** $Id: //Smart_design/ChipGen/rtl/addrMap.vp#14 $
+ ** $DateTime: 2011/06/23 15:20:02 $
+ ** $Change: 9375 $
+ ** $Author: danowitz $
+ *************************************************************************/
+
+/******************************************************************************
+ * File: addrMap.vp
+ * Author: Andrew Danowitz
+ * 
+ * Description:
+ * Genesis-based address translator
+ * 
+ * Required Constrained Parameters:
+ * VA_WIDTH: virtual address size
+ * PA_WIDTH: physical address size
+ * OP_WIDTH: op-code width
+ * OP_LIST: list of processor operations
+ * INTERRUPT_OPS: supported interrupt operations
+ * NUM_MEM_BLOCKS: number of memory blocks
+ * DEFAULT_TARGET: the default memory block(s) to send raw addresses to
+ * 
+ * Required Unconstrained Parameters:
+ * TRANS_MAP:A list of the desired remap segments. Each segment is a hash
+ * containing an entry for:
+ *   remap_bits: Values to match virtual address bits against
+ *   n_remap_bits: Number of bits to map virtual address against remap bits
+ *   paddr: Bits to replace the va rmap bits to create the pa
+ *   targ_blocks: A binary number to select which memory blocks a physical
+ *                address should be passed to
+ *   ops: A list of ops for which this segment mapping applies
+ * 
+ * Change bar:
+ * -----------
+ * Date          Author    Description
+ * Jun 23, 2011  danowitz  Complete rework of old addrMap
+ * 
+ *****************************************************************************/
+
+//; require GenExt;
+// Temp compile param
+//; use POSIX;
+
+// Required Constrained Parameters
+//; my $va_width= $self->get_param('VA_SIZE');
+//; my $pa_width = $self->define_param('PA_SIZE'=>32);
+//; my $op_width = $self->get_param('OP_SIZE');
+//; my $op_list = $self->get_param('OP_LIST');
+//; my $interrupt_ops = $self->define_param('INTERRUPT_OPS'=>['nop']);
+//; my $interrupt_width = $self->define_param('INTERRUPT_WIDTH'=>1);
+//; my $targ_size = $self->get_param('TARG_SIZE');
+//; my $default_target = $self->get_param('DEFAULT_TARGET');
+//; my $valid_targets = $self->define_param(VALID_TARGETS => [0..$targ_size-1]);
+
+// Enumerate the operations
+//; my $cnt = 0;
+//; my %op_map = (); # used for mapping an op to a code
+//; foreach my $op (@{$op_list}){
+//;	$op_map{$op} = $cnt++;
+//; }
+
+// Enumerate the interrupts
+//; $cnt = 0;
+//; my %int_map = (); # used for mapping an op to a code
+//; foreach my $op (@{$interrupt_ops}){
+//;	$int_map{$op} = $cnt++;
+//; }
+
+// Required Unconstrained Parameter
+//; my $trans_map = $self->define_param('TRANSLATION_MAP' => 
+//; [{'remap_bits'=>0, 'n_remap_bits'=>4, 'paddr'=>0, 'interrupt'=> 0, 'targ_blocks'=> 0b0, 'ops' => []}]);
+
+module `mname()`( `$self->GenExt::AddPort("input                Clk,","CLK");`
+  `$self->GenExt::AddPort("input                      Reset,");`
+  `$self->GenExt::AddPort("input [".($va_width-1).":0] address_in,","MON","H");`
+  `$self->GenExt::AddPort("input [".($op_width-1).":0] op_in,","MON","D");`
+  `$self->GenExt::AddPort("output logic [".($op_width-1).":0] op_out,","MON","D");`
+  `$self->GenExt::AddPort("output logic [".($pa_width-1).":0] address_out,","MON","H");`
+  `$self->GenExt::AddPort("output logic [".($targ_size-1).":0] targ_block,","MON","B");`
+  `$self->GenExt::AddPort("output logic [".($interrupt_width-1).":0] interrupts,","MON","B");`
+  `$self->GenExt::AddPort("input TMode");`
+);
+
+   //op code is just a passthrough
+   assign op_out = op_in;
+   
+   always_comb begin
+	  
+	  //Remap by matching op codes
+	  unique case(op_out)
+		//; $cnt = 0;
+		//;	 foreach my $op (@{$op_list}){
+		`%op_map->{$op}`: begin
+		//;   foreach my $segment (@{$trans_map}){
+		//;     if (exists($segment->{$op})){
+		   if (address_in[`$va_width-1`:`$va_width-$segment->{n_remap_bits}`]==`$segment->{n_remap_bits}`'d`$segment->{remap_bits}`) 
+			 begin
+				address_out <= {`$segment->{n_remap_bits}`'d`$segment->{paddr}`, adress_in[`$pa_width-$segment->{n_remap_bits}`:0]};
+				targ_block <= `$segment->{targ_blocks}` & 
+					      ~{`$targ_size`{Reset}};
+				interrupts <= `$segment->{interrupt}`;
+			 end
+		   else
+			 begin
+				address_out <= address_in;
+				targ_block <= `$targ_size`'d`$default_target`
+					      & ~{`$targ_size`{Reset}};
+				interrupts <= 'b0;
+			 end // else: !if(address_in[`$va_width-1`:`$va_width-$segment->{n_remap_bits}`]==`$segment->{n_remap_bits}`'d`$segment->{remap_bits}`)
+		   //; $cnt++
+		//;     }
+		//; if ($cnt==0){
+		   address_out <= address_in;
+		   targ_block <= `$targ_size`'d`$default_target` &
+				 ~{`$targ_size`{Reset}};
+		   interrupts <= 'b0;
+	    //;}
+		end // UNMATCHED !!
+	    //;}
+
+	  //;}
+	  default: begin
+		 address_out <= address_in;
+		 targ_block <= `$targ_size`'d`$default_target` &
+			       ~{`$targ_size`{Reset}};
+		 interrupts <= 'b0;
+	  end
+	  endcase // case(op_out)
+   end // UNMATCHED !!
+
+endmodule : `mname()`

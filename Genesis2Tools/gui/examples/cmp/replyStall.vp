@@ -1,0 +1,30 @@
+/******************************************************************************
+ * File: replyStall.vp
+ * Author: Andrew Danowitz
+ * 
+ * Description:
+ * replyStall wrapper for tile.
+ * 
+ * Required Genesis Parameters (default value):Description
+ * * DATA_SIZE (32): Size of the data bus
+ * 
+ * Change bar:
+ * -----------
+ * Date          Author   Description
+ * Apr 14, 2010    danowitz Generatable wrapper version
+ *  
+ * 
+ *****************************************************************************/
+
+//; my $DATA_SIZE = $self->define_param('DATA_SIZE'=>32);
+
+module `$self->get_module_name()` ( input [`$DATA_SIZE-1`:0] data_in,
+									input valid_in,
+									input stall_in,
+									output logic [`$DATA_SIZE-1`:0] data_out
+									);
+   assign 								   data_out = data_in;
+   
+   //insert module here
+
+endmodule //

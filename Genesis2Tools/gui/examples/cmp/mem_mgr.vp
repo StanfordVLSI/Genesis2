@@ -1,0 +1,289 @@
+/*************************************************************************
+ ** From Perforce:
+ **
+ ** $Id: //Smart_design/ChipGen/TileTest/TileGenTest/mem_mgr.vp#12 $
+ ** $DateTime: 2010/07/13 15:54:11 $
+ ** $Change: 8904 $
+ ** $Author: danowitz $
+ *************************************************************************/
+
+/* *****************************************************************************
+ * File: mem_mgr.vp
+ * Author: Andrew Danowitz
+ * 
+ * Description:
+ * Genesis-based address translator
+ * 
+ * Required Genesis Controlable Parameters:
+ * * ADDR_SIZE - Determines how many bits the address is, def: 32 bits
+ * * DATA_SIZE - Determines how big the data word and mask are, def: 32 bits
+ * * META_SIZE - Determines how big the meta word and mask are, def: 5 bits
+ * * INITIAL_TYPE - Determines whether the memory is initialized to "zero" 
+ * *                (all zeroes), "x" (all x's), "val" same repeated value,
+ * *                def: 0.
+ * * INI_META - Value to initialize meta memory to if initial type is val.
+ * * INI_DATA - Value to initialize data memory to if initial type is val.
+ * * OP_SIZE - width of opcode bus
+ * * EN_SIZE - size of byte-enable mask
+ * * OP_LIST - list of operations
+ * * DATA_SIZE - Size of target mem blocks bus
+ * * META_SIZE - SIZE of meta_data
+ * 
+ * Change bar:
+ * -----------
+ * Date          Author   Description
+ * May 18, 2010  danowitz init version
+ * Jun 21, 2010  danowitz fixed signal out width issue
+ * Jun 24, 2010  danowitz revamped to handle transaction class and enable 
+ *                        signal
+ * Jun 30, 2010  danowitz finished required fixes to get this working
+ * Jun 30, 2010  danowitz removed debug $display statements
+ * Jul 2,  2010  danowitz various bug fixes
+ * Jul 3,  2010  danowitz Set nop to return 0 instead of nothing
+ * Jul 6,  2010  danowitz Set up memory to handle data and instr ops seperately
+ * Jul 12, 2010  danowitz Fixed to use new write/read Instr methods
+ * 
+ * ****************************************************************************/
+
+//; my $addr_size = $self->define_param('ADDR_SIZE'=>32);
+//; my $data_size = $self->define_param('DATA_SIZE'=>32);
+//; my $instr_size = $self->define_param('INSTR_SIZE'=>32);
+//; my $meta_size = $self->define_param('META_SIZE'=>5);
+//; my $ini_type = $self->define_param('INITIAL_TYPE'=>'zero');
+//; my $ini_meta = $self->define_param('INI_META'=>'');
+//; my $ini_data = $self->define_param('INI_DATA'=>'');
+//; my $op_size = $self->define_param('OP_SIZE'=>5);
+//; my $data_op_list = $self->define_param('DATA_OP_LIST'=>[]);
+//; my $instr_op_list = $self->define_param('INSTR_OP_LIST'=>[]);
+//; my $en_size = $self->define_param('EN_SIZE'=>3);
+//; my $num_processor = $self->define_param('NUM_PROCESSOR'=>1);
+//; my $msg_size;
+//; if ($instr_size > $data_size) {
+//;     $msg_size = $instr_size;
+//; }
+//; else {
+//;     $msg_size = $data_size;
+//; }
+//;
+//; my $cnt = 0;
+//; my %data_op_map = (); # used for mapping an op to a code
+//; foreach my $data_op (@{$data_op_list}){
+//;	$data_op_map{$data_op} = $cnt++;
+//; }
+//;
+//; $cnt = 0;
+//; my %instr_op_map = (); # used for mapping an op to a code
+//; foreach my $inst_op (@{$instr_op_list}){
+//;	$instr_op_map{$inst_op} = $cnt++;
+//; }
+class `$self->get_module_name()`;
+
+ 
+ protected mailbox memory_in;
+ protected mailbox memory_out;
+
+ protected event p2m;
+ protected event m2p;
+
+ //; my $memObj = $self->unique_inst('generic_memory', 'mem',
+ //;                     ADDR_SIZE => $addr_size,
+ //;                     DATA_SIZE => $data_size,
+ //;                     INSTR_SIZE => $instr_size,
+ //;                     META_SIZE => $meta_size,
+ //;                     INITIAL_TYPE => $ini_type,
+ //;                     INI_META => $ini_meta,
+ //;                     INI_DATA => $ini_data,
+ //;                     
+ //; );
+
+ //; my $memMod = $memObj->get_module_name();
+ //; my $mem = $memObj->get_instance_name();
+
+ protected `$memMod` `$mem`;
+ 
+ function new (mailbox memory_in, mailbox memory_out, ref event p2m, ref event m2p);
+	  this.memory_in = memory_in;
+	  this.memory_out = memory_out;
+	  this.p2m = p2m;
+	  this.m2p = m2p;
+	  
+	  `$mem` = new(0,
+                        "`$mem`",
+						 0, "`$mem`", 0);
+	 
+	  
+	  
+ endfunction; // new
+
+task mem_ini();
+	   `$mem`.UploadFile("/home/danowitz/chipgen/ChipGen/TileTest/TileGenTest/iram0.data", 32'h40000000, "@", `$instr_size/8`);
+	  `$mem`.UploadFile("/home/danowitz/chipgen/ChipGen/TileTest/TileGenTest/dram0.data", 32'h80000024, "@", `$data_size/8`);
+	  `$mem`.UploadFile("/home/danowitz/chipgen/ChipGen/TileTest/TileGenTest/abs.dat", 32'h0, "@", `$data_size/8`);
+endtask // mem_ini
+
+ task mem_access();
+	  integer sendID;
+	  string srcType;
+	  bit [`$op_size-1`:0] op;
+	  bit [`$addr_size-1`:0] addr;
+	  bit [`$msg_size-1`:0] msg;
+	  bit [`$en_size-1`:0] bEn;
+	  bit [`$msg_size-1`:0] msg_mask;
+	  bit [`$meta_size-1`:0] meta_mask;
+	  bit [`$data_size-1`:0] retData;
+      bit [`$meta_size-1`:0] metaData;
+	  bit [`$instr_size-1`:0] retInstr;
+	  bit [`$msg_size-1`:0] retMsg;
+	  
+	  
+	  //; my $mem_in_trans_obj = $self->unique_inst('transaction', 'mtrans_in',
+	  //;            'PAYLOAD' => $addr_size+$op_size+$msg_size+$en_size);
+	  //; my $mem_in_trans_mod = $mem_in_trans_obj->get_module_name();
+	  //; my $mem_in_trans = $mem_in_trans_obj->get_instance_name();
+
+	  //; my $mem_out_trans_obj = $self->unique_inst('transaction', 
+	  //; 'mtrans_out', 'PAYLOAD' => $msg_size+$meta_size);
+	  //; my $mem_out_trans_mod = $mem_out_trans_obj->get_module_name();
+	  //; my $mem_out_trans = $mem_out_trans_obj->get_instance_name();
+
+	  // define transaction objects
+	  `$mem_in_trans_mod` `$mem_in_trans`;
+	  `$mem_out_trans_mod` `$mem_out_trans`;
+
+	  //spool off into parallel threads
+	  fork
+		 //loop forever on the p2m event
+		 forever begin
+			@ (p2m)
+			  // loop until memory_in is empty
+			  while (memory_in.num() > 0 )
+				 begin
+					memory_in.get(`$mem_in_trans`);
+					
+					`$mem_in_trans`.payload(sendID, srcType, {addr, op, msg, bEn});
+					$display("mem_decode addr %h op %h data %h bEn %h", addr, op, msg, bEn);
+					if (srcType.compare("data")==0) begin
+					   case (op)
+						 //; while ((my $op, my $value)=each(%data_op_map)){
+						 `$value`: begin
+							//; if ($op =~ m/store/i){
+							
+							meta_mask = 'b0;
+						 
+							`$mem`.WriteData(addr, msg[`$data_size-1`:0], 
+											 msg_mask[`$data_size/8-1`:0], 
+											 /*FIXME*/ 'b0 , meta_mask);
+ 						 
+							`$mem_out_trans` = new(sendID, srcType, 
+												   {`$meta_size`'b0, 
+													`$msg_size`'b0});
+						 
+ 							memory_out.put(`$mem_out_trans`);
+							->m2p;
+					  
+							//; }
+							//; elsif (($op =~ m/load/i)||($op =~ m/fetch/i)) {
+
+							retData = 'b0;
+							metaData = 'b0;
+							`$mem`.ReadData(addr, retData[`$data_size-1`:0],
+											metaData[`$meta_size-1`:0]);
+							$display("data addr: %h, data: %h", addr, retData);
+
+						    `$mem_out_trans` = new(sendID, srcType, 
+												   {retData, metaData});
+						 
+ 							memory_out.put(`$mem_out_trans`);
+							->m2p;
+					  
+							//;}
+							//; else {
+						  
+							`$mem_out_trans` = new(sendID, srcType, 'b0);
+						 
+ 							memory_out.put(`$mem_out_trans`);
+							->m2p;
+							//;}
+						 end // case: `$value`
+
+						 //;}
+						 default: begin
+							retData = 'b0;
+							metaData = 'b0;
+							`$mem`.ReadData(addr, retData[`$data_size-1`:0], 
+											metaData[`$meta_size-1`:0]);
+							
+							`$mem_out_trans` = new(sendID, srcType, 
+												   {retData, metaData});
+							
+							memory_out.put(`$mem_out_trans`);
+							->m2p;
+							
+						 end
+					   endcase // case(op)
+					end // if (srcType.compare("data")==0)
+
+					else begin
+					   case (op)
+						 //; while ((my $op, my $value)=each(%instr_op_map)){
+						 `$value`: begin
+							//; if ($op =~ m/store/i){
+							meta_mask = 'b0;
+						 
+							`$mem`.WriteData(addr, msg[`$instr_size-1`:0], 
+											 msg_mask[`$instr_size/8-1`:0], 
+											 /*FIXME*/ 'b0 , meta_mask);
+ 						 
+							`$mem_out_trans` = new(sendID, srcType, {`$meta_size`'b0, `$msg_size`'b0});
+						 
+ 							memory_out.put(`$mem_out_trans`);
+							->m2p;
+					  
+							//; }
+							//; elsif (($op =~ m/load/i)||($op =~ m/fetch/i)) {
+							
+							metaData = 'b0;
+							
+							`$mem`.ReadInstr(addr, retInstr, 
+											metaData);
+							$display("addr: %h, data: %h", addr, retInstr);
+							retMsg = {`$msg_size-$instr_size`'b0, retInstr};
+							
+							`$mem_out_trans` = new(sendID, srcType, 
+												   {retMsg, metaData});
+						 
+ 							memory_out.put(`$mem_out_trans`);
+							->m2p;
+					  
+							//;}
+							//; else {
+						  
+							`$mem_out_trans` = new(sendID, srcType, 'b0);
+						 
+ 							memory_out.put(`$mem_out_trans`);
+							->m2p;
+							//;}
+						 end // case: `$value`
+
+						 //;}
+						 default: begin
+							
+							metaData = 'b0;
+							
+							`$mem`.ReadInstr(addr, retInstr, 
+											metaData[`$meta_size-1`:0]);
+							retMsg = {`$msg_size-$instr_size`'b0, retInstr};
+							
+							`$mem_out_trans` = new(sendID, srcType, {retMsg, metaData});
+							
+							memory_out.put(`$mem_out_trans`);
+							->m2p;
+							
+						 end
+					   endcase // case(op)
+					end // else: !if(srcType.compare("data")==0)
+				 end
+		 end
+		 join_none
+ endtask // mem_access
+endclass

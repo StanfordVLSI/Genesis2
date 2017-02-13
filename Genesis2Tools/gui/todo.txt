@@ -1,0 +1,6 @@
+See gui/0bugs*.txt, between "BEGIN 120423" and "END 120423".
+
+
+
+
+

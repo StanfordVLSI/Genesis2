@@ -1,0 +1,289 @@
+/*************************************************************************
+ ** From Perforce:
+ **
+ ** $Id: //Smart_design/ChipGen/TileTest/TileGenTest/pc.vp#9 $
+ ** $DateTime: 2010/07/13 15:52:59 $
+ ** $Change: 8903 $
+ ** $Author: danowitz $
+ *************************************************************************/
+
+/* *****************************************************************************
+ * File: pc.vp
+ * Author: Andrew Danowitz
+ * 
+ * Description:
+ * Genesis-based address translator
+ * 
+ * Required Genesis Controlable Parameters:
+ * * ADDR_SIZE  - Determines how many bits the address is
+ * * OP_SIZE - width of opcode bus
+ * * OP_LIST - list of operations
+ * * DATA_SIZE - Size of target mem blocks bus
+ * * META_SIZE - SIZE of meta_data
+ * * NUM_PROCS - Number of processors
+ * 
+ * Change bar:
+ * -----------
+ * Date          Author   Description
+ * May 18, 2010  danowitz init version
+ * Jun 21, 2010  danowitz minor fixes
+ * Jun 23, 2010  danowitz revamp to use new transaction class 
+ * Jun 30, 2010  danowitz finished up various fixes to allow for comm.
+ * Jun 30, 2010  danowitz removed debug $display statements
+ * Jul 13, 2010  danowitz Fixed a mailbox access bug
+ * 
+ * ****************************************************************************/
+
+//; my $ADDR_SIZE = $self->define_param('ADDR_SIZE'=>32);
+//; my $DATA_OP_SIZE = $self->define_param('DATA_OP_SIZE'=>3);
+//; my $INSTR_OP_SIZE = $self->define_param('INSTR_OP_SIZE'=>3);
+//; my $DATA_EN_SIZE = $self->define_param('DATA_EN_SIZE'=>3);
+//; my $INSTR_EN_SIZE = $self->define_param('INSTR_EN_SIZE'=>3);
+//; my $MAT_EN_SIZE = $self->define_param('MAT_EN_SIZE'=>3);
+
+//; my $OP_LIST = $self->define_param('OP_LIST'=>{'RD'=>0,'WR'=>1, 'NOP'=>2});
+//; my $DATA_SIZE = $self->define_param('DATA_SIZE'=>32);
+//; my $INSTR_SIZE = $self->define_param('INSTR_SIZE'=>32);
+//; my $NUM_PROCESSOR = $self->define_param('NUM_PROCESSOR'=>1);
+//; my $META_SIZE = $self->define_param('META_SIZE'=>32);
+//; my $RET_SIZE = $self->define_param('RET_SIZE'=>5);
+
+class `$self->get_module_name()`;
+
+protected mailbox data_pc_in;
+protected mailbox instr_pc_in;
+
+protected mailbox data_pc_out;
+protected mailbox instr_pc_out;
+
+protected mailbox memory_in;
+protected mailbox memory_out;
+
+protected event pc_in;
+protected event pc_out;
+protected event p2m;
+protected event m2p;
+
+function new(mailbox data_pc_in, mailbox instr_pc_in, mailbox data_pc_out, mailbox instr_pc_out, mailbox memory_in, mailbox memory_out, ref event pc_in, ref event pc_out, ref event p2m, ref event m2p);
+	  this.data_pc_in = data_pc_in;
+	  this.instr_pc_in = instr_pc_in;
+	  
+	  this.data_pc_out = data_pc_out;
+	  this.instr_pc_out = instr_pc_out;
+	  
+	  this.memory_in = memory_in;
+	  this.memory_out = memory_out;
+	  this.memory_in = memory_in;
+	  this.memory_out = memory_out;
+
+	  this.pc_in = pc_in;
+	  this.pc_out = pc_out;
+	  this.p2m = p2m;
+	  this.m2p = m2p;
+	  
+	  
+endfunction // new
+
+task mem_access();
+	  //; my $msg_size;
+	  //; if ($INSTR_SIZE > $DATA_SIZE) {
+	  //;    $msg_size = $INSTR_SIZE;
+	  //; }
+	  //; else {
+	  //;    $msg_size = $DATA_SIZE;
+	  //; }
+
+	  //; my $data_in_trans_obj = $self->unique_inst('transaction', 'dtrans',
+	  //;                     'PAYLOAD' => $ADDR_SIZE+$DATA_OP_SIZE+$DATA_SIZE+$DATA_EN_SIZE
+	  //; );
+	  //;
+	  //; my $data_in_trans_mod = $data_in_trans_obj->get_module_name();
+	  //; my $data_in_trans = $data_in_trans_obj->get_instance_name();
+	  //;
+	  //; my $data_out_trans_obj = $self->unique_inst('transaction', 'dtrans_out',
+	  //;                     'PAYLOAD' => $DATA_SIZE+$META_SIZE+$RET_SIZE
+	  //; );
+	  //; my $data_out_trans_mod = $data_out_trans_obj->get_module_name();
+	  //; my $data_out_trans = $data_out_trans_obj->get_instance_name();
+	  
+	  //; my $instr_in_trans_obj = $self->unique_inst('transaction', 'itrans',
+	  //;                     'PAYLOAD' => $ADDR_SIZE+$INSTR_OP_SIZE+$INSTR_SIZE+$INSTR_EN_SIZE
+	  //; );
+	  //; my $instr_in_trans_mod = $instr_in_trans_obj->get_module_name();
+	  //; my $instr_in_trans = $instr_in_trans_obj->get_instance_name();
+	  //;
+
+	  //; my $instr_out_trans_obj = $self->unique_inst('transaction', 'itrans_out',
+	  //;                     'PAYLOAD' => $INSTR_SIZE+$META_SIZE
+	  //; );
+	  //; my $instr_out_trans_mod = $instr_out_trans_obj->get_module_name();
+	  //; my $instr_out_trans = $instr_out_trans_obj->get_instance_name();
+	  //;
+	  //; my $mem_in_trans_obj = $self->unique_inst('transaction', 'mtrans_in',
+	  //;                     'PAYLOAD' => $ADDR_SIZE+$DATA_OP_SIZE+$msg_size+$MAT_EN_SIZE
+	  //; );
+	  //; my $mem_in_trans_mod = $mem_in_trans_obj->get_module_name();
+	  //; my $mem_in_trans = $mem_in_trans_obj->get_instance_name();
+	  //;
+	  //; my $mem_out_trans_obj = $self->unique_inst('transaction', 'mtrans_out',
+	  //;                     'PAYLOAD' => $msg_size+$META_SIZE
+	  //; );
+	  //; my $mem_out_trans_mod = $mem_out_trans_obj->get_module_name();
+	  //; my $mem_out_trans = $mem_out_trans_obj->get_instance_name();
+	  
+	  `$data_in_trans_mod` `$data_in_trans`;
+	  `$data_out_trans_mod` `$data_out_trans`;
+	  
+	  `$instr_in_trans_mod` `$instr_in_trans`;
+	  `$instr_out_trans_mod` `$instr_out_trans`;
+		 
+	  `$mem_in_trans_mod` `$mem_in_trans.'_d'`;
+	  `$mem_in_trans_mod` `$mem_in_trans.'_i'`;
+	  `$mem_out_trans_mod` `$mem_out_trans`;
+
+	  //Don't make the testbench stall for this
+	  fork
+		 //Want the pc to work forever
+		 forever begin		
+			//Fork out each process so to-from memory transactions don't block
+			//eachother
+			integer sendID;
+			string srcType;
+			bit [`$ADDR_SIZE-1`:0] addr;
+			bit [`$DATA_OP_SIZE-1`:0] op;
+			bit [`$DATA_SIZE-1`:0] data;
+			bit [`$DATA_EN_SIZE-1`:0] bEn;
+			bit [`$msg_size-1`:0] memDat;
+			bit [`$MAT_EN_SIZE-1`:0] membEn;
+			
+			@(pc_in);
+			fork 
+			   begin
+				  if (this.data_pc_in.try_get(`$data_in_trans`)>=1)
+					begin
+					   `$data_in_trans`.payload(sendID, srcType, {addr, op, data, bEn});
+					   
+					   //; if ($msg_size > $DATA_SIZE) {
+					   memDat = {`$msg_size-$DATA_SIZE`'b0, data};
+					   //; }
+					   //; else {
+					   memDat = data;
+					   //; }
+					   
+					   //; if ($MAT_EN_SIZE > $DATA_EN_SIZE) {
+					   membEn = {`$MAT_EN_SIZE - $DATA_EN_SIZE`'b0, bEn};
+					   //; }
+					   //; else {
+					   membEn = bEn;
+					   //; }
+					   
+					   `$mem_in_trans.'_d'` = new(sendID, srcType, {addr, op, memDat, membEn});
+   					   this.memory_in.put(`$mem_in_trans.'_d'`);
+					   ->p2m;
+					   
+					end // if (this.data_pc_in.try_get(`$data_in_trans`))
+			   end // fork begin
+			join_none
+		 end // forever begin
+		 
+		 
+		 forever begin
+
+			integer isendID;
+			string isrcType;
+			bit [`$ADDR_SIZE-1`:0] iaddr;
+			bit [`$INSTR_OP_SIZE-1`:0] iop;
+			bit [`$DATA_OP_SIZE-1`:0] imop;
+			bit [`$INSTR_SIZE-1`:0] idata;
+			bit [`$INSTR_EN_SIZE-1`:0] ibEn;
+			bit [`$msg_size-1`:0] imemDat;
+			bit [`$MAT_EN_SIZE-1`:0] imembEn;
+			integer tg;
+			
+			@(pc_in);
+			//$display("$trigged, %h", this.instr_pc_in.num());
+			
+			fork
+			   begin
+				  tg = this.instr_pc_in.try_get(`$instr_in_trans`);
+				  //$display("ret stat: %d", tg);
+				  
+				  //if (this.instr_pc_in.try_get(`$instr_in_trans`)==1) begin
+				  if (tg >= 1) begin
+					 `$instr_in_trans`.payload(isendID, isrcType, {iaddr, iop, idata, ibEn});
+					 $display("pc_out addr %h op %h data %h iBen %h", iaddr, iop, idata, ibEn);
+					 
+					 //; if ($msg_size > $INSTR_SIZE) {
+					 imemDat = {`$msg_size-$INSTR_SIZE`'b0, idata};
+					 //; }
+					 //; else {
+					 imemDat = idata;
+					 //; }
+
+					 imop = {`$DATA_OP_SIZE-$INSTR_OP_SIZE`'b0, iop};
+					 
+					 // Convert enable from a word mask to a byte mask
+					 imembEn = {
+					 //; for (my $count = 0; $count < $INSTR_EN_SIZE; $count++) {
+   					 //;     for (my $index = 0; $index < 4; $index++) {
+	 				            ibEn[`$count`]
+			         //;     if ($index <3 || $count < $INSTR_EN_SIZE-1) {
+						        ,
+		 			 //;     }
+			         //;     }
+			         //; }
+				 	      };
+
+					 `$mem_in_trans.'_i'` = new(isendID, isrcType, {iaddr, imop, imemDat, imembEn});
+					 
+   					 this.memory_in.put(`$mem_in_trans.'_i'`);
+					 ->p2m;
+				  end // if (this.instr_pc_in.try_get(`$instr_in_trans`))
+			   end // fork begin
+			join_none
+		 end // forever begin
+		 
+		 
+		 forever begin
+			integer msendID;
+			string msrcType;
+			bit [`$msg_size-1`:0] omemMSG;
+			bit [`$META_SIZE-1`:0] omemRet;
+			bit [`$DATA_SIZE-1`:0] omemData;
+			bit [`$INSTR_SIZE-1`:0] omemInstr;
+			
+
+			@(m2p);
+			while(memory_out.num() != 0)
+			   begin
+ 				  if (memory_out.try_get(`$mem_out_trans`)>0) begin
+					 
+					 `$mem_out_trans`.payload(msendID, msrcType, {omemMSG, omemRet});
+					 omemData = omemMSG[`$DATA_SIZE-1`:0];
+					 omemInstr = omemMSG[`$INSTR_SIZE-1`:0];
+					 $display("rec'd %h %h", omemMSG, omemInstr);
+					 
+					 if (msrcType.compare("data")==0) begin
+						`$data_out_trans` = new(msendID, msrcType, {omemData, `$META_SIZE`'b0});
+						this.data_pc_out.put(`$data_out_trans`);
+						->pc_out;
+				  
+					 end
+					 else begin
+
+						`$instr_out_trans` = new(msendID, msrcType, {omemInstr, omemRet});
+						$display("put out %h", {omemInstr, omemRet});
+						
+						this.instr_pc_out.put(`$instr_out_trans`);
+						
+						->pc_out;
+						
+					 end
+				  end // if (this.memory_out.try_get(`$mem_out_trans`)==1)
+			   end // fork begin
+		 end
+	  join_none
+			  
+endtask // mem_access
+
+endclass

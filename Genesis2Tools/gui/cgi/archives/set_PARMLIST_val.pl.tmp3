@@ -1,0 +1,54 @@
+my %PARMLIST;
+
+test_set_PARMLIST_val();
+
+sub test_set_PARMLIST_val {
+    my $DBG = 1;
+    set_PARMLIST_val("a.b.c", "abc", \%PARMLIST, $DBG );
+    set_PARMLIST_val("a.b.e", "abe", \%PARMLIST, $DBG );
+    set_PARMLIST_val("d",     "17d", \%PARMLIST, $DBG );
+    print "\n";
+
+    print "PARMLIST{a}{b}{c} = \"$PARMLIST{a}{b}{c}\"\n";
+    print "PARMLIST{a}{b}{e} = \"$PARMLIST{a}{b}{e}\"\n";
+    print "PARMLIST{d}.....  = \"$PARMLIST{d}\"\n";
+    print "\n";
+    print "PARMLIST{a}{b}..  = \"$PARMLIST{a}{b}\"\n";
+    print "PARMLIST{a}{c}..  = \"$PARMLIST{a}{c}\"\n";
+    print "\n";
+}
+
+sub set_PARMLIST_val {
+    my $field = shift(@_);    # E.g. "a.b.c"
+    my $value = shift(@_);    # E.g. "17"
+    my $plr   = shift(@_);    # Reference to hash %PARMLIST
+    my $DBG   = shift(@_);
+
+    #################################################################
+    # E.g. if $field = "a.b.c"
+    #         $value = "17"
+    #         $plr = \%PARMLIST
+    # then set $PARMLIST{a}{b}{c} = 17
+
+    my @parmpath = split(/\./ , $field);  # "a.b.c" => ("a","b","c")
+
+    if ($DBG) {
+	print "# spv(".($#parmpath+1)."): ";
+	print "PARMLIST";
+	for (my $i = 0; $i <= $#parmpath; $i++) { print "{$parmpath[$i]}"; }
+	print " = \"$value\"\n";
+    }
+
+    while (my $key = shift(@parmpath)) {    # print "$#parmpath: key=$key\n";
+
+	if ($#parmpath < 0) { %{$plr}->{$key} = $value; return;	}
+
+	elsif (defined %{$plr}->{$key}) {}  # print "already have a hash for {$key}\n";
+
+	else {
+	    my %hashtmp;                    # print "must create a new hash for {$key}\n";
+	    %{$plr}->{$key} = \%hashtmp;
+	}
+	$plr = $plr->{$key};                # print "plr = $plr\n\n";
+    }
+}

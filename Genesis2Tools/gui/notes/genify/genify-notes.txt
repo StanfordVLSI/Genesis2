@@ -1,0 +1,21 @@
+#   //; $flop_inst =  $self->unique_inst('flop','Stall_flop',
+#   //;                                      'FLOP_WIDTH' => 1,
+#   //;                                      'FLOP_TYPE' => 'rflop',
+#    //;                                     'FLOP_DEFAULT' =>  0);
+#   `$flop_inst->get_module_name()`  `$flop_inst->get_instance_name()`
+#     (.Clk(Clk),  .Reset(Reset), .Enable(/*not used*/),
+#       .data_in(Stall),           .data_out(procStall));
+#
+# ...which to me would look rather daunting if I  were a Verilog
+# designer being asked to write or understand Genesis.  But  maybe
+# what if instead it could look like this:
+#
+# //; $flop_inst =  genify('
+# //;     flop #(
+# //;             .FLOP_WIDTH(1),
+# //;             .FLOP_TYPE("rflop"),
+# //;             .FLOP_DEFAULT(0)
+# //;     )
+# //;      Stall_flop(.Clk(Clk), .Reset(Reset), .Enable(/*not used*/),
+# //;                 .data_in(Stall),           .data_out(procStall));
+# //; ');

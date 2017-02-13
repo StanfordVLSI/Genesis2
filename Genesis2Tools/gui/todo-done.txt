@@ -1,0 +1,341 @@
+OLD/DONE: see todo-done.txt
+
+
+New regime crashes on FloatingPointGen??
+
+1. Security holes (mounting /cad on vlsiweb)
+
+SUBPARMS = &SPECIAL_DATA_MEM_OPS.0=%.deleteme&SPECIAL_DATA_MEM_OPS.30=%.deleteme
+
+querystring = "newdesign=cmpdemo
+&curdesign=..%2Fdesigns%2Ftgt0%2Fcmpdemo-111008-074714.js
+&modpath=top.DUT.p0
+&DBG=1
+&TIE_OPCODE_WIDTH=6
+&INSTRUCTION_BUS_WIDTH=64
+&USE_SHIM=off
+&DATA_BUS_WIDTH=32
+&USE_XT=SIM4Xtensa
+&SPECIAL_DATA_MEM_OPS.0=%.deleteme
+&SPECIAL_DATA_MEM_OPS.30=%.deleteme"
+
+
+This one seems to have gone away...(10/17/2011)...?
+Floatingpointgen
+=> inside testbench=>any transaction (e.g. TransGenA)
+=> change blank parm "NamedTransCtrl" to "A" and Submit
+=> "A" disappears
+
+I think this one is not presently in my court: see ~/gui-megan-bug-notes.txt
+
+htpasswd removal (DONE): see ~/gui-security-notes.txt
+
+is there a good way to make updatedesigndirs work with symbolic links instead of copying...?
+problem is 1) need to overwrite file occasionally (BAD REASON) and 
+2) need to touch the xml file for makefile to work correctly (another bad reason)
+
+add/subtract array items:
+  - see e.g. megan_tile:top.DUT.PC2XBAR_REQ_SIGNALS
+  - add minus and plus circles to left of each array item
+    - minus deletes the item; plus clones it
+
+misc
+  - figure out how to publish
+  - DONE? find and remove thing that creates "tmpdbg"
+  - DONE? scrub and checkin changes
+  - DONE? reconstruct tgt0-baseline.xml, see if parm order improves
+  - add DBG option to choosedesign, opendesign settable from index.htm
+  - add snazzy logo to splash page / find a tree logo for index_stanford (DONE 10/2011)
+
+SECURITY!
+- Create a tab-separated list "designs/design_list.txt" of design directories.
+- On startup, make a dir "designs/design_name" for each directory in list.
+  You know where.
+- Make sure each has a SysCfgs subdirectory?
+- designs/updatedesign.csh consults with "design_list.txt"
+  to see where to find each new design.
+
+misc
+  - look at making "cancel" and "submit" buttons look like buttons
+  - preserve parm order after submit!??
+
+===================================================================================================
+1/9/2012 I'm calling this FIXED until I hear otherwise...?
+
+Notes from sometime around 12/2011:
+
+1. configs_stanford is wrong.
+2. editdesigns nonetheless uses genesis/configs/something_else??
+
+In vlsiweb:/var/www/homepage/genesis/, 
+CONFIG.TXT points to 
+
+In /var/www/homepage/genesis/configs/CONFIG_stanford.txt,
+DESIGN_LIST points to
+   /home/steveri/gui/configs/design_list_stanford.txt (WRONG)
+
+updatedesigndirs appears to be using design list in genesis/configs (why??)
+
+editdesigns appear to be using design list in steveri/configs
+
+steveri/configs: FPdemo is commented out
+genesis/configs: FPdemo NOT commented out
+
+genesis splash page (updatedesigndirs) shows FPdemo, must be using steveri/configs (check)
+genesis editdesigns.pl shows NO FPdemo, must be using genesis/configs (why?)
+===================================================================================================
+
+  - maybe address the missing "add/sub" buttons? DONE 4/2012
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[os 5/3] Two small issues I ran into:
+
+DONE 5/2012 * I tried to remove some old designs from the design list and add a
+DONE 5/2012   new one instead. One got removed. one got added. one can not be
+DONE 5/2012   removed (that's the DAC one).
+DONE 5/2012   > DAC seems to be gone, did you remove it by hand?
+DONE 5/2012   > I'm looking at http://vlsiweb/genesis
+
+DONE 5/2012 * When choosing an empty xml, it used to detect that and do an initial
+DONE 5/2012   build. It does not anymore. Can you put that back in?
+
+
+[os 5/4] Some issues I found:
+
+DONE 5/2012 * When I have a compound structure (list of hash) and I try to change
+DONE 5/2012   a leaf element value in the hash, I cannot click submit. The button
+DONE 5/2012   does not do anything.
+DONE 5/2012   > Again, I guess I need an example of what went wrong.  It worked
+DONE 5/2012   > for me when I changed parameter "top.DUT.p0.SPECIAL_DATA_MEM_OPS[0].tiecode"
+DONE 5/2012   > using http://vlsiweb/genesis on design CMP/cmp-baseline...
+
+DONE 5/2012 * When I click the "click here to download current design" I only get
+DONE 5/2012   the xml etc. But not the verilog files.
+DONE 5/2012   >SR reply: Can you give me more context/example for this?
+DONE 5/2012   >When I try it I see all the verilog files...?
+DONE 5/2012   >I tried it on both "FPGEN" and "tile_official"
+DONE 5/2012   >using http://vlsiweb/genesis...?
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+DONE 4/2012   - extensive testing of latest examples/cmp Makefile DONE 4/2012
+DONE 4/2012   - check cmp in to perforce DONE 4/2012
+DONE 4/2012   - deprecate tgt0 example (in favor of "cmp") DONE 5/2012
+DONE 4/2012     - send a note to ofer first! DONE 4/2012
+
+DONE 5/2012 First visit to an empty design should do a "make gen", yes?
+DONE 5/2012   - See opendesign.pl line 179 "my $tmpfile = build_new_php(..."
+
+DONE 5/2012   - friendlier/shorter "stewie list" output
+
+Fixed:
+  bug: should complain about pre-existing /tmp/stewie$$
+  fix: "i don't see /tmp/stewie$$; shall i try to create it for you (y or n)? "
+       n => "okay bye"
+  also: if dir exists, should warn:
+       "new clone will overwrite any old files that may exist in /tmp/stewie$$; is that okay (y or n)? "
+       n => "okay bye"
+
+  bug: should fail because no /tmp/stewie$$/scratch
+  fix: wrapper "clone" option should build scratch dir (if necessary);
+       "start" option should verify scratch dir and build if necessary
+
+  bug: should fail because missing setup.cshrc
+  fix: if not exists: "cannot find valid /tmp/stewie$$/configs/setup.cshrc for your site;
+                       please find or build one; for prototype see /tmp/stewie$$/configs/setup_stanford.cshrc"
+       if exists: "found /tmp/stewie$$/configs/setup.cshrc: <list contents>"
+                  "does this look correct for your site (y or n)? "
+                  n => "Please install a valid /tmp/stewie$$/configs/setup.cshrc and try again.  Bye!"
+
+  bug: should complain about "." problems
+  fix1: add "." to stewie.pl  NAH!
+  fix2: add "." to stewie wrapper NAH!
+  fix3: add "./" to mini-server YES!
+==============================================================================
+==============================================================================
+This should work:
+  ssh neva
+  unset path
+  ~/gui/bin/stewie clone /tmp/stewie$$
+
+
+==============================================================================
+New procedure will look like this:
+
+% $CHIPGEN/gui/bin/stewie clone $CHIPGEN/gui /tmp/mystewie
+% cd /tmp/mystewie/configs; ln -s setup_stanford.cshrc setup.csrhc
+% cp $CHIPGEN/gui/configs/design_list_stanford.txt /tmp/mystewie/configs
+% stewie start /tmp/mystewie
+
+Try this:
+  ssh neva
+  unset path
+  $CHIPGEN/gui/bin/stewie 
+
+WHEN WE COME BACK
+  - stewie.pl should call "./$exe" and not "$exe"
+  - megan's stewie didn't make a scratch directory!?
+  - megan's stewie had no setup.cshrc file
+  - (megan used the "clone" install I think)
+  - something with /tmp/stewie_msgs or something.
+  - design-list issues (see below)
+  - horrible bug in editdesigns.pl:make_backup_file(): hardwired /var/www...
+  - others (see mail)
+
+==============================================================================
+(The fix will be in gui/bin/stewie.pl:  Instead of
+
+         if ($path =~ /\/?cgi\/(.*)/) { # E.g. "cgi/opendesign.pl"
+             my $exe = $1;
+             print "HTTP/1.0 200 OK\r\n";
+             print `cd cgi; $exe`;  # Execute the perl file
+
+the last line will say:
+
+             print `cd cgi; ./$exe`;  # Execute the perl file
+)
+==============================================================================
+
+DONE ========================================================================
+DONE > 2. In cgi/editdesigns.pl there are two small bugs:
+DONE > "File cannot be copied. at ./editdesigns.pl line 389." -- It tries to
+DONE > backup old files, but since one does not exists it dies.
+DONE 
+DONE Oh man that is some horrible code.  It tries to back up to
+DONE "/var/www/homepage/..." which of course is only going to work on
+DONE vlsiweb.  Yes, please, keep this commented out until I get back.
+DONE 
+DONE And yes, the "return" should also be commented out.  Horrible,
+DONE horrible code!  We should fire that guy.  :o
+DONE 
+DONE ========================================================================
+
+Wednesday, March 7, 2012 3:40 PM
+From: "Ofer Shacham" <shacham@alumni.stanford.edu>
+To: "Steve Richardson" <steveri@stanford.edu>
+Hi Steve,
+
+I'm installing Luie...
+
+1. The issue with copy design list to backup or die almost killed me
+again, but I knew about it so I commented it out. It is the almost
+last line of editdesigns.pl.
+
+2. I noticed that when I add a new design to the webform, and click an
+extra submit, it also copies the new design to the delete list.
+
+3. It would be nice if Luie, when looking for a design in the design
+list but not finding it, will give some friendly message. It is not
+its fault that some drive was not mounted on the VM but it would have
+saved debug time.
+
+(4. we ned to replace the tgt0_example with one that does not require
+SMASH or any stanford related setup)
+
+Other than that, I am just a few permission and definition issues from
+crowning Luie the third (1:Stanford, 2:CMU, 3:Google??)
+
+Long live the king!
+Ofer.
+
+========================================================================
+Hi Steve
+
+I was able to get it to partially run but not completely.
+
+1. It must have /. as part of the path before the gui is launched. It
+is not enough to add it to the config/setup.cshrc
+
+2. In cgi/editdesigns.pl there are two small bugs:
+
+"File cannot be copied. at ./editdesigns.pl line 389." -- It tries to
+backup old files, but since one does not exists it dies. Once
+commented things work better.
+
+"Can't return outside a subroutine at ./editdesigns.pl line 34." --
+you have a random "return;" statement there. I think it should be
+commented out.
+
+3. All stewies are writing the same msg file:
+
+"sh: /tmp/stewie_msgs.txt: Permission denied" -- Maybe it is better if
+they write to a file where the gui was started from? or with the port#
+as part of the file name?
+
+4. Once 1 and 2 or bypassed, the gui comes up. I can choose a design
+and brows it, but unfortunately when I make a change and click submit
+it breaks. I have not figured out why. It seems to know how to
+generate a design since when I start with empty.xml it generates
+everything and I can see the hierarchy. But if I then change a param
+and submit, I get a page that does not show any design.
+
+5. Is it possible that Stewie is the memory leak? we had no problem
+with neva-2 until we started playing with it. and no problem with neva
+until we started puting stewie to work on it. Circumstantial deviance
+only...
+
+Ofer.
+==============================================================================
+Tuesday, March 6, 2012 9:32 PM
+From: "Ofer Shacham" <shacham@alumni.stanford.edu>
+To: "Steve Richardson" <steveri@stanford.edu>
+Hi Steve,
+
+I decided to do a model of installing stewie. I tried it on neva at /tmp/stewie/ and things worked nicely initially, but I can't get it to fully work. It's on neva:8080 but once I click on choose your own design, things break. Here is what I did and what I see in the shell when I try to connect using either firefox on neva, neva-2 or chrome on my machine.
+
+neva:/tmp/stewie/gui>./bin/stewie start
+WARNING: Deleting existing index.htm
+WARNING: Deleting existing CONFIG.TXT
+
+Building new index.htm with http://neva.stanford.edu:8080 and /tmp/stewie/gui...
+Building new CONFIG.TXT with http://neva.stanford.edu:8080 and /tmp/stewie/gui...
+./bin/stewie.pl gui="/tmp/stewie/gui" port=8080
+
+Using gui at location ""/tmp/stewie/gui""
+
+Will attempt to bind to port 8080
+To stop server:
+  kill 25544
+
+I will attempt to launch firefox for you because you're so lazy.
+If there are problems, look for errors in "/tmp/stewie-ff.25543.log"
+
+MyWebServer: You can connect to your server at http://localhost:8080/
+neva:/tmp/stewie/gui>sh: choosedesign.pl: command not found
+sh: choosedesign.pl: command not found
+sh: choosedesign.pl: command not found
+sh: choosedesign.pl: command not found
+sh: choosedesign.pl: command not found
+
+==============================================================================
+ > 1. The issue with copy design list to backup or
+ > die almost killed me again, but I knew about it
+ > so I commented it out. It is the almost last line
+ > of editdesigns.pl.
+==============================================================================
+ > 2. I noticed that when I add a new design to the webform, and click an
+ > extra submit, it also copies the new design to the delete list.
+ > 3. It would be nice if Luie, when looking for a design
+ > in the design list but not finding it, will give some
+ > friendly message. It is not its fault
+ > that some drive was not mounted on the VM
+ > but it would have saved debug time.
+==============================================================================
+2. In cgi/editdesigns.pl there are two small bugs:
+"File cannot be copied. at ./editdesigns.pl line 389." -- It tries to
+backup old files, but since one does not exists it dies. Once commented
+things work better.
+"Can't return outside a subroutine at ./editdesigns.pl line 34." -- you
+have a random "return;" statement there. I think it should be commented out.
+==============================================================================
+3. All stewies are writing the same msg file:
+"sh: /tmp/stewie_msgs.txt: Permission denied" -- Maybe it is better if they
+write to a file where the gui was started from? or with the port# as part
+of the file name?
+==============================================================================
+
+  - gui should be part of larger release at /cad/genesis2
+  - "choose your design" doesn't seem to work for miniserver from paint...
+
+==============================================================================
+DONE 6/2012 (5/2012) Scrub design_list_stanford and get rid of old/crappy designs...
+

@@ -1,0 +1,31 @@
+DECODER (move to 0notes-decoder.txt?)
+Consider:
+  - "decode.py -1" runs and prints pass 1;
+    "decode.py -2" runs passes 1 and 2 and prints pass 2; etc.
+  - OR IS IT BETTER just to use "sed -n 'PASS1','PASS2'p
+  - pipeline the separate passes as separate programs---does it go faster?
+
+  - Stop commenting-out processed xml between passes!?? (?)
+
+===========================================================================
+Added 1/2012:
+
+xml-decode
+  -- clean up debugged output
+  -- turn off debugging
+  -- compare to samples/wallace.js
+
+  - future decode: turn off comment-out for intermediate passes?
+  -- each pass is separate "include" file?  How do "include" files work?
+  -- MORE DEFS each def should be one page or less; no indent  > one or two?
+
+===========================================================================
+see ~/gui/xml-tools/xml-cat.pl
+see ~/xml-decoder-bug/(mydesign-111129-140028.xml)
+
+  - clean up xml-tools; propose a home for them?
+
+========================================================================
+see ~/gui/xml-tools/xml-cat.pl
+see ~/xml-decoder-bug/(mydesign-111129-140028.xml)
+

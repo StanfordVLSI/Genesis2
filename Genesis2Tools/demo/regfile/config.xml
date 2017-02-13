@@ -1,0 +1,9 @@
+<HierarchyTop>
+  <!-- This is an empty xml configuration file. Populate it as you please -->
+  <BaseModuleName>top</BaseModuleName>
+  <ImmutableParameters></ImmutableParameters>
+  <InstanceName>top</InstanceName>
+  <Parameters></Parameters>
+  <SubInstances></SubInstances>
+  <UniqueModuleName>top</UniqueModuleName>
+</HierarchyTop>

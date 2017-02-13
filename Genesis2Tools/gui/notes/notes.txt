@@ -1,0 +1,8 @@
+The gray box below represents a chip designed using Genesis2.  At the
+top level, there are four blocks representing the test environment for
+the chip: DUT (the chip itself), tb (simulation/verification testbench
+for the chip) and two interfaces for connecting the chip to the
+testbench (dut2tst_cfg_ifc and tst2dut_cfg_ifc).  If you click on DUT
+you'll see that this chip is a processor with a CPU (p0), plus one or
+more memory
+

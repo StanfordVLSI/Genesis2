@@ -1,0 +1,56 @@
+/*************************************************************************
+ ** From Perforce:
+ **
+ ** $Id: //Smart_design/ChipGen/rtl/replyHandler.vp#9 $
+ ** $DateTime: 2010/07/02 21:48:05 $
+ ** $Change: 8878 $
+ ** $Author: danowitz $
+ *************************************************************************/
+/* *****************************************************************************
+ * File: tile.vp
+ * 
+ * Description:
+ * This is the top level of the reply handler. It is currently just an empty
+ * shell for the purposes of generation
+ * 
+ * Required Genesis Parameters (default value):Description
+ * * ADDR_SIZE (32): Physical address size for the tile
+ * * OP_SIZE (3): Size of the memory op
+ * * DATA_SIZE (32): Memory word size
+ * * META_SIZE (32): Memory meta-data size
+ * 
+ * 
+ * Change bar:
+ * -----------
+ * Date          Author   Description
+ * ***           danowitz init version
+ * Jun 22        danowitz added byte/word enables and module documentation
+ * Jun 22        danowitz fixed enable signal sizes 
+ * Jun 28        danowitz wired ports to always go to system memory
+ * 
+ * ****************************************************************************/
+//; my $ADDR_SIZE = $self->define_param('ADDR_SIZE' => 32);
+//; my $OP_SIZE = $self->define_param('OP_SIZE' => 3);
+//; my $DATA_SIZE = $self->define_param('DATA_SIZE' => 32);
+//; my $META_SIZE = $self->define_param('META_SIZE' => 32);
+//; my $EN_SIZE = $self->define_param('EN_SIZE'=>1);
+
+module `$self->get_module_name()` (input [`$DATA_SIZE-1`:0] data_in,
+								   input [`$OP_SIZE-1`:0] op_in,
+								   input [`$EN_SIZE-1`:0] en_in,
+								   input [`$ADDR_SIZE-1`:0] addr_in,
+								   input [`$DATA_SIZE-1`:0] return_data_in,
+								   input [`$META_SIZE-1`:0] meta_in,
+								   input [`$DATA_SIZE+$META_SIZE-1`:0] pc2tie_rep,
+								   output logic [`$DATA_SIZE-1`:0] return_data_out,
+								   output logic stall_out,
+								   output logic [`$OP_SIZE+$EN_SIZE+$ADDR_SIZE+$DATA_SIZE-1`:0] tie2pc_req
+								   );
+
+   //put module here
+   assign 								  tie2pc_req = {addr_in, op_in, data_in, en_in};
+   assign 								  return_data_out = pc2tie_rep[`$DATA_SIZE+$META_SIZE-1`:`$META_SIZE`];
+   
+   //$display("what rh_got %h", return_data_out);
+   
+endmodule //

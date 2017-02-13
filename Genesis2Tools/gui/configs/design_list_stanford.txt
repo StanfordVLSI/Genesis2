@@ -1,0 +1,31 @@
+# Stick to the example formats of existing entries and you probably won't have trouble.
+# Rules for the list are designed to be obvious by example, but here they are anyway:
+#
+# Any line that begins with a "#" is a comment.
+# Blank lines are ignored.
+# All other lines are design-name/design-dir pairs in the following format:
+#
+# design-name<whitespace>designdir-path
+#
+# Note: It's good if the given "designdir-path" name is valid on both the
+# server host ("vlsiweb" for stanford) and the development host ("neva-2").
+# Also, probably shouldn't use special chars (like "~") in the pathname.
+
+
+#######################################################################################################
+# SR designs
+CMP                          /home/steveri/smart_memories/Smart_design/ChipGen/bin/Genesis2Tools/gui/examples/cmp
+FFTGenerator                 /home/steveri/fftgen
+
+#######################################################################################################
+# OS designs
+FloatingPointGen	      /home/shacham/projects/smart_memories/design/ChipGen/FP-Gen
+
+#######################################################################################################
+# MW designs
+tile_megan                     /home/wachs/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest
+
+
+#######################################################################################################
+# AD designs
+tile_official                 /home/danowitz/chipgen/ChipGen/TileTest/TileGenTest

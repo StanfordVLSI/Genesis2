@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+  <head>
+    <title>Genesis Home - SR dev</title>
+
+    <base href="http://www-vlsi.stanford.edu/cgi-bin/genesis_dev_sr/" />
+
+    <STYLE>
+      .module { border: 8px solid #990000;
+                border-spacing: 4; background-color: #e7d19a;
+                width: 324; height: 460;
+      }
+      .secret_button { font-size:0.5em; display:inline }
+    </style>
+
+  <script type="text/javascript"><!--
+    var cookie_vars = new Array();
+    cookie_vars['COMMENTS'] = true; // On by default, for Ofer.
+    cookie_vars['DEBUG']    = false;
+
+    function toggle_cookie(varname,abbrev) {
+      //var DBG = cookie_vars['DEBUG'];
+      //alert(varname);
+      //var cv = cookie_vars[varname];
+        cookie_vars[varname] = (!cookie_vars[varname]);      // Toggle.
+
+        var state = cookie_vars[varname] ? "ON"    : "OFF";
+        alert(varname + " now " + state);
+        setCookie(varname, state, 7); // Set varname to "ON" or "OFF" for max seven days.
+
+        var color = cookie_vars[varname] ? "black" : "gray";
+        document.getElementById("toggle_cookie_"+varname).style.color = color;
+
+
+
+
+//      if (cookie_vars[varname]) {
+//      //cookie_vars[varname] = true;
+//        alert(varname + " now ON");
+//        document.getElementById("toggle_cookie_"+varname).style.color = "black";
+//        setCookie(varname, "ON", 7);
+//      } else {
+//      //cookie_vars[varname] = false;
+//        alert(varname + " now OFF");
+//        document.getElementById("toggle_cookie_"+varname).style.color = "gray";
+//        setCookie(varname, "OFF", 7);
+//      }
+    }
+    function setCookie(name,value,exdays) {
+      var exdate=new Date();
+      exdate.setDate(exdate.getDate() + exdays);
+      var c_value = escape(value) + "; expires=" + exdate.toUTCString();
+      document.cookie = name + "=" + c_value;
+    }
+    for (var i in cookie_vars) { setCookie(i,cookie_vars[i] ? "ON" : "OFF", 7); }
+
+    //--></script>
+
+
+
+  </head>
+
+  <body>
+
+    <table class=module>
+	<tr>
+	  <td style='vertical-align:top; text-align:center'>
+	    <h2>
+               Welcome to the<br>Interactive Chip Generator<br>
+	       <small><i>powered by Genesis</i></small>
+            </h2>
+
+	    <hr>
+	    <h3>
+	      <a href = 'opendesign.pl?newdesign=cmpdemo&file=../designs/tgt0/tgt0-baseline.xml'>
+		  Demo: (Real-ish) CMP generator
+              </a>
+	    </h3>
+
+	    <hr>
+	    <h3>
+	      <a href = 'opendesign.pl?newdesign=socdemo&file=../designs/demo/top.xml'>
+		  Demo: (Toy-ish) SoC generator
+              </a>
+	    </h3>
+
+	    <hr>
+	    <h3>
+	    <a href = "choosedesign.pl">
+		  Click here to do real work</a>
+	    </h3>
+	    <hr>
+	    <br>
+	    <br>
+	    <br>
+	    <br>
+	    <h3>(Snazzy logo goes here)</h3>
+            <div style="text-align:right">
+              <div class=secret_button style="color:black"
+                   id=toggle_cookie_COMMENTS onclick='toggle_cookie("COMMENTS","c")'>c
+              </div>
+              <div class=secret_button style="color:gray"
+                   id=toggle_cookie_DEBUG onclick='toggle_cookie("DEBUG","d")'>d
+              </div>
+            </div>
+	  </td>
+	</tr>
+    </table>
+  </body>
+</html>
+
+
+<!--            <center><small><div id=toggle_comments onclick='alert("You clicked c!")'>
+              <s>c</s>
+-->

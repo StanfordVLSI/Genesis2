@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<!-- DO NOT MODIFY INDEX.HTM! -->
+<!-- It is a symbolic link. Instead modify e.g. configs/index_stanford.htm -->
+
+<html>
+  <head>
+    <title>Genesis Home - SR dev</title>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    <link rel="shortcut icon" href="favicon.ico">
+    <script type="text/javascript" src="secret_buttons.js"></script>
+    <base href="http://www-vlsi.stanford.edu/cgi-bin/genesis_dev_sr/">
+    <style type="text/css">
+      .module { border: 8px solid #990000; width: 320px; height: 440px;
+                border-spacing: 4px; background-color: #e7d19a; }
+      .secret_button { font-size:0.5em; display:inline }
+    </style>
+
+  </head>
+  <!--==================================================================-->
+  <body>
+    <table class=module>
+	<tr>
+	  <td style='vertical-align:top; text-align:center'>
+	    <h2>
+               Welcome to the<br>Interactive Chip Generator<br>
+	       <small><i>powered by Genesis</i></small>
+            </h2>
+
+	    <hr><!--==================================================================-->
+	    <h3>
+	      <a href = 'opendesign.pl?newdesign=cmpdemo&amp;file=../designs/CMP/cmp-baseline.xml'>
+		  Demo: CMP generator
+              </a>
+	    </h3>
+
+	    <hr><!--==================================================================-->
+	    <h3>
+	      <a id=choosedesign href="choosedesign.pl">Click here to do real work</a>
+	    </h3>
+	    <hr><!--==================================================================-->
+
+            <!-- Secret buttons.  Shhhh!!! -->
+            <div style="text-align:left">
+              <div class=secret_button style="color:black"
+                   title='secret button: disable new-array mode'
+                   id=toggle_cookie_NEW_ARRAY_MODE onclick='toggle_cookie("NEW_ARRAY_MODE","a")'>a
+              </div>
+              <div class=secret_button style="color:black"
+                   title='secret button: turn off comments'
+                   id=toggle_cookie_COMMENTS  onclick='toggle_cookie("COMMENTS", "c")'>c
+              </div>
+              <div class=secret_button style="color:gray"
+                   title='secret button: turn on debugging'
+                   id=toggle_cookie_DEBUG     onclick='toggle_cookie("DEBUG",    "d")'>d
+              </div>
+              <div class=secret_button style="color:black"
+                   title='secret button: about'>
+                <a href="about.pl">?</a>
+              </div>
+            </div>
+
+	    <!-- h3>(Snazzy logo goes here)</h3 -->
+            <center><img src="../../genesis_dev_sr/images/stanford_seal.gif" alt="tree"></center>
+
+            <!-- HTML compliance -->
+            <div style="text-align:right">
+              <a href="http://validator.w3.org/check?uri=referer">
+                  <img src="http://www.w3.org/Icons/valid-html401"
+                       alt="Valid HTML 4.01 Transitional" height=12>
+                  <!-- width=44 -->
+                  <!-- height="31" width="88" -->
+              </a>
+            </div>
+	  </td>
+	</tr>
+    </table>
+  </body>
+  <!--==================================================================-->
+</html>

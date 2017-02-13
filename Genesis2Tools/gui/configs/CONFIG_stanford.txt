@@ -1,0 +1,14 @@
+# one two three testing the comments
+
+SERVER_URL      http://www-vlsi.stanford.edu
+
+CGI_DIR         /usr/lib/cgi_bin/genesis     # Where the cgi files live on the server
+CGI_URL         /cgi-bin/genesis             # How to access cgi files from the web
+
+GUI_HOME_DIR    /var/www/homepage/genesis
+GUI_HOME_URL    /genesis
+
+#DESIGN_LIST     /home/steveri/gui/configs/design_list_stanford.txt
+DESIGN_LIST     /var/www/homepage/genesis/configs/design_list_stanford.txt
+
+#END#

@@ -1,0 +1,454 @@
+#! /bin/bash
+# No #! directive means /bin/sh...right???
+
+#  stewie setup . 
+#    - (assumes running from unpacked tarball)
+#    - link CONFIG.TXT => configs/CONFIG_stewie.txt
+#    - link index.htm => configs/index_stewie.htm
+#  stewie clone /tmp/foo
+#    - same as "setup" except builds a new installation in indicated directory
+#  stewie kill
+#    - finds and kills running stewie server(s)
+#  stewie start <portno>
+#    - starts a new stewie server on port "portno" (default=first available)
+#  stewie restart <portno>
+#    - kill existing server and restart
+
+stewie_help () {
+  cmd=`basename $0`
+  cmd=${0##*/}
+
+  echo "Usage:"
+  echo
+  echo "  $cmd clone <olddir> <newdir> # clone existing installation olddir and put it in newdir"
+  echo "  $cmd setup <dir> <port>      # ready the stewie install at <dir>, port <port>"
+  echo "  $cmd start <dir> [port]      # start stewie for <dir> using indicated port (default = next avail)"
+  echo "  $cmd list                    # Find and list running stewie servers"
+  echo "  $cmd kill                    # kill existing stewie server(s)"
+  echo "  $cmd restart [dir] [port]    # kill and then restart (see above)"
+  echo
+
+  mydir=${0%/*}/
+  test $mydir = "$0/" && mydir=./
+  guidir=`cd $mydir/..;pwd`;
+
+  echo "Examples:"
+  echo "  $cmd clone $guidir ."
+  echo "  $cmd start ."
+  echo
+}
+
+stewie_setup() {
+
+    # Given e.g. dir=/tmp/stewie and port=8080, build index.htm and CONFIG.TXT etc.
+
+    # E.g. "stewie_setup setup /tmp/stewie 8080"
+    if `test \( $# -ne 2 \)`; then stewie_help; exit; fi
+    dir=$1; port=$2;
+
+    cd $dir
+
+    f=index.htm
+    if `test -e $f`; then echo "WARNING: Deleting existing $f"; rm $f; fi
+
+    f=CONFIG.TXT
+    if `test -e $f`; then echo "WARNING: Deleting existing $f"; rm $f; fi
+
+    URL="http://"`hostname`":"$port   # E.g. "http://neva-2.stanford.edu:8080"
+    echo
+
+    index=configs/index_stewie.htm;
+    echo "Building new index.htm with $URL and $dir ..."
+    if `test \! -e $index`; then
+        echo; echo "ERROR Cannot find $dir/$index."; stewie_help; exit;
+    fi
+    cat $index\
+        | sed "s|STEWIE_BASE_HREF_HERE|$URL|g"\
+        | sed "s|STEWIE_DIR_HERE|$dir|g"\
+        > index.htm
+
+    config=configs/CONFIG_stewie.txt
+    echo "Building new CONFIG.TXT with $URL and $dir ..."
+    if `test \! -e $config`; then
+        echo; echo "ERROR Cannot find $dir/$config."; stewie_help; exit;
+    fi
+    cat $config\
+        | sed "s|STEWIE_BASE_HREF_HERE|$URL|g"\
+        | sed "s|STEWIE_DIR_HERE|$dir|g"\
+        > CONFIG.TXT
+}
+
+verify_dir() {
+    # E.g. "verify_dir <dir>"
+    dir=$1
+
+    # If <dir> not exist, then create it;
+    if `test \! -e "$dir"`; then mkdir "$dir"; fi
+
+    # If <dir> exists but not writeable, then complain and die.
+    touch $dir/deleteme-write-test || {
+        echo; echo "ERROR: Directory '$dir' not writeable maybe?"; echo
+        ls -ld $dir
+        exit -1;
+    }
+    /bin/rm $dir/deleteme-write-test
+}
+
+check_designs() {
+    # E.g. "check_designs /home/steveri/gui/designs"
+    dir=$1
+
+    # If one or more dirs in design directory are unwritable,
+    # warn and give the option to quit.
+
+    fail=0
+    for f in `ls $dir`; do
+        test -d $dir/$f && {
+            test -w $dir/$f || {
+                #echo "$dir/$f not writeable:";
+                ls -ld $dir/$f;
+                #echo
+                fail=1
+            }
+        };
+    done
+    test $fail -eq 1 && {
+        echo; echo "WARNING: Found one or more unwriteable designs (above)."
+        echo "If you are steveri, maybe you want to do"
+        echo "  ~/gui/bin/sr_stewie_prep.sh"
+        echo "  ~/gui/bin/sr_dev_restore.sh"
+        echo -n "Okay to continue (y or n)? "
+        read answer; answer=${answer:0:1} # First char only
+        if `test "$answer" = 'n' -o "$answer" = 'N'`; then
+            echo "Okay, bye."; echo; exit;
+        fi
+        echo
+    }
+}
+
+remove_slash() {
+  # If dirname has a slash at the end, remove it.
+  # E.g. `remove_slash a/b/c/d/` => "a/b/c/d"
+  dirname=$1
+  n=`expr "$dirname" : '.*[^/]'`;  # Nchars before final slash.
+  expr substr $dirname 1 $n
+}
+
+build_missing_gui_dir() {
+    bindir=`remove_slash $1`; targdir=`remove_slash $2`;
+    echo "Oops $targdir no exist. I will build it for you."
+
+#    echo -n "Do you want me to build it for you (y or n)? "
+#    read answer; answer=${answer:0:1} # First char only
+#    if `test "$answer" = 'n' -o "$answer" = 'N'`; then
+#        echo "Okay bye."; echo; exit -1;
+#    fi
+#    mkdir $targdir || exit -1
+#
+#   #echo; echo "$bindir/stewie clone $bindir/.. $targdir";
+    $bindir/stewie clone $bindir/.. $targdir || exit -1
+}
+
+#install_stewie() {
+#    # E.g. "install_stewie bindir targdir "or" [ "exit" | "continue" ]
+#    bindir=$1
+#    targdir=$2
+#    exit_or_continue=$4;
+#
+#    echo; echo -n "Shall I install the latest version for you (y or n)? "
+#    read answer; answer=${answer:0:1} # First char only
+#
+#    # $answer = YES
+#    if `test "$answer" = 'y' -o "$answer" = 'Y'`; then
+#        echo
+#        echo "  $bindir/stewie clone $bindir/.. $targdir"
+#        echo
+#        $bindir/stewie clone $bindir/.. $targdir
+#        return;
+#    fi
+# 
+#    # $answer = NO
+#    if [ $exit_or_continue = "continue" ]; then
+#        echo; echo "Okay continuing with 'stewie start'"
+#    else
+#        echo; echo "Okay bye."; exit -1;
+#    fi
+#}
+
+version_check() {
+
+  bindir=$1   # E.g. "/cad/genesis2/r10345/gui/bin"
+  targdir=$2; # E.g. "." or "/tmp/mystewie"
+
+  srcverfile=$bindir/../configs/install/version_number.txt;
+   targverfile=$targdir/configs/install/version_number.txt;
+
+   src_version=`cat $srcverfile  2> /dev/null || echo -1` 
+  targ_version=`cat $targverfile 2> /dev/null || echo -1` 
+
+#  echo src version $src_version
+#  echo targ version $targ_version
+#  echo
+
+  if [ $targ_version -lt $src_version ]; then
+      echo Your stewie appears to be either missing or outdated.
+      echo "  Your stewie version number: $targ_version"
+      echo "  Latest distribution number: $src_version"
+
+#      install_stewie $bindir $targdir or continue
+
+      echo; echo -n "Shall I install the latest version for you (y or n)? "
+      read answer; answer=${answer:0:1} # First char only
+      if `test "$answer" = 'n' -o "$answer" = 'N'`; then
+          echo; echo "Okay continuing with 'stewie start'"
+      else
+         #echo; echo "  $bindir/stewie clone $bindir/.. $targdir"; echo
+          $bindir/stewie clone $bindir/.. $targdir || exit -1
+      fi
+  fi
+}
+
+
+##############################################################################
+# Executable code begins here.
+
+if `test \( $# -eq 0 \)`; then stewie_help; exit; fi
+
+case "$1" in
+
+    (clone) {
+        if `test \( $# -ne 3 \)`; then stewie_help; exit; fi
+        olddir=$2; newdir=$3;
+
+        # Dots and tildes and such can MESS YOU UP, MAN!
+
+       #pwd
+       #echo olddir=$olddir newdir=$newdir
+        olddir=`cd $olddir; pwd`
+        if [ -e $newdir ]; then
+            newdir=`cd $newdir; pwd`
+        fi
+
+       #echo olddir=$olddir newdir=$newdir
+       #pwd
+       #exit -1
+
+        echo; echo -n "Clone from \"$olddir\" to \"$newdir\", right (y or n)? ";
+        read answer; answer=${answer:0:1} # First char only
+        if `test "$answer" = 'n' -o "$answer" = 'N'`; then
+            echo "Okay bye"; exit;
+        fi
+        echo
+        
+      # Make sure destination does not yet exist
+        if `test -e $newdir`; then
+           #echo "Oops looks like $newdir already exists and I don't want to write over it."
+           #echo "Looks like $newdir already exists."
+            echo "Clone will obliterate and replace any pre-existing files in '$newdir'"
+            echo -n "Is that okay (y or n)? "
+            read answer; answer=${answer:0:1} # First char only
+            if `test "$answer" = 'n' -o "$answer" = 'N'`; then
+                echo "Okay bye.  Recommend you do this:"
+                echo "/bin/rm -rf $newdir";
+                echo "or make up a new directory to use."
+                exit -1;
+            fi
+            /bin/rm -rf $newdir/*
+        else
+            mkdir $newdir
+        fi
+
+        tarball=/tmp/gui.tar.bz2
+
+      # Build an up-to-date tarfile (creates $tarball)
+        echo; echo Building new gui, please be patient...
+        $olddir/configs/install/build_tarfile.sh -q || exit -1
+
+      # Expand the tarball to create /tmp/gui-unpack-$$/gui
+        mkdir /tmp/gui-unpack-$$
+        cd /tmp/gui-unpack-$$
+        tar xjf $tarball || exit
+        /bin/rm $tarball          # Finished w/tarball
+
+#        echo "Okay copying gui to its new home \"$newdir\""; echo;
+#        echo "i am here: `pwd`"
+#        echo "i wanna do this: mv gui $newdir"
+#        echo "will that work?"
+#        exit -1
+
+        mv gui/* $newdir
+
+      # Clean up your mess and leave.
+        /bin/rm -rf /tmp/gui-unpack-$$
+        exit;
+    };;
+
+    (setup) {
+        shift;           # "setup /tmp/stewie 8080" => "/tmp/stewie 8080"
+        stewie_setup $*;
+        exit;
+    };;
+    
+    (list) {
+        ps aux \
+          | egrep 'perl .*[/]stewie.pl' \
+          | sed 's,/usr/bin/perl.*gui=,gui=,';
+        echo
+        procs=`ps ax | egrep 'perl .*[/]stewie.pl' | awk '{print $1}'`;
+        for p in ${procs[*]}; do echo kill $p; done;
+        exit;
+    };;
+
+    (kill) {
+        echo "Before:"
+        ps aux | egrep 'perl .*[/]stewie.pl';
+        procs=`ps ax | egrep 'perl .*[/]stewie.pl' | awk '{print $1}'`;
+
+        echo
+        for p in ${procs[*]}; do
+            echo -n kill $p;
+            echo -n ": Really do it (y or n)? "; read answer
+
+            answer=${answer:0:1} # First char only
+            if `test "$answer" = 'y' -o "$answer" = 'Y'`; then
+                kill $p;
+            fi
+        done;
+        echo
+
+        echo "After:"
+        ps aux | egrep 'perl .*[/]stewie.pl';
+        exit
+    };;
+
+    (start) {
+        # How the hell does this work???
+        # I guess "%/*" means "match everything up to the final occurrence of '/'" sorta
+        mydir=${0%/*}/
+        test $mydir = "$0/" && mydir=./
+
+        # Call to get_stewie_args returns e.g.
+        # "ARGS /home/steveri/smart_memories/Smart_design/ChipGen/gui 8080"
+
+        shift;  # Remaining args are "<dir> [port]"; port is optional, dir is not.
+
+#        # Set gui dir
+#        gsa_dir=""
+#        if `test \( $# -gt 0 \)`; then
+#            # assume first arg, if any, is a dir
+#            gsa_dir="gui=$1"; shift;
+#        fi
+
+        # First arg after "stewie start" must be target directory
+        if `test \( $# -eq 0 \)`; then
+          echo "Sorry, new rule: stewie home directory must be specified on command line."
+          echo
+          echo "Examples:"
+          echo "  $0 start `pwd`";
+          cd $mydir/..
+          echo "  $0 start `pwd`";
+          echo
+          stewie_help;
+          exit -1;
+        fi;
+        gsa_dir="gui=$gui";
+        gui=$1;
+        shift;
+
+        # Second argument after "stewie start" is optional desired portnum.
+        gsa_port=""
+        if `test \( $# -gt 0 \)`; then
+            # assume second arg, if any, is a port
+            gsa_port="port=$1"; shift;
+        fi
+
+        # Set gsa_port to next open port, if necessary
+        # echo ${mydir}get_stewie_args.pl $gsa_dir $gsa_port 
+        ${mydir}get_stewie_args.pl $gsa_dir $gsa_port > /tmp/tmp.$$ || exit
+        stewie_args=(`cat /tmp/tmp.$$ | grep ARGS | sed 's/ARGS //'`)
+        # cat /tmp/tmp.$$
+        /bin/rm /tmp/tmp.$$
+        port=${stewie_args[1]}
+
+        # BUG/TODO: Notice "gui" result gets ignored;
+        # replace "get_stewie_args dir port" (above) w/"find_free_port port"
+        #gui=${stewie_args[0]};
+
+        if [ ! -d $gui ]; then
+            build_missing_gui_dir $mydir $gui
+        else
+            version_check $mydir $gui
+        fi
+
+        # For each directory $gui/scratch and $gui/designs:
+        #   if dir not exist, then create it;
+        #   if dir exists but not writeable, then complain and die.
+
+        verify_dir $gui/scratch
+        verify_dir $gui/designs
+
+        # Maybe trouble if one or more dirs in design directory
+        # are unwritable;  warn and give the option to quit.
+        check_designs $gui/designs
+
+#for f in `ls`; do test -d $f &&
+# { test -w $f || { echo $f not writeable; ls -ld $f; echo; } }; done
+
+        # Bigger trouble if no "configs/setup.cshrc"
+        setup="$gui/configs/setup.cshrc";
+
+        if `test \! -e "$setup"`;
+        then
+            echo
+            echo "ERROR: Stewie could not find a valid setup file for your site."
+            echo "ERROR: Setup file should be here: '$setup'"
+            echo "ERROR: For sample setup files see $gui/configs/setup*"
+            echo
+            exit -1;
+        else
+            echo
+            echo "Found Genesis setup file '$setup'";
+
+            #echo '=============================================================================='
+            #cat $setup | egrep -v '^[ \t]*#' | egrep .
+            #echo '=============================================================================='
+            #echo; echo -n "Does this look like a valid setup file for your site (y or n)? "
+            
+            echo "Please make sure this setup file is correct for your site."
+            echo "If not, GUI will fail when it tries to build a new design."
+            echo; echo -n "Ready to continue (y or n)? "
+            read answer; answer=${answer:0:1} # First char only
+            if `test "$answer" = 'n' -o "$answer" = 'N'`; then
+                echo; echo "Please fix '$setup' and try again.  Bye now."; echo;
+                exit -1;
+            fi
+        echo
+        fi
+#       echo "ho ho gui=$gui port=$port"
+
+        savedir=`pwd`
+        stewie_setup $gui $port
+        cd $savedir
+
+        echo "${mydir}stewie.pl gui=\"$gui\" port=$port"
+        ${mydir}stewie.pl gui="$gui" port=$port
+        exit
+    };;
+
+    (restart) {
+        $0 kill
+        shift;
+        $0 start $*
+        exit;
+    };;
+esac
+
+stewie_help;
+
+
+
+#exit;
+#
+#HELP:
+#echo "i got your help right HERE"
+#

@@ -1,0 +1,199 @@
+Makefile.new:6: WARNING: TileGenTest home set to ./
+Makefile.new:17: WARNING: SMASH set to /home/steveri/smart_memories/Smart_design/ChipGen
+Makefile.new:23: WARNING: SYNOPSYS set to /cad/synopsys/dc_shell/latest/
+Makefile.new:235: WARNING: GENESIS_CFG_XML set to /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest/SysCfgs/config.xml
+
+Making flop.pm because of flop.vp
+==================================================
+Genesis2.pl -parse -srcpath . -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -incpath . -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -debug 0 -input flop.vp 
+
+Genesis2::Manager->execute: Starting Source File Parsing Phase
+Genesis2::Manager->parse_files: Now parsing file flop.vp
+Genesis2::Manager->execute: Done With Source File Parsing Phase
+
+Making reg_file.pm because of reg_file.vp
+==================================================
+Genesis2.pl -parse -srcpath . -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -incpath . -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -debug 0 -input reg_file.vp 
+
+Genesis2::Manager->execute: Starting Source File Parsing Phase
+Genesis2::Manager->parse_files: Now parsing file reg_file.vp
+Genesis2::Manager->execute: Done With Source File Parsing Phase
+
+Making cfg_ifc.pm because of cfg_ifc.vp
+==================================================
+Genesis2.pl -parse -srcpath . -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -incpath . -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -debug 0 -input cfg_ifc.vp 
+
+Genesis2::Manager->execute: Starting Source File Parsing Phase
+Genesis2::Manager->parse_files: Now parsing file cfg_ifc.vp
+Genesis2::Manager->execute: Done With Source File Parsing Phase
+
+Making regbank.pm because of regbank.vp
+==================================================
+Genesis2.pl -parse -srcpath . -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -incpath . -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -debug 0 -input regbank.vp 
+
+Genesis2::Manager->execute: Starting Source File Parsing Phase
+Genesis2::Manager->parse_files: Now parsing file regbank.vp
+Genesis2::Manager->execute: Done With Source File Parsing Phase
+
+Making test.pm because of test.vp
+==================================================
+Genesis2.pl -parse -srcpath . -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -incpath . -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -debug 0 -input test.vp 
+
+Genesis2::Manager->execute: Starting Source File Parsing Phase
+Genesis2::Manager->parse_files: Now parsing file test.vp
+Genesis2::Manager->execute: Done With Source File Parsing Phase
+
+Making top.pm because of top.vp
+==================================================
+Genesis2.pl -parse -srcpath . -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -incpath . -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -debug 0 -input top.vp 
+
+Genesis2::Manager->execute: Starting Source File Parsing Phase
+Genesis2::Manager->parse_files: Now parsing file top.vp
+Genesis2::Manager->execute: Done With Source File Parsing Phase
+
+Making ProcShim.pm because of ProcShim.vp
+==================================================
+Genesis2.pl -parse -srcpath . -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -incpath . -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -debug 0 -input ProcShim.vp 
+
+Genesis2::Manager->execute: Starting Source File Parsing Phase
+Genesis2::Manager->parse_files: Now parsing file ProcShim.vp
+Genesis2::Manager->execute: Done With Source File Parsing Phase
+
+Making generic_memory.pm because of generic_memory.vp
+==================================================
+Genesis2.pl -parse -srcpath . -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -incpath . -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -debug 0 -input generic_memory.vp 
+
+Genesis2::Manager->execute: Starting Source File Parsing Phase
+Genesis2::Manager->parse_files: Now parsing file generic_memory.vp
+Genesis2::Manager->execute: Done With Source File Parsing Phase
+
+Making pc.pm because of pc.vp
+==================================================
+Genesis2.pl -parse -srcpath . -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -incpath . -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -debug 0 -input pc.vp 
+
+Genesis2::Manager->execute: Starting Source File Parsing Phase
+Genesis2::Manager->parse_files: Now parsing file pc.vp
+Genesis2::Manager->execute: Done With Source File Parsing Phase
+
+Making mem_mgr.pm because of mem_mgr.vp
+==================================================
+Genesis2.pl -parse -srcpath . -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -incpath . -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -debug 0 -input mem_mgr.vp 
+
+Genesis2::Manager->execute: Starting Source File Parsing Phase
+Genesis2::Manager->parse_files: Now parsing file mem_mgr.vp
+Genesis2::Manager->execute: Done With Source File Parsing Phase
+
+Making transaction.pm because of transaction.vp
+==================================================
+Genesis2.pl -parse -srcpath . -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -incpath . -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -debug 0 -input transaction.vp 
+
+Genesis2::Manager->execute: Starting Source File Parsing Phase
+Genesis2::Manager->parse_files: Now parsing file transaction.vp
+Genesis2::Manager->execute: Done With Source File Parsing Phase
+
+Making tile.pm because of tile.vp
+==================================================
+Genesis2.pl -parse -srcpath . -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -incpath . -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -debug 0 -input tile.vp 
+
+Genesis2::Manager->execute: Starting Source File Parsing Phase
+Genesis2::Manager->parse_files: Now parsing file tile.vp
+Genesis2::Manager->execute: Done With Source File Parsing Phase
+
+Making processor.pm because of processor.vp
+==================================================
+Genesis2.pl -parse -srcpath . -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -incpath . -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -debug 0 -input processor.vp 
+
+Genesis2::Manager->execute: Starting Source File Parsing Phase
+Genesis2::Manager->parse_files: Now parsing file processor.vp
+Genesis2::Manager->execute: Done With Source File Parsing Phase
+
+Making procClkGen.pm because of procClkGen.vp
+==================================================
+Genesis2.pl -parse -srcpath . -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -incpath . -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -debug 0 -input procClkGen.vp 
+
+Genesis2::Manager->execute: Starting Source File Parsing Phase
+Genesis2::Manager->parse_files: Now parsing file procClkGen.vp
+Genesis2::Manager->execute: Done With Source File Parsing Phase
+
+Making memory.pm because of memory.vp
+==================================================
+Genesis2.pl -parse -srcpath . -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -incpath . -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -debug 0 -input memory.vp 
+
+Genesis2::Manager->execute: Starting Source File Parsing Phase
+Genesis2::Manager->parse_files: Now parsing file memory.vp
+Genesis2::Manager->execute: Done With Source File Parsing Phase
+
+Making addrMap.pm because of addrMap.vp
+==================================================
+Genesis2.pl -parse -srcpath . -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -incpath . -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -debug 0 -input addrMap.vp 
+
+Genesis2::Manager->execute: Starting Source File Parsing Phase
+Genesis2::Manager->parse_files: Now parsing file addrMap.vp
+Genesis2::Manager->execute: Done With Source File Parsing Phase
+
+Making depStall.pm because of depStall.vp
+==================================================
+Genesis2.pl -parse -srcpath . -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -incpath . -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -debug 0 -input depStall.vp 
+
+Genesis2::Manager->execute: Starting Source File Parsing Phase
+Genesis2::Manager->parse_files: Now parsing file depStall.vp
+Genesis2::Manager->execute: Done With Source File Parsing Phase
+
+Making ms2p_xbar.pm because of ms2p_xbar.vp
+==================================================
+Genesis2.pl -parse -srcpath . -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -incpath . -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -debug 0 -input ms2p_xbar.vp 
+
+Genesis2::Manager->execute: Starting Source File Parsing Phase
+Genesis2::Manager->parse_files: Now parsing file ms2p_xbar.vp
+Genesis2::Manager->execute: Done With Source File Parsing Phase
+
+Making p2ms_xbar.pm because of p2ms_xbar.vp
+==================================================
+Genesis2.pl -parse -srcpath . -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -incpath . -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -debug 0 -input p2ms_xbar.vp 
+
+Genesis2::Manager->execute: Starting Source File Parsing Phase
+Genesis2::Manager->parse_files: Now parsing file p2ms_xbar.vp
+Genesis2::Manager->execute: Done With Source File Parsing Phase
+
+Making replyHandler.pm because of replyHandler.vp
+==================================================
+Genesis2.pl -parse -srcpath . -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -incpath . -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -debug 0 -input replyHandler.vp 
+
+Genesis2::Manager->execute: Starting Source File Parsing Phase
+Genesis2::Manager->parse_files: Now parsing file replyHandler.vp
+Genesis2::Manager->execute: Done With Source File Parsing Phase
+
+Making lut.pm because of lut.vp
+==================================================
+Genesis2.pl -parse -srcpath . -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -incpath . -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -debug 0 -input lut.vp 
+
+Genesis2::Manager->execute: Starting Source File Parsing Phase
+Genesis2::Manager->parse_files: Now parsing file lut.vp
+Genesis2::Manager->execute: Done With Source File Parsing Phase
+
+Making replyStall.pm because of replyStall.vp
+==================================================
+Genesis2.pl -parse -srcpath . -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -srcpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -incpath . -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Processor -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Primitives -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/MemBlocks -incpath /home/steveri/smart_memories/Smart_design/ChipGen/rtl/Env_rtl -incpath /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest -debug 0 -input replyStall.vp 
+
+Genesis2::Manager->execute: Starting Source File Parsing Phase
+Genesis2::Manager->parse_files: Now parsing file replyStall.vp
+Genesis2::Manager->execute: Done With Source File Parsing Phase
+
+Making genesis_vlog.vf because of flop.pm reg_file.pm cfg_ifc.pm regbank.pm test.pm top.pm ProcShim.pm generic_memory.pm pc.pm mem_mgr.pm transaction.pm tile.pm processor.pm procClkGen.pm memory.pm addrMap.pm depStall.pm ms2p_xbar.pm p2ms_xbar.pm replyHandler.pm lut.pm replyStall.pm /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest/SysCfgs/config.xml
+==================================================
+Genesis2.pl -gen -top top -depend depend.list -product genesis_vlog.vf -hierarchy hierarchy_out.xml -debug 0 -xml /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest/SysCfgs/config.xml 
+
+Genesis2::Manager->execute: Starting Verilog Code Generation Phase
+Genesis2::Manager->execute: Done With Verilog Code Generation Phase
+-----------------------------------------------
+--- Genesis Finished Generating Your Design ---
+-----------------------------------------------
+
+Genesis2.pl -gen -top top -hierarchy hierarchy_out.xml -debug 0 -xml /home/steveri/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest/SysCfgs/config.xml
+
+Genesis2::Manager->execute: Starting Verilog Code Generation Phase
+Genesis2::Manager->execute: Done With Verilog Code Generation Phase
+-----------------------------------------------
+--- Genesis Finished Generating Your Design ---
+-----------------------------------------------
+

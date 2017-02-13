@@ -1,0 +1,249 @@
+==============================================================================
+04/2015 update
+
+Also see
+* http://genesis2.stanford.edu/mediawiki/index.php/Original_GUI_Installation_Details#PREVENT_THE_BOTS
+* ~steveri/0notes/gui.txt
+
+To see the bots at work:
+
+  % ssh vlsiweb
+  % sudo cat /var/log/apache2/access.log | grep 'genesis.*xml' \
+    | sed 's/.xml.*//' | cut -d ' ' -f 4,6,7 \
+    | sed 's|.GET.*/designs/||' | uniq | less
+
+To prevent the bots, see notes on robots.txt below.
+
+Also: We are now using the jekyll system to maintain our website.
+This means the robots.txt file gets blown away every time there's a
+web update.  To prevent this, jekyll's config fill must be told to
+"keep" robots.txt, something like this:
+
+keep_files: ["people/alum", "genesis", "robots.txt"]
+
+(See
+https://www-vlsi.stanford.edu/mediawiki/index.php/Modifying_The_Web_Site
+#Adding_and_Maintaining_Non-Jekyll_Content_to_the_Website)
+
+Also, our top-level directory is now /var/www/html, so to set up the
+robot file:
+
+  cd /var/www/html
+  ls -l robots.txt
+
+  cp ~steveri/gui/robots.txt .
+  chown www-data robots.txt
+  chgrp www-data robots.txt
+  ls -l robots.txt
+
+Original setup information from 2013 continues below.
+
+==============================================================================
+07/2013
+
+To prevent the Google robot, use a robots.txt file as described below.
+
+I think the robot-prevention file robots.txt (see below) is supposed
+to be in your top-level directory, or in our case, /var/www/homepage
+on vlsiweb.
+
+  % cd /var/www/homepage
+  % ls -l robots*
+  -rwxr-xr-x 1 www-data www-data 304 2008-12-10 23:07 robots.txt*
+
+Download or copy the anti-robot information to a text file called
+robots.txt.  Copy or move the file to the highest-level directory of
+your site.  The robots.txt file must reside in the root of the domain
+and must be named "robots.txt".  A robots.txt file located in a
+subdirectory isn't valid, as bots only check for this file in the root
+of the domain. For instance, "http://www.example.com/robots.txt" is a
+valid location, but "http://www.example.com/mysite/robots.txt" is not.
+
+Currently (7/2013) using the following for robots.txt (see "~steveri/gui/robots.txt"):
+
+    User-agent: *
+    Disallow: /administrator/
+    Disallow: /cache/
+    Disallow: /components/
+    Disallow: /images/
+    Disallow: /includes/
+    Disallow: /installation/
+    Disallow: /language/
+    Disallow: /libraries/
+    Disallow: /media/
+    Disallow: /modules/
+    Disallow: /plugins/
+    Disallow: /templates/
+    Disallow: /tmp/
+    Disallow: /xmlrpc/
+    Disallow: /genesis/cgi/
+    Disallow: /cgi-bin/
+    Disallow: /cgi-bin/genesis/
+    Disallow: /cgi-bin/genesis_dev_sr/
+    Disallow: /cgi-bin/genesis.deleteme/
+    Disallow: /cgi-bin/genesis*/
+    Disallow: /cgi_bin/
+    Disallow: /cgi_bin/genesis/
+    Disallow: /cgi_bin/genesis_dev_sr/
+    Disallow: /cgi_bin/genesis.deleteme/
+    Disallow: /cgi_bin/genesis*/
+
+Previously used this I think ("~steveri/gui/robots.txt.old"):
+
+    User-agent: *
+    Disallow: /administrator/
+    Disallow: /cache/
+    Disallow: /components/
+    Disallow: /images/
+    Disallow: /includes/
+    Disallow: /installation/
+    Disallow: /language/
+    Disallow: /libraries/
+    Disallow: /media/
+    Disallow: /modules/
+    Disallow: /plugins/
+    Disallow: /templates/
+    Disallow: /tmp/
+    Disallow: /xmlrpc/
+    Disallow: /cgi-bin/
+    Disallow: /cgi-bin/genesis/
+    Disallow: /cgi-bin/genesis_dev_sr/
+    Disallow: /cgi-bin/genesis.deleteme/
+    Disallow: /cgi-bin/genesis*/
+
+==============================================================================
+http://linuxpoison.blogspot.com/2009/02/how-to-create-and-configure-robottxt.html
+
+3) The following disallows all search engines and robots from crawling select directories and pages:
+
+    User-agent: *
+    Disallow: /cgi-bin/
+    Disallow: /privatedir/
+    Disallow: /tutorials/blank.htm
+
+==============================================================================
+
+http://en.wikipedia.org/wiki/Robots.txt
+
+This example tells all robots to stay out of a website:
+
+User-agent: *
+Disallow: /
+
+
+
+The next is an example that tells all robots not to enter four
+directories of a website:
+
+User-agent: *
+Disallow: /cgi-bin/
+Disallow: /images/
+Disallow: /tmp/
+Disallow: /private/
+
+==============================================================================
+
+
+
+http://support.google.com/webmasters/bin/answer.py?hl=en&answer=156449&from=35237&rd=1
+
+...
+
+The simplest robots.txt file uses two rules:
+
+    User-agent: the robot the following rule applies to
+    Disallow: the URL you want to block
+
+These two lines are considered a single entry in the file. You can include as many entries as you want. You can include multiple Disallow lines and multiple user-agents in one entry.
+
+Each section in the robots.txt file is separate and does not build upon previous sections. For example:
+
+
+User-agent: *
+Disallow: /folder1/
+
+User-Agent: Googlebot
+Disallow: /folder2/
+
+In this example only the URLs matching /folder2/ would be disallowed for Googlebot.
+
+...
+
+
+Blocking user-agents
+
+The Disallow line lists the pages you want to block. You can list a specific URL or a pattern. The entry should begin with a forward slash (/).
+
+    To block the entire site, use a forward slash.
+
+    Disallow: /
+
+    To block a directory and everything in it, follow the directory name with a forward slash.
+
+    Disallow: /junk-directory/ 
+
+    To block a page, list the page.
+
+    Disallow: /private_file.html
+
+    To remove a specific image from Google Images, add the following:
+
+    User-agent: Googlebot-Image
+    Disallow: /images/dogs.jpg 
+
+    To remove all images on your site from Google Images:
+
+    User-agent: Googlebot-Image
+    Disallow: / 
+
+    To block files of a specific file type (for example, .gif), use the following:
+
+    User-agent: Googlebot
+    Disallow: /*.gif$
+
+...
+
+Save your robots.txt file by downloading the file or copying the
+contents to a text file and saving as robots.txt. Save the file to the
+highest-level directory of your site. The robots.txt file must reside
+in the root of the domain and must be named "robots.txt". A robots.txt
+file located in a subdirectory isn't valid, as bots only check for
+this file in the root of the domain. For instance,
+http://www.example.com/robots.txt is a valid location, but
+http://www.example.com/mysite/robots.txt is not.
+
+...
+
+Test a robots.txt file
+
+The Test robots.txt tool will show you if your robots.txt file is
+accidentally blocking Googlebot from a file or directory on your site,
+or if it's permitting Googlebot to crawl files that should not appear
+on the web. When you enter the text of a proposed robots.txt file, the
+tool reads it in the same way Googlebot does, and lists the effects of
+the file and any problems found.
+
+To test a site's robots.txt file:
+
+    On the Webmaster Tools Home page, click the site you want.
+    Under Site configuration, click Crawler access
+    If it's not already selected, click the Test robots.txt tab.
+    Copy the content of your robots.txt file, and paste it into the first box.
+    In the URLs box, list the site to test against.
+    In the User-agents list, select the user-agents you want.
+
+Any changes you make in this tool will not be saved. To save any
+changes, you'll need to copy the contents and paste them into your
+robots.txt file.
+
+==============================================================================
+Note to self, found in a draft mail msg circa 3/2012: I'm thinking
+that the easy fix is to have the CGI scripts (in this case
+"opendesign.pl" pop up a little dialog box that says something like
+"this will take a moment; click here to continue" or "really do it?
+click here to continue" etc...presumably the bot will have lost
+interest by then
+
+Follow-up 7/2013: FFT generator now requires e-mail sign-in...should
+this propagate to other generators?  Also: does this really solve the
+problem!!?

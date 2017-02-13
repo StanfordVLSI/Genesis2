@@ -1,0 +1,49 @@
+/* *****************************************************************************
+ * File: lut.vp
+ * Author: Andrew Danowitz
+ * 
+ * Description:
+ * Genesis-based address translator
+ * 
+ * Required Genesis Controlable Parameters:
+ * * LUT_PARAMS: Array of hashes containing segment entries.
+ * * ex. [{'lookup_val'=>lut address, 'table_val'=> entry 
+ * * corresponding to address}]
+ * * LOOKUP_VAL_SIZE: Size of lut address
+ * * TABLE_VAL_SIZE: Size of table address
+ * 
+ * Change bar:
+ * -----------
+ * Date          Author   Description
+ * April 20, 2010  danowitz init version
+ * 
+ *  
+ * 
+ * ****************************************************************************/
+
+//; my $LUT_PARAMS_REF = $self->define_param('LUT_PARAMS'=> [{'lookup_val'=>0, 'table_val'=>0}]);
+//; my $LOOKUP_VAL_SIZE = $self->define_param('LOOKUP_VAL_SIZE' => 1);
+//; my $TABLE_VAL_SIZE = $self->define_param('TABLE_VAL_SIZE' => 1);
+//; my $NAME = $self->get_module_name();
+
+//; my @LUT_PARAMS = @$LUT_PARAMS_REF;
+
+module `$NAME` ( input [`$LOOKUP_VAL_SIZE-1`:0] lookup_val,
+				 output logic [`$TABLE_VAL_SIZE-1`:0] table_val);
+   
+   bit  [`$TABLE_VAL_SIZE-1`:0] lut_array[*];
+
+   initial begin
+	  //;my $kvp;
+	  //;foreach $kvp (@LUT_PARAMS) {
+	  lut_array[`$kvp->{lookup_val}`] = `$TABLE_VAL_SIZE`'b`$kvp->{table_val}`;
+	  //;}
+   end
+
+   always_comb  begin
+	  table_val = lut_array[lookup_val];
+   end
+   //insert module here
+
+endmodule //
+

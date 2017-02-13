@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+  <head>
+    <title>Genesis Home - SR dev</title>
+
+    <base href="http://www-vlsi.stanford.edu/cgi-bin/genesis_dev_sr/" />
+
+    <STYLE>
+      .module { border: 8px solid #990000;
+                border-spacing: 4; background-color: #e7d19a;
+                width: 324; height: 460;
+      }
+    </style>
+
+  <script type="text/javascript"><!--
+    var SHOWCOMMENTS = true; // On by default, for Ofer.
+    function toggle_comments(e) {
+      if (SHOWCOMMENTS) {
+        SHOWCOMMENTS = false;
+        alert("Comments now OFF");
+        document.getElementById("toggle_comments" ).innerHTML = "c";
+        setCookie("SHOWCOMMENTS", "OFF", 7);
+      } else {
+        SHOWCOMMENTS = true;
+        alert("Comments now ON");
+        document.getElementById("toggle_comments" ).innerHTML = "<s>c</s>";
+        setCookie("SHOWCOMMENTS", "ON", 7);
+      }
+    }
+    function setCookie(name,value,exdays) {
+      var exdate=new Date();
+      exdate.setDate(exdate.getDate() + exdays);
+      var c_value = escape(value) + "; expires=" + exdate.toUTCString();
+      document.cookie = name + "=" + c_value;
+    }
+
+    //--></script>
+
+
+
+  </head>
+
+  <body>
+
+    <table class=module>
+	<tr>
+	  <td style='vertical-align:top; text-align:center'>
+	    <h2>
+               Welcome to the<br>Interactive Chip Generator<br>
+	       <small><i>powered by Genesis</i></small>
+            </h2>
+
+	    <hr>
+	    <h3>
+	      <a href = 'opendesign.pl?newdesign=cmpdemo&file=../designs/tgt0/tgt0-baseline.xml'>
+		  Demo: (Real-ish) CMP generator
+              </a>
+	    </h3>
+
+	    <hr>
+	    <h3>
+	      <a href = 'opendesign.pl?newdesign=socdemo&file=../designs/demo/top.xml'>
+		  Demo: (Toy-ish) SoC generator
+              </a>
+	    </h3>
+
+	    <hr>
+	    <h3>
+	    <a href = "choosedesign.pl">
+		  Click here to do real work</a>
+	    </h3>
+	    <hr>
+	    <br>
+	    <br>
+	    <br>
+	    <br>
+	    <h3>(Snazzy logo goes here)</h3>
+            <div style="text-align:right; font-size:0.5em" id=toggle_comments onclick='toggle_comments()'>
+              c
+            </div>
+	  </td>
+	</tr>
+    </table>
+  </body>
+</html>
+
+
+<!--            <center><small><div id=toggle_comments onclick='alert("You clicked c!")'>
+              <s>c</s>
+-->

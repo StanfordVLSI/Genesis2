@@ -1,0 +1,82 @@
+# To test, try something like: perl -f <thisfile>
+use strict;
+
+sub find_name_or_key {
+
+    # "@lines" is a copy of remaining input file, beginning with a
+    # <ParameterItem> or <HashItem> tag, depending on $ph parameter passed in.
+    # Look ahead to find and return the name of the block.
+    # Block should consist of one or more "Type" blocks and a "Name" or "Key" tag.
+
+    my $ph    = shift @_;   # "Parameter" or "Hash"
+    my @lines = @_;
+
+    my $DBG = "DBG (fnok";  # Prefix for debug output.
+
+    while (my $line = shift @lines) {
+	debug9("$DBG $line");
+
+	if ($line =~ /^\s*<\/($ph)Item>\s*$/) { # "ParameterItem" or "HashItem"
+	    debug9("DBG (fnok DONE\n");
+	    print "ERROR fnok() never found a name or a key...!!\n\n";
+	    exit;
+	}
+
+	# Skip type blocks.
+
+	elsif ($line =~ /^\s*<(Hash|Array)Type>\s*$/) {
+#	    debug9("$DBG ppi found $1Type, calling shat\n");
+#	    skip_hasharray_type(\@lines, $1);
+	    debug9("$DBG ppi found $1Type, calling sxb\n");
+	    skip_xml_block(\@lines, "$1Type");
+	}
+	elsif ($line =~ /^\s*<Key>([^<]+)<\/Key>/) {
+	    debug9("$DBG found hash key $1\n");
+	    return $1;
+	}
+	elsif ($line =~ /^\s*<Name>([^<]+)<\/Name>/) {
+	    debug9("$DBG found parm name $1\n");
+	    return $1;
+	}
+    }
+}
+
+my $sxb_depth = 0; # Recurse level.
+sub skip_xml_block {
+    my $ptr = shift @_;   # Points to line after "<ImaTag>"
+    my $tag = shift @_;   # Tag name i.e. "ImaTag"
+
+    # Found an xml open-tag alone on a line e.g. "<ImaTag>".
+    #
+    # $ptr points to array of xml lines, specifically points to line
+    # after "<ImaTag>"
+    #
+    # Discard xml lines until find corresponding close-tag "</ImaTag>"
+    #
+    # When done, $ptr points to line after close-tag.
+    # (Actually pointer hasn't changed, but array has shifted---get it?)
+    # (Thus---note---destroys array contents as it works.)
+
+    my $DBG9 = 0; # DBG9 = xtreme debug
+
+    my $DBG = "DBG (sxb".$sxb_depth++;
+
+    while (my $line = shift(@{$ptr})) {
+    
+	if ($DBG9) { print("$DBG $line"); }
+
+	if ($line =~ /^\s*<\/($tag)>\s*$/) { # Close-item (must go first!)
+	    if ($DBG9) { print("$DBG DONE\n"); } $sxb_depth--; return;
+	}
+	elsif ($line =~ /^\s*<\/(.*)>\s*$/) { # Close-item (must go first!)
+	    print "ERROR found orphan close-tag <$1>\n"; exit;
+	}
+	elsif ($line =~ /^\s*<([^>]+)>\s*$/) {
+	    if ($DBG9) { print("$DBG found tag <$1>, calling sxb recursively\n"); }
+	    skip_xml_block($ptr, $1);
+	}
+    }
+    print "ERROR hey never found close-item tag </$tag>\n";
+}
+
+1;

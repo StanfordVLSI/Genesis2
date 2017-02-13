@@ -1,0 +1,7 @@
+Does empty.xml work w/standalone?  look in utils.pl for "nlines < 5"
+More generally: what's the right thing to do with empty files?
+Maybe empty files should
+  - alert("found empty file; will try to generate a new design")
+  - jump to new design
+And/or option for guisada to generate new design (using -out flag below?)
+guisada should have a default output filename ("mydesign"?  ask the users)

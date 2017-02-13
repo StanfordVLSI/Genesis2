@@ -1,0 +1,7 @@
+To test in standalone directory, create a symbolic link
+    ln -s ~steveri/gui/designs/tgt0
+
+To check, run
+
+updatedesign-checkresults.csh
+

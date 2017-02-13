@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<!-- DO NOT MODIFY INDEX.HTM! -->
+<!-- It is a symbolic link. Instead modify e.g. configs/index_stanford.htm -->
+
+<html>
+  <head>
+    <title>Genesis Home - Stanford Edition</title>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    <link rel="shortcut icon" href="favicon.ico">
+    <!-- base href="../../cgi-bin/genesis/" -->
+
+    <style type="text/css">
+      .module { border: 8px solid #990000; width: 320px; height: 440px;
+                border-spacing: 4px; background-color: #e7d19a; }
+      .secret_button { font-size:0.5em; display:inline }
+    </style>
+
+    <script>
+      function init_gateway() {
+        var lo = location.origin; // E.g. "http://vlsiweb.stanford.edu" or "http://vlsiweb.stanford.edu:8080"
+        // alert(lo);
+
+        var stewie = lo.match(/[:]\d+[\/]?$/);
+        // E.g. stewie TRUE if lo = "http://vlsiweb.stanford.edu:8080";
+        // or lo = "http://vlsiweb.stanford.edu:8080/";
+
+        var cgi = stewie ? (lo + "/cgi/") : (lo + "/cgi-bin/genesis/");
+
+        // document.getElementById("email_form").action = cgi + "opendesign.pl";
+        // Need to initialize fftgen design on first call.
+        // So created "initdesign" wrapper that in turn will call opendesign.pl.
+        document.getElementById("email_form").action = cgi + "fftgen_initdesign.pl";
+
+        document.getElementById("about_link").href = cgi + "about.pl";
+
+        //if (stewie) { alert("it's stewie!  cgi='"+cgi); }
+        //else    { alert("it's not stewie.  cgi='"+cgi); }
+
+        // Put the focus in the email-input box.
+        document.getElementById("email_input_box").focus(); 
+      }
+    </script>
+  </head>
+  <!--==================================================================-->
+  <body onload='init_gateway()'>
+    <table class=module>
+	<tr>
+	  <td style='vertical-align:top; text-align:center'>
+	    <h2>
+              FFT Generator
+            </h2>
+
+            <div style="text-align:justify;font-style:italic;font-size:small">
+	    <hr><!--==================================================================-->
+            <br>
+            Note: Sometimes it takes awhile for the generator to build
+            and verify a new design.  If you click and nothing
+            happens, please wait at least two minutes...usually it
+            will have finished by then.
+            <br><br>
+	    <hr><!--==================================================================-->
+            <br>
+            Also: Strange things may happen when the generator is
+            under heavy load.  The locking mechanism may not be
+            sufficienfly robust to prevent your design from colliding
+            with someone else trying to build another design at the
+            same time.
+
+            If this seems to be happening, it may be best to go away,
+            come back and try again later.
+            <br><br>
+            </div>
+	    <hr><!--==================================================================-->
+	  </td>
+	</tr>
+        <tr height=100% style="vertical-align:text-top"><td>
+
+            <div style="text-align:justify;font-size:large">
+              To continue, please enter a valid e-mail address in the box below:
+
+              <!--
+                  action for form is set by javascript, above,
+                  depending on whether this is for stewie or not-stewie
+                  stewie:     action="cgi/opendesign.pl"
+                  not-stewie: action="cgi-bin/genesis/opendesign.pl"
+                -->
+              <form name="email_form" id="email_form" method="get">
+                <!-- Design: --><input type="hidden"
+                                       name="file"
+                                       value="../designs/FFTGenerator/empty.xml">
+                <!-- email:  --><input id="email_input_box"
+                                       type="text"
+                                       style='width:100%'
+                                       name="newdesign">
+                <!-- DBG:    --><input id="fft_debug"
+                                       type="hidden"
+                                       name="DBG"
+                                       value=0>
+                <input type="submit" value="Submit">
+              </form>
+            </div>
+        </td></tr>
+        <tr>
+          <td>
+
+            <!-- Secret buttons.  Shhhh!!! -->
+              <div class=secret_button style="color:gray"
+                   title='secret button: turn on debugging'
+                   id=toggle_cookie_DEBUG
+                   onclick='if (document.getElementById("fft_debug").value == 0) {
+                       document.getElementById("fft_debug").value = 1;
+                       alert("Debug ON");
+                   } else {
+                       document.getElementById("fft_debug").value = 0;
+                       alert("Debug OFF");
+                   }'>d
+              </div>
+              <div class=secret_button style="color:black"
+                   title='secret button: about'>
+                <a id="about_link" href="about.pl">?</a>
+              </div>
+            </div>
+
+	    <!-- h3>(Snazzy logo goes here)</h3
+            <center><img src="../../genesis/images/stanford_seal.gif" alt="tree"></center>
+             -->
+
+
+            <!-- HTML compliance -->
+            <div style="text-align:right">
+              <a href="http://validator.w3.org/check?uri=referer">
+                  <img src="http://www.w3.org/Icons/valid-html401"
+                       alt="Valid HTML 4.01 Transitional" height=12>
+                  <!-- width=44 -->
+                  <!-- height="31" width="88" -->
+              </a>
+            </div>
+	  </td>
+	</tr>
+    </table>
+  </body>
+  <!--==================================================================-->
+</html>

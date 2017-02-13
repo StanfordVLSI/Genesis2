@@ -1,0 +1,8 @@
+Context 6/2012:
+  - ~/gui/0bugs-and-todo-gui.txt
+
+Totally non-crucial:
+  - ~/gui/0notes/0notes-testing.txt
+  - ~/gui/0notes/0notes-xml-decoder.txt
+
+trash: see ~/gui/0notes/0notes-trash.txt

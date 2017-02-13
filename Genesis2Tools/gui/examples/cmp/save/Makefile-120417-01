@@ -1,0 +1,294 @@
+##############################################################################
+################ Makefile Definitions
+################################################################################
+# This little trick finds where the makefile exists
+DESIGN_HOME := $(dir $(word $(words $(MAKEFILE_LIST)), $(MAKEFILE_LIST)))
+$(warning WARNING: CMP home set to $(DESIGN_HOME)) 
+
+-include Makefile.local
+
+# Make sure we have all the relevant definitions
+ifndef SMASH
+  $(error ERROR: Chip Gen path is not set. Use "setenv SMASH <path_to_chipgen>")
+else
+  $(warning WARNING: SMASH set to $(SMASH))
+endif
+
+# ifndef SYNOPSYS
+#   $(error ERROR: SYNOPSYS is not set. Use "setenv SYNOPSYS <path_to_synopsys_home_dir>")
+# else
+#   $(warning WARNING: SYNOPSYS set to $(SYNOPSYS))
+# endif
+
+# ifndef PROCESSOR_HOME
+# $(error PROCESSOR_HOME is not set)
+# endif
+
+############# For Genesis2 ##############
+#########################################
+# tile is the top of the pre-processed hierarchy
+TOP_MODULE := top
+
+
+# list src folders and include folders
+# PROC_PATH := $(SMASH)/rtl/Processor
+# #PROC_PATH := ./Processor
+# TILE_PATH := $(SMASH)/rtl
+# PRIMITIVES_PATH := $(SMASH)/rtl/Primitives
+# MEMBLOCK_PATH := $(SMASH)/rtl/MemBlocks
+# #MEMBLOCK_PATH := ./MemBlocks
+# COMMON_ENV_PATH := $(SMASH)/rtl/Env_rtl
+# TILE_ENV_PATH := $(SMASH)/TileTest/TileGenTest
+
+TILE_ENV_PATH := .
+TILE_CFGS_PATH := $(TILE_ENV_PATH)/SysCfgs
+
+GENESIS_SRC :=  -srcpath .                              \
+		-srcpath $(DESIGN_HOME)
+#		-srcpath $(PROC_PATH)			\
+#		-srcpath $(TILE_PATH)			\
+#		-srcpath $(PRIMITIVES_PATH)		\
+#		-srcpath $(MEMBLOCK_PATH)		\
+#		-srcpath $(COMMON_ENV_PATH)		\
+#		-srcpath $(TILE_ENV_PATH)
+
+GENESIS_INC :=  -incpath .				\
+		-incpath $(DESIGN_HOME)
+#		-incpath $(PROC_PATH)			\
+#		-incpath $(TILE_PATH)			\
+#		-incpath $(PRIMITIVES_PATH)		\
+#		-incpath $(MEMBLOCK_PATH)		\
+#		-incpath $(COMMON_ENV_PATH)		\
+#		-incpath $(TILE_ENV_PATH)
+
+# vpath directive tells where to search for *.vp and *.vph files
+vpath 	%.vp  $(GENESIS_SRC)
+vpath 	%.vph $(GENESIS_INC)
+
+GENESIS_PRIMITIVES :=	flop.vp reg_file.vp cfg_ifc.vp regbank.vp
+
+GENESIS_ENV :=		test.vp top.vp ProcShim.vp generic_memory.vp pc.vp \
+			mem_mgr.vp transaction.vp
+
+GENESIS_DESIGN := 	tile.vp processor.vp procClkGen.vp			\
+			memory.vp						\
+			addrMap.vp depStall.vp ms2p_xbar.vp p2ms_xbar.vp	\
+			replyHandler.vp lut.vp 					\
+			memory.vp replyStall.vp
+
+GENESIS_INPUTS :=	$(GENESIS_PRIMITIVES) $(GENESIS_ENV) $(GENESIS_DESIGN) 
+
+GENESIS_INTERMIDS := $(GENESIS_INPUTS:.vp=.pm)
+
+# debug level
+GENESIS_DBG_LEVEL := 0
+
+# List of generated verilog files
+GENESIS_VLOG_LIST := genesis_vlog.vf
+
+## Input xml program
+ifndef GENESIS_CFG_XML
+GENESIS_CFG_XML := $(TILE_CFGS_PATH)/config.xml
+else
+  $(warning WARNING: GENESIS_CFG_XML set to $(GENESIS_CFG_XML))
+endif
+
+# xml hierarchy file
+ifndef GENESIS_HIERARCHY
+GENESIS_HIERARCHY := hierarchy_out.xml
+else
+  $(warning WARNING: GENESIS_HIERARCHY set to $(GENESIS_HIERARCHY))
+endif
+
+# For more Genesis parsing options, type 'Genesis2.pl -help'
+#        [-parse]                    ---   should we parse input file to generate perl modules?
+#        [-sources|srcpath dir]      ---   Where to find source files
+#        [-includes|incpath dir]     ---   Where to find included files
+#        [-input file1 .. filen]     ---   List of top level files
+#                                    ---   The default is STDIN, but some functions
+#                                    ---   (such as "for" or "while")
+#                                    ---   may not work properly.
+#        [-perl_modules modulename]  ---   Additional perl modules to load
+GENESIS_PARSE_FLAGS := 	-parse $(GENESIS_SRC) $(GENESIS_INC)			\
+			-debug $(GENESIS_DBG_LEVEL)
+#			-input $(GENESIS_INPUTS)				\
+
+# For more Genesis parsing options, type 'Genesis2.pl -help'
+#        [-generate]                 ---   should we generate a verilog hierarchy?
+#        [-top topmodule]            ---   Name of top module to start generation from
+#        [-depend filename]          ---   Should Genesis2 generate a dependency file list? (list of input files)
+#        [-product filename]         ---   Should Genesis2 generate a product file list? (list of output files)
+#        [-hierarchy filename]       ---   Should Genesis2 generate a hierarchy representation tree?
+#        [-xml filename]             ---   Input XML representation of definitions
+GENESIS_GEN_FLAGS :=	-gen -top $(TOP_MODULE)					\
+			-depend depend.list					\
+			-product $(GENESIS_VLOG_LIST)				\
+			-hierarchy $(GENESIS_HIERARCHY)                		\
+			-debug $(GENESIS_DBG_LEVEL)				\
+			-xml $(GENESIS_CFG_XML)
+
+
+
+
+# ############ For Verilog (VCS) #############
+# ############################################
+# VERILOG_ENV :=		$(COMMON_ENV_PATH)/clocker.v 				
+# 
+# VERILOG_DESIGN :=	$(COMMON_ENV_PATH)/ProcessorShim.v 
+# 
+# 
+# VERILOG_FILES :=  	$(VERILOG_ENV)						\
+# 			$(VERILOG_DESIGN)					
+# 
+# 
+# VERILOG_LIBS := 	+incdir+$(TILE_PATH) +incdir+$(COMMON_ENV_PATH)			\
+# 			$(SYNOPSYS)/dw/sim_ver/						\
+# 			+incdir+$(SYNOPSYS)/dw/sim_ver/					\
+# 			$(SMASH)/rtl/st90libs/CORX90GPLVT.v				\
+# 			-y $(PROCESSOR_HOME)/Hardware/rtl 				\
+# 			+incdir+$(PROCESSOR_HOME)/Hardware/rtl 				\
+# 			-v $(PROCESSOR_HOME)/Hardware/rtl/primitives.v 			\
+# 			-v $(PROCESSOR_HOME)/Hardware/verification/xtbench/TAP.v 	\
+# 			-f $(PROCESSOR_HOME)/Hardware/rtl/Xtensa.vf			
+# 
+# #			-y $(PROCESSOR_HOME)/Hardware/verification/xtbench		\
+# 
+# 
+# # "-sverilog" enables system verilog
+# # "+lint=PCWM" enables linting error messages
+# # "+libext+.v" specifies that library files (imported by the "-y" directive) ends with ".v"
+# # "-notice" used to get details when ports are coerced to inout
+# # "-full64" for 64 bit compilation and simulation
+# # "+v2k" for verilog 2001 constructs such as generate
+# # "-timescale=1ns/1ns" sets the time unit and time precision for the entire design
+# # "+noportcoerce" compile-time option to shut off the port coercion for the entire design
+# VCS_FLAGS := 	-sverilog 					\
+# 		+cli 						\
+# 		+lint=PCWM					\
+# 		+libext+.v					\
+# 		-notice						\
+# 		-full64						\
+# 		+v2k						\
+# 		-debug_pp					\
+# 		-timescale=1ns/1ns				\
+# 		+noportcoerce               \
+# 		-ntb_opts dtm
+# 
+# 
+# 
+# # "+vpdbufsize+100" limit the internal buffer to 100MB (forces flushing to disk)
+# # "+vpdports" Record information about ports (signal/in/out)
+# # "+vpdfileswitchsize+1000" limits the wave file to 1G (then switch to next file)
+# SIMV_FLAGS := 	$(SIMV_FLAGS) 				\
+# 		-l simv.log				\
+# 		+vpdbufsize+100				\
+# 		+vpdfileswitchsize+100
+# 
+
+
+
+################################################################################
+################ Makefile Rules
+################################################################################
+#default rule: 
+# all: simv
+all: gen
+
+# Genesis2 rules:
+#####################
+# Genesis2 Parse:
+# This is the rule to activate Genesis2 parser to generate perl module (.pm)
+# from the input verilog preprocessed (.vp) files.
+# Use "make PARSE=<genesis2_parse_flags>" to add elaboration time flags
+%.pm: %.vp
+	@echo ""
+	@echo Making $@ because of $?
+	@echo ==================================================
+	Genesis2.pl $(GENESIS_PARSE_FLAGS) -input $? $(PARSE)
+
+# Genesis2 Generate:
+# This is the rule to activate Genesis2 generator to generate verilog 
+# files (_unqN.v) from the perl (.pm) program.
+# Use "make GEN=<genesis2_gen_flags>" to add elaboration time flags
+$(GENESIS_VLOG_LIST): $(GENESIS_INTERMIDS) $(GENESIS_CFG_XML)
+	@echo ""
+	@echo Making $@ because of $?
+	@echo ==================================================
+	Genesis2.pl $(GENESIS_GEN_FLAGS) $(GEN)
+
+
+# phony rules for partial compilation process
+.PHONY: parse gen
+
+parse: $(GENESIS_INTERMIDS)
+
+gen: $(GENESIS_VLOG_LIST) 
+	Genesis2.pl -gen -top top -hierarchy $(GENESIS_HIERARCHY) -debug 0 -xml $(GENESIS_CFG_XML)
+
+
+
+# # VCS rules:
+# #####################
+# # compile rules:
+# ifndef GENESIS_CFG_XML
+# GENESIS_CFG_XML := $(TILE_CFGS_PATH)/config.xml
+# else
+#   $(warning WARNING: GENESIS_CFG_XML set to $(GENESIS_CFG_XML))
+# endif
+# # use "make COMP=+define+<compile_time_flag[=value]>" to add compile time flags
+# simv:	$(VERILOG_FILES) $(GENESIS_VLOG_LIST)
+# 	@echo ""
+# 	@echo Making $@ because of $?
+# 	@echo ==================================================
+# 	@echo $(LM_LICENSE_FILE)
+# 	vcs  -top top -f $(GENESIS_VLOG_LIST) $(VERILOG_FILES) $(VERILOG_LIBS) $(VCS_FLAGS) $(COMP) 
+# 
+# 
+# 
+# # Simulation rules:
+# #####################
+# # use "make run RUN=+<runtime_flag[=value]>" to add runtime flags
+# .PHONY: run run_wave
+# run_wave: simv
+# 	@echo ""
+# 	@echo Now Running ./simv with wave
+# 	@echo ==================================================
+# 	./simv +wave $(SIMV_FLAGS) $(RUN)
+# 
+# run: simv
+# 	@echo ""
+# 	@echo Now Running ./simv
+# 	@echo ==================================================
+# 	./simv $(SIMV_FLAGS) $(RUN)
+
+
+
+# Cleanup rules:
+#####################
+.PHONY: clean cleanall 
+clean:
+	@echo ""
+	@echo Cleanning old files, objects, logs and garbage
+	@echo ==================================================
+	\rm -rf simv*
+	\rm -rf csrc
+	\rm -rf *.daidir
+	\rm -rf *.log
+	\rm -rf vcs.key
+	\rm -rf *.pvl
+	\rm -rf *.syn
+	\rm -rf *.mr
+	\rm -rf *.pvk
+	\rm -rf *.flc
+	\rm -rf ucli.key
+	\rm -rf *~
+	\rm -rf top.v
+	\rm -rf $(GENESIS_INTERMIDS)
+	\rm -rf $(GENESIS_INTERMIDS:.pm=_unq*.v)
+	\rm -rf depend.list $(GENESIS_VLOG_LIST) hierarchy_out.xml
+	\rm -rf genesis_work
+	\rm -rf lsp
+
+cleanall: clean
+	\rm -rf DVE*
+	\rm -rf vcdplus.vpd

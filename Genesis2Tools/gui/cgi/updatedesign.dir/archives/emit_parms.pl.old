@@ -1,0 +1,312 @@
+# To test, try something like: perl -f <thisfile>
+use strict;
+
+my $DBG9 = 0; # DBG9 = xtreme debug
+
+my $PARMLISTref_global; # Use global to pass param to "defined_parm()"; is this bad?
+my %CLONE_LIST;
+my %DELETE_LIST;
+
+# How to set globals from elsewheres.
+my $testtype = "old";
+sub set_testtype_for_emit_parms { $testtype = shift @_; }
+
+sub emit_parms {
+
+    # $lines_ptr should be pointing at beginning of input file's target <Parameters> block.
+
+    my $PARMLISTref = shift @_;
+    my $lines_ptr   = shift @_;  # Pointer to contents of input file.
+
+    my $clones      = shift @_;  # E.g. "SPECIAL_DATA_MEM_OPS.0&SPECIAL_DATA_MEM_OPS.3"
+    my $deletes     = shift @_;
+
+    my @clone_array = split /\&/, $clones;
+    foreach my $c (@clone_array) { $CLONE_LIST{$c} = 1; }
+
+    my @delete_array = split /\&/, $deletes;
+    foreach my $c (@delete_array) { $DELETE_LIST{$c} = 1; }
+
+
+    $PARMLISTref_global = $PARMLISTref; # Pass parm via global; is this bad?
+
+    if ($DBG9) { test_defined_parm($PARMLISTref); }
+
+    my $changes = "";  # Store changefile here.
+
+    while (my $line = shift(@{$lines_ptr})) {
+
+	debug9("DBG emit $line");
+	$changes .= $line;
+
+	# Already processed "<Parameters>" line before calling emit_parms.
+	# Remainder of block must consist of one or more "<ParameterItem>"
+	# blocks followed by close-tag "</Parameters>"
+	# Ignore one-liners e.g. "<ParameterItem></ParameterItem>"
+
+	#<ParameterItem> => process ParameterItem block
+	if ($line =~ /^\s*<ParameterItem>\s*$/) {
+	    $changes .= process_parameter_item($lines_ptr);
+	}
+	elsif ($line =~ /^\s*<ParameterItem>\s*<\/ParameterItem>\s*$/) {}
+
+	elsif ($line =~ /^\s*<\/Parameters>/) { return $changes; } # DONE
+
+	else {
+	    print "ERROR hey found strange tag in <Parameters> block\n"; exit;
+	}
+    }
+    print "ERROR hey never found close-tag </Parameters>\n"; exit;
+}       
+
+# PARMNAME is a parameter path name e.g. ("SPECIAL","0","keyname")
+# means parm->{SPECIAL}[0]{keyname}
+my @PARMNAME;  # Let's make this global, why not.
+
+sub process_parameter_item {
+    my $lines_ptr  = shift @_;
+
+    # Found (and processed) "<ParameterItem>" tag;
+    # now process remainder of ParameterItem block.
+
+    # First must lookahead to find item's name
+
+    debug9("DBG ppi calls fnok to find parm name\n");
+    @PARMNAME = (find_name_or_key("Parameter", @{$lines_ptr}));
+
+    debug9("DBG PARMNAME = \"". join(".", @PARMNAME) . "\"\n");
+    debug9("DBG\nDBG Found name; now look for value\n");
+
+    #######################################################################
+    # <ParameterItem>...</ParameterItem> contains
+    #     <Name>$name</Name>  (preprocessed by "find_name_or_key()" above)
+    # and
+    #     <Val>$val</Val>     (change val if new one is available)
+    # or
+    #     <ArrayType>...</ArrayType>   call process_arraytype()
+    # or
+    #     <HashType>...</HashType>     call process_arraytype()
+    # or
+    #     <Doc>$doc</Doc>    (ignore/processed elsewhere)
+    #     <Range>...</Range> (ignore/processed elsewhere)
+    #     <AnythingElse>...  (ignore/processed elsewhere)
+    #
+    # and because these are MUTABLE parameters, should not contain:
+    #
+    #     <InstancePath>...</InstancePath>
+    #######################################################################
+
+    my ($parmname,$parmval);  # Store each parm name and val here (for debugging only).
+    my $changes = "";         # Store processed <ParameterItem> block here.
+
+    while (my $line = shift(@{$lines_ptr})) {
+	debug9("DBG ppi $line");
+
+	if ($line =~ /^(\s*<Val>)([^<]+)(<\/Val>)/) {
+
+	    $parmname = join(".", @PARMNAME); $parmval = $2;
+	    debug9("DBG ppi found parameter \"$parmname\" = \"$parmval\"\n");
+
+	    $changes .= checkval("ppi", $line, @PARMNAME); # Rewrite parm val if needed.
+	}
+	elsif ($line =~ /^\s*<(Hash|Array)Type>\s*$/) {
+	    $changes .= $line;
+	    debug9("DBG ppi found $1Type, calling phat\n");
+	    $changes .= process_hasharray_type($lines_ptr, $1);
+	}
+	elsif ($line =~ /^\s*<\/ParameterItem>\s*$/) { # End of ParameterItem block.
+	    $changes .= $line;
+#	    debug9("DBG ppi DONE\n");
+
+	    if ($parmname ne "") { # Note may not always have had a value (mighta been Array or Hash)
+		debug9("PARM \"$parmname\" = \"$parmval\"\n\n");
+	    }
+	    return $changes;
+	}
+	else {
+	    $changes .= $line;
+	}
+    }
+    print "ERROR hey never found close-tag </ParameterItem>\n"; exit;
+}
+
+sub process_hasharray_type {
+    my $lines_ptr = shift @_;
+    my $ha        = shift @_; # "Array" or "Hash"
+
+    my $changes = "";
+    my $index   = 0;
+    my $DBG     = "DBG phat";
+
+    while (my $line = shift(@{$lines_ptr})) {
+
+	# Search for (and count) array items.
+	# print "$DBG $line"; $changes .= $line;
+
+	if ($line =~ /^\s*<\/($ha)Type>\s*$/) {
+            $changes .= dbgline($DBG, $line);
+	    debug9("$DBG DONE\n");
+            debug9("foo3 now changes= (return val)\n$changes\n\n");
+	    return $changes;
+	}
+	elsif ($line =~ /^\s*<($ha)Item>\s*<\/($ha)Item>\s*$/) {
+            dbgline($DBG, "DELETED $line"); # BUG/TODO delete doesn't work here yet.
+	    if ($ha eq "Array") {
+		debug9("$DBG found one-liner array item number $index\n");
+		push (@PARMNAME, "$index");
+		$index++;
+
+                if (defined $CLONE_LIST{join(".", @PARMNAME)}) {
+                    if ($DBG) { print "\nGotta clone this oneline guy!\n\n"; }
+                    $changes .= dbgline($DBG, $line); # Twice as nice...
+                }
+                if (defined $DELETE_LIST{join(".", @PARMNAME)}) {
+                    if ($DBG) { print "\nGotta delete this oneline guy!\n\n"; }
+                }
+                else {
+                    $changes .= dbgline($DBG, $line);
+                }
+		debug9("DBG PARMNAME = \"". join(".", @PARMNAME) . "\"\n");
+		pop @PARMNAME;
+	    }
+	    else {
+		debug9("$DBG found HashItem one-liner (WHY??)\n");
+	    }
+	}
+	elsif ($line =~ /^\s*<($ha)Item>\s*$/) {
+            my $DELETE = 0;
+	    if ($ha eq "Array") {
+                push (@PARMNAME, "$index");
+                $index++;
+                debug9("DBG PARMNAME = \"". join(".", @PARMNAME) . "\"\n");
+
+                if (defined $CLONE_LIST{join(".", @PARMNAME)}) {
+                    if ($DBG) { print "\nGotta clone this guy!\n\n"; }
+                }
+                if (defined $DELETE_LIST{join(".", @PARMNAME)}) {
+                    if ($DBG) { print "\nGotta delete this guy!\n\n"; }
+                    $DELETE = 1;
+                }
+                # Delete is easy; just skip ahead to next array item w/o printing anything
+                
+                # CHANGE FIRST, THEN CLONE
+                # Change happens all by itself; 
+	    }
+
+            if ($DELETE==0) {
+                $changes .= dbgline($DBG, $line);
+                debug9("$DBG found $ha.Item, calling phai\n");
+                $changes .= process_hasharray_item($lines_ptr, $ha);
+            }
+            else {
+               #print "DELETE==1\n";
+               #print "now changes=\n$changes\n\n";
+
+                dbgline($DBG, "DELETED $line");
+                debug9("$DBG found DELETE COMMAND for $ha.Item, calling (and ignoring) phai\n");
+
+                my $dummy .= process_hasharray_item($lines_ptr, $ha);
+
+                if ($DBG) {
+                    my @dummy = split /\n/, $dummy;
+                    foreach my $t (@dummy) { dbgline($DBG, "DELETED $t\n"); }
+                }
+                $DELETE=0;
+            }
+
+	    if ($ha eq "Array") { pop @PARMNAME; }
+	}
+	else {
+            $changes .= dbgline($DBG, $line);
+	    print "ERROR $ha.Type block should only contain $ha.Item or close.$ha.type\n";
+	}
+    }    
+    print "ERROR hey never found close-type tag\n"; exit;
+}
+
+sub process_hasharray_item {
+    my $lines_ptr = shift @_;
+    my $ha        = shift @_;
+
+    my $changes = "";
+    my $DBG = "DBG phai";
+
+    # Item can contain one of:
+    #   close-item
+    #   (Hash|Array)Type
+    #   simple parm
+
+    # If it's a hash, we must find the key and increment the name path...
+
+    if ($ha eq "Hash") {
+	my $keyname = (find_name_or_key("Hash", @{$lines_ptr}));
+	push @PARMNAME, $keyname;
+    }
+
+    while (my $line = shift(@{$lines_ptr})) {
+
+	# Search for (and count) items.
+
+	debug9("$DBG $line");
+
+	if ($line =~ /^\s*<\/($ha)Item>\s*$/) {
+	    $changes .= $line;
+	    debug9("$DBG DONE\n");
+	    if ($ha eq "Hash") { pop @PARMNAME; }
+           #print "foo4 now changes=\n$changes\n\n";
+	    return $changes;
+	}
+	elsif ($line =~ /^\s*<(Hash|Array)Type>\s*$/) {
+	    $changes .= $line;
+	    debug9("$DBG found $1Type, calling phat\n");
+	    $changes .= process_hasharray_type($lines_ptr, $1);
+	}
+
+	elsif ($line =~ /^(\s*<Val>)([^<]+)(<\/Val>)/) {
+
+	    debug9("DBG PARMNAME = \"". join(".", @PARMNAME) . "\"\n");
+	    debug9("DBG HEY found complex parm value $2\n");
+	    debug9("PARM \"". join(".", @PARMNAME) . "\" = \"$2\"\n");
+
+	    $changes .= checkval("phai", $line, @PARMNAME);
+	}
+	else {
+	    $changes .= $line;
+	}
+    }    
+    print "ERROR hey never found close-item tag\n"; exit;
+}
+
+sub checkval {
+    my $id       = shift @_; # E.g. "ppi"
+    my $line     = shift @_; # E.g. "<Val>14</Val>
+    my @parmname = @_;       # E.g. ("SPECIAL", "2", "keyname")
+
+    $line =~ /^(\s*<Val>)([^<]+)(<\/Val>)/;
+    my ($pfx,$val,$sfx) = ($1,$2,$3);
+
+#    debug9("PARM \"". join(".", @parmname) . "\" = \"$2\"\n");
+
+    # If there's a new value for this parameter, use it instead.
+
+    my ($isdefined, $parmval) = defined_parm($PARMLISTref_global, @parmname);
+    if ($isdefined) {
+	debug9("DBG $id WHOA NO WAY!  Found a parm!!!\n");
+	debug9("DBG $id $pfx$parmval$sfx\n");
+	$line = "";
+#	$line .= "DBG $id WHOA NO WAY!  Found a parm!!!\n";
+	$line .= "$pfx$parmval$sfx\n";
+    }
+    return $line;
+}
+
+sub dbgline {
+    my $prefix = shift @_;
+    my $line   = shift @_;
+    if ($DBG9) { print "$prefix $line"; } # E.g. "DBG phat    <Parameters>"
+    return $line;
+}
+
+sub debug9 { my $msg = shift @_; if ($DBG9) { print $msg; } }
+
+1;

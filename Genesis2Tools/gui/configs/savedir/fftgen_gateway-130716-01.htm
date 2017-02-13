@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<!-- DO NOT MODIFY INDEX.HTM! -->
+<!-- It is a symbolic link. Instead modify e.g. configs/index_stanford.htm -->
+
+<html>
+  <head>
+    <title>Genesis Home - Stanford Edition</title>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    <link rel="shortcut icon" href="favicon.ico">
+    <script type="text/javascript" src="secret_buttons.js"></script>
+
+    <!-- "www-vlsi" messes up the form submission :o
+    <base href="http://www-vlsi.stanford.edu/cgi-bin/genesis/">
+    -->
+
+    <!--
+        Assumes current dir is http://vlsiweb/genesis/configs
+        So this takes us back to http://vlsiweb/cgi-bin/genesis
+        If use "www-vlsi" in the base href it messes up the form submit ! :o :(
+    -->
+    <base href="../../cgi-bin/genesis/">
+
+    <style type="text/css">
+      .module { border: 8px solid #990000; width: 320px; height: 440px;
+                border-spacing: 4px; background-color: #e7d19a; }
+      .secret_button { font-size:0.5em; display:inline }
+    </style>
+
+  </head>
+  <!--==================================================================-->
+  <body>
+    <table class=module>
+	<tr>
+	  <td style='vertical-align:top; text-align:center'>
+	    <h2>
+              FFT Generator
+            </h2>
+
+            <div style="text-align:justify;font-style:italic">
+	    <hr><!--==================================================================-->
+            Note: Sometimes it takes awhile for the generator to build
+            and verify a new design.  If you click and nothing
+            happens, please wait at least two minutes...usually it
+            will have finished by then.
+
+	    <hr><!--==================================================================-->
+            Also: Strange things may happen when the generator is
+            under heavy load.  The locking mechanism may not be
+            sufficienfly robust to prevent your design from colliding
+            with someone else trying to build another design at the
+            same time.
+
+            If this seems to be happening, it may be best to go away,
+            come back and try again later.
+            </div>
+
+	    <hr><!--==================================================================-->
+
+To continue, please enter a valid e-mail address:
+
+<!--
+<form>
+<input type="text" name="email_address">
+</form>
+
+
+opendesign.pl?file=..%2Fdesigns%2FFFTGenerator%2Fempty.xml&newdesign=mydesign&DBG=1
+-->
+
+<!--
+<form method="GET" action="example.html">
+  <input type="text" name="var" size="50" value="foo/bar">
+  <input type="submit">
+</form>
+
+      action="../../cgi-bin/genesis/opendesign.pl"
+-->
+
+            <div style="text-align:justify;font-style:italic">
+              <form name="input" action="opendesign.pl" method="get">
+                <!-- Design: --><input type="hidden"
+                                       name="file"
+                                       value="../designs/FFTGenerator/empty.xml">
+                <!-- email:  --><input style='width:100%'
+                                       type="text"
+                                       name="newdesign">
+                <!-- DBG:    --><input id="fft_debug"
+                                       type="hidden"
+                                       name="DBG"
+                                       value=0>
+                <input type="submit" value="Submit">
+              </form>
+            </div>
+
+
+
+	    <hr><!--==================================================================-->
+	    <h3>
+	      <a href = 'opendesign.pl?newdesign=cmpdemo&amp;file=../designs/CMP/cmp-baseline.xml'>
+		  CMP generator (demo)
+              </a>
+	    </h3>
+
+	    <hr><!--==================================================================-->
+	    <h3>
+	      <a href = 'http://vlsiweb.stanford.edu/genesis/configs/fftgen_gateway.htm'>
+		  FFT generator
+              </a>
+	    </h3>
+
+	    <hr><!--==================================================================-->
+
+
+            <!-- Secret buttons.  Shhhh!!! -->
+            <div style="text-align:left">
+              <div class=secret_button style="color:black"
+                   title='secret button: disable new-array mode'
+                   id=toggle_cookie_NEW_ARRAY_MODE onclick='toggle_cookie("NEW_ARRAY_MODE","a")'>a
+              </div>
+              <div class=secret_button style="color:black"
+                   title='secret button: turn off comments'
+                   id=toggle_cookie_COMMENTS  onclick='toggle_cookie("COMMENTS", "c")'>c
+              </div>
+              <div class=secret_button style="color:gray"
+                   title='secret button: turn on debugging'
+                   id=toggle_cookie_DEBUG
+                   onclick='if (document.getElementById("fft_debug").value == 0) {
+                       document.getElementById("fft_debug").value = 1;
+                       alert("Debug ON");
+                   } else {
+                       document.getElementById("fft_debug").value = 0;
+                       alert("Debug OFF");
+                   }'>d
+              </div>
+              <div class=secret_button style="color:black"
+                   title='secret button: about'>
+                <a href="about.pl">?</a>
+              </div>
+            </div>
+
+	    <!-- h3>(Snazzy logo goes here)</h3
+            <center><img src="../../genesis/images/stanford_seal.gif" alt="tree"></center>
+             -->
+
+
+            <!-- HTML compliance -->
+            <div style="text-align:right">
+              <a href="http://validator.w3.org/check?uri=referer">
+                  <img src="http://www.w3.org/Icons/valid-html401"
+                       alt="Valid HTML 4.01 Transitional" height=12>
+                  <!-- width=44 -->
+                  <!-- height="31" width="88" -->
+              </a>
+            </div>
+	  </td>
+	</tr>
+    </table>
+  </body>
+  <!--==================================================================-->
+</html>

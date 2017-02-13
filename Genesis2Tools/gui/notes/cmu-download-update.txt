@@ -1,0 +1,44 @@
+Jolin: I'm sending you three files
+  gui/0-template.php (to replace existing 0-template.php)
+  gui/Misc.js (to add as a new file in the gui directory)
+  gui/cgi/buildtarball.pl (to add as a new file in the cgi directory)
+
+You should diff the old and new 0-template.php files to see what's
+changed, and then add in the new changes to your copy of 0-template.php.
+
+Misc.js and buildtarball.pl have some system-dependent information at
+the top of each file that you may have to edit.  In particular,
+Misc.js has
+
+  var CGI_URL = "/cgi-bin/ig/"; // Where to find cgi programs for gui.
+
+...which you will probably change to read
+
+  var CGI_URL = "/cgi-bin/genesis/"; // Where to find cgi programs for gui.
+
+
+
+
+...and in "buildtarball.pl" you will need to change
+
+  my $GUI_HOME_DIR = "~steveri/smart_memories/Smart_design/ChipGen/bin/Genesis2Tools/gui";
+  my $GUI_HOME_URL = "/ig";                         # URL path used to access the gui.
+  my $BUILDTARBALL = "/cgi-bin/ig/buildtarball.pl"; # URL path used to
+  access this script.
+
+to:
+
+  my $GUI_HOME_DIR = [your directory name here]
+  my $GUI_HOME_URL = "/gui";                             # URL path used to access the gui.
+  my $BUILDTARBALL = "/cgi-bin/genesis/buildtarball.pl"; # URL path used to access this script.
+
+
+
+
+
+Note: I decided not to use the Makefile at all for the download, so
+there's no need for the Makefile changes that I talked about in
+previous e-mail...
+
+Let me know when you run into trouble!
+Steve

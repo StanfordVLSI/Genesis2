@@ -1,0 +1,1196 @@
+/*************************************************************************
+ ** From Perforce:
+ **
+ ** $Id: //Smart_design/ChipGen/TileTest/TileGenTest/generic_memory.vp#7 $
+ ** $DateTime: 2010/07/13 20:41:31 $
+ ** $Change: 8911 $
+ ** $Author: danowitz $
+ *************************************************************************/
+
+/* *****************************************************************************
+ * File: addrMap.vp
+ * Author: Andrew Danowitz
+ * 
+ * Description:
+ * Genesis-based off-system memory
+ * 
+ * Required Genesis Controlable Parameters:
+ * * ADDR_SIZE - Determines how many bits the address is, def: 32 bits
+ * * DATA_SIZE - Determines how big the data word and mask are, def: 32 bits
+ * * META_SIZE - Determines how big the meta word and mask are, def: 5 bits
+ * * INITIAL_TYPE - Determines whether the memory is initialized to "zero" 
+ * *                (all zeroes), "x" (all x's), "val" same repeated value,
+ * *                def: 0.
+ * * INI_META - Value to initialize meta memory to if initial type is val.
+ * * INI_DATA - Value to initialize data memory to if initial type is val.
+ * 
+ * Change bar:
+ * -----------
+ * Date          Author   Description
+ * May 14, 2010  danowitz init version
+ * Jul  2, 2010  danowitz fixed read and file upload methods
+ * Jul 12, 2010  danowitz changed memory back to a 32 bit word size and added 
+ *                        methods for instruction and data accesses
+ * Jul 13, 2010  danowitz added integer accesss read/write functions for sim_io
+ *                        lib
+ * 
+ * ****************************************************************************/
+
+// Allow for case statements
+//; use Switch;
+
+//; my $addr_size = $self->define_param('ADDR_SIZE'=>32);
+//; my $data_size = $self->define_param('DATA_SIZE'=>32);
+//; my $instr_size = $self->define_param('INSTR_SIZE'=>32);
+//; my $meta_size = $self->define_param('META_SIZE'=>5);
+//; my $ini_type = $self->define_param('INITIAL_TYPE'=>0);
+//; my $ini_meta = $self->define_param('INI_META'=>'');
+//; my $ini_data = $self->define_param('INI_DATA'=>'');
+//; self->error("Missing parameter: INI_META") if (($ini_meta=='')&&($ini_type =~ m/^val/));
+//; self->error("Missing parameter: INI_DATA") if (($ini_data=='')&&($ini_type =~ m/^val/));
+//extern bit RunWithTrace;
+
+class `$self->get_module_name()`;
+   
+   protected bit [31:0] data_mem[*];
+   protected bit [31:0] meta_mem[*];
+   static protected bit is_random_value;
+   static protected bit [31:0] default_data_val;
+   static protected bit [31:0] default_meta_val;
+
+   // control variables
+   //-------------------
+   protected integer active;
+   protected string my_agent_name;
+   protected integer my_agent_ID;
+   protected string my_prefix;
+   protected integer my_ID;
+   protected integer _DEBUG_;
+   protected semaphore semID; // use semaphore to arbitrate reads and writes
+   protected bit RunWithTrace;
+   
+   //Log file handle:
+   integer log_file_handle;
+
+   function new (integer _DEBUG, string my_agent_name_, integer my_agent_ID_,
+				 string my_prefix_, integer entity_ID_, RunWithTrace=0);
+   begin
+   //////////////////////////////////////////////////////////
+   // In the common case this method should not be changed //
+   //////////////////////////////////////////////////////////
+   this._DEBUG_ = _DEBUG;
+   if ( this._DEBUG_ ) $display ("%s: New Mem was created\n",my_agent_name_);
+   active = 0; // initial memory as not active.
+   this.my_agent_name = my_agent_name_;
+   this.my_agent_ID = my_agent_ID_;
+   this.my_prefix = my_prefix_;
+   this.my_ID = entity_ID_;
+   
+   //Set up default memory value:
+   //; if ($ini_type =~ m/zero/) {
+   this.default_data_val = 'b0;
+   this.default_meta_val = 'b0;
+   //;                     }
+   //; elsif ($ini_type =~ m/x/) {
+   this.default_data_val = 'bx;
+   this.default_meta_val = 'bx;
+   //;                     }
+   //; elsif ($ini_type =~ m/val/) {
+   this.default_data_val = 32'd`$ini_data`;
+   this.default_meta_val = 32'd`$ini_meta`;
+   //;                     }
+   //; else {
+   //;   $self->error("Invalid default type specified");
+   //; }
+   
+   // Open log file
+   log_file_handle = $fopen({my_prefix, "Mem.log"}, "w");
+   if (log_file_handle == 0)
+   begin
+    $fdisplay("ERROR: SV Can't open %sMem.log for writing\n", my_prefix);
+    active = 0;
+      //repeat (2) @(posedge CLOCK);
+    $finish;
+   end
+   else
+   begin
+    $fdisplay (log_file_handle,"File: %sMem.log\n", my_prefix);
+    $fdisplay (log_file_handle,"*********************************\n" );
+   end
+   
+   
+   // initialize the accesses semaphore
+   //                    random semaphore ID, #semaphores, keys per semaphore
+	  
+	  this.semID= new(1);
+
+   if (! semID)
+   begin
+    $fdisplay("ERROR: SV can't allocate semaphores\n");
+    $finish;
+   end
+   
+   end
+   endfunction // new
+
+   // Utility tasks
+   //--------------
+   extern task SetRandomParams(bit is_random_value_, bit [`$data_size-1`:0] default_data_value_,
+                       bit [`$meta_size-1`:0] default_meta_value_);
+   
+   // generic_memory tasks
+   //------------------
+   extern task WriteData(bit [`$addr_size-1`:0] addr, 
+						 bit[`$data_size-1`:0] data, 
+						 bit [`$data_size/8-1`:0] data_mask,
+						 bit [`$meta_size-1`:0] meta, 
+						 bit [`$meta_size/8-1`:0] meta_mask, 
+						 string comment,
+						 integer written_by);
+   extern task WriteInstr(bit [`$addr_size-1`:0] addr, 
+						 bit[`$instr_size-1`:0] instr, 
+						 bit [`$instr_size/8-1`:0] instr_mask,
+						 bit [`$meta_size-1`:0] meta, 
+						 bit [`$meta_size/8-1`:0] meta_mask, 
+						 string comment,
+						 integer written_by);
+   extern task WriteInt(bit[`$addr_size-1`:0] addr,
+						integer data,
+						bit [3:0] data_mask,
+						integer meta,
+						bit [3:0] meta_mask,
+						string comment,
+						integer written_by);
+	  
+   extern task ReadData(bit [`$addr_size-1`:0] addr, 
+						output logic [`$data_size-1`:0] data,
+						output logic [`$meta_size-1`:0] meta, 
+						input string comment, 
+						input bit local_access);
+   extern task ReadInstr(bit [`$addr_size-1`:0] addr, 
+						output logic [`$instr_size-1`:0] instr,
+						output logic [`$meta_size-1`:0] meta, 
+						input string comment, 
+						input bit local_access);
+   extern task ReadInt(bit [`$addr_size-1`:0] addr,
+					   output integer data,
+					   output integer meta,
+					   input string comment,
+					   input bit local_access);
+	  
+   // Other Memory Useful Tasks/Functions
+   //----------------------------------------
+   function bit Empty();
+	  Empty= (data_mem.num()==0) ? 1'b0:1'b1;
+   endfunction;
+	  
+   function integer Size();
+	  Size = data_mem.num();
+   endfunction; // Size
+	  
+
+   //; my $range_high = '';
+   //; for (my $x = 0; $x < $addr_size; $x++) {
+   //;				  $range_high = $range_high . "1";
+   //; }
+   extern function integer GetClosestIndx(logic [`$addr_size-1`:0] indx,
+                                  bit [`$addr_size-1`:0] range_high,
+                                  bit [`$addr_size-1`:0] range_low,
+                                  bit [`$addr_size-1`:0] pattern,
+                                  bit [`$addr_size-1`:0] pattern_mask);
+   extern task UploadFile(string file_name, bit [`$addr_size-1`:0] 
+						  base_addr /*= 0*/, string new_indx_sign /*="@"*/, 
+						  integer word_size);
+   
+   // Global activation/termination functions
+  //----------------------------------------
+   extern task run();
+   extern task stop_me();
+
+	  endclass
+   
+   // Task for comunicating with future scoreboards
+   //----------------------------------------------
+//   task SendWriteToSB(bit [`$addr_size-1`:0] addr, bit[`$addr_size-1`:0] data, bit [`$addr_size-1`:0] data_mask,
+//                     bit [5:0] meta, bit meta_byte_mask)
+//   {/*to be implemented by a scoreboard linking extention*/}
+//   }
+
+// generic_memory::run()
+task `$self->get_module_name()`::run();
+	  
+ //////////////////////////////////////////////////////////
+ // In the common case this method should not be changed //
+ //////////////////////////////////////////////////////////
+ if ( _DEBUG_ ) $display ("%s: Mem was activated\n",my_agent_name);
+ active = 1;
+
+endtask //
+	  
+//------------------------------------------------------------------------------
+// `$self->get_module_name()`::stop_me()
+task `$self->get_module_name()`::stop_me();
+	  
+ //////////////////////////////////////////////////////////
+ // In the common case this method should not be changed //
+ //////////////////////////////////////////////////////////
+ if ( _DEBUG_ ) $display ("%s: Mem was terminated\n",my_agent_name);
+ active = 0;
+// repeat (2) @(posedge CLOCK); //wait for queues to drain
+ if (log_file_handle)
+ $fclose (log_file_handle);
+endtask //
+
+//------------------------------------------------------------------------------
+// `$self->get_module_name()`::WriteData(...)
+task `$self->get_module_name()`::WriteData(bit [`$addr_size-1`:0] addr, 
+										   bit[`$data_size-1`:0] data,
+										   bit [`$data_size/8-1`:0] data_mask, 
+										   bit [`$meta_size-1`:0] meta,
+										   bit [`$meta_size/8-1`:0] meta_mask, 
+										   string comment="",
+										   integer written_by=0);
+	  
+
+ //////////////////////////////////////////////////////////
+ // In the common case this method should not be changed //
+ //////////////////////////////////////////////////////////
+ bit [`$data_size-1`:0] readData;
+ bit [`$meta_size-1`:0] readMetaData;
+ bit [`$data_size-1`:0] bit_mask;
+ bit [`$meta_size-1`:0] bit_meta_mask;
+	  
+ //; my $addr_mask = $addr_size . '\'b';
+
+ //; for (my $x = 0; $x < $addr_mask; $x++) {
+ //;   $addr_mask = $addr_mask . "1";
+ //; }
+ 
+ addr = addr & `$addr_mask`;
+	  
+ if ( _DEBUG_ ) $display ("%d:%s:Mem.WriteData() was activated\n",
+                         $time,my_agent_name);
+
+ // lock semaphore:
+ semID.get();
+
+ //write to log
+ if (log_file_handle && (RunWithTrace))
+   begin
+	  $fdisplay (log_file_handle,
+				 "%d:%s:Mem.WriteData(): addr=%8x data=%8x be=%4b meta=%6b meta_be=%1b |%s\n",
+				 $time, my_agent_name, addr, data, data_mask, meta,
+				 meta_mask, comment);
+   end  
+
+  // read previous value from memory
+ ReadData(addr,readData, readMetaData, comment, 1);
+
+	  bit_mask = {
+				  //; for (my $x = 0; $x < $data_size/8; $x++){
+				  //;    for (my $y = 0; $y < 8; $y++) {
+				  data_mask[`$data_size/8-1-$x`]
+				  //;       if ($x < $data_size/8-1 || $y < 7) {
+				  ,
+				  //;       }
+				  //;    }
+				  //; }
+				  };
+	  bit_meta_mask = {
+				  //; for (my $x = 0; $x < $meta_size/8; $x++){
+				  //;    for (my $y = 0; $y < 8; $y++) {
+				  meta_mask[`$meta_size/8-1-$x`]
+				  //;       if ($x < $meta_size/8-1 || $y < 7) {
+				  ,
+				  //;       }
+				  //;    }
+				  //; }
+				  };
+	  
+	  
+	  readData &= ~bit_mask;
+	  readData |= data & bit_mask;
+	  //$display("data addr %h data %h", addr, readData);
+	  readMetaData &= ~bit_meta_mask;
+	  readMetaData |= meta & bit_meta_mask;
+
+	  //write new value to memory
+	  //; if ($data_size == 8) {
+	  data_mem[addr] = {24'b0, readData};
+	  //; }
+	  //; elsif ($data_size == 16) {
+	  readData &= ~bit_mask;
+	  readData |= data & bit_mask;
+	  data_mem[addr] = {16'b0, readData};
+	  //; }
+	  //; elsif ($data_size == 32) {
+	  readData &= ~bit_mask;
+	  readData |= data & bit_mask;
+	  data_mem[addr] = readData;
+	  //; }
+      //; elsif ($data_size == 64) {
+	  data_mem[addr+4] = readData[63:32];
+	  data_mem[addr] = readData[31:0];
+      //; }
+      //; elsif ($data_size == 128) {
+	  data_mem[addr+12] = readData[127:96];
+	  data_mem[addr+8] = readData[95:64];
+	  data_mem[addr+4] = readData[63:32];
+	  data_mem[addr] = readData[31:0];
+      //; }
+      //; else {
+      //;    die "Invalid data size.  Must be 8, 16, 32, 64, or 128 bits";
+      //; }
+
+	  //write new meta value to memory
+	  //; if ($meta_size == 8) {
+	  meta_mem[addr] = {24'b0, readMetaData};
+	  //; }
+	  //; elsif ($meta_size == 16) {
+	  meta_mem[addr] = {16'b0, readMetaData};
+	  //; }
+	  //; elsif ($meta_size == 24) {
+	  meta_mem[addr] = {8'b0, readMetaData};
+	  //; }
+	  //; elsif ($meta_size == 32) {
+	  meta_mem[addr] = readMetaData;
+	  //; }
+      //; elsif ($meta_size == 64) {
+	  meta_mem[addr+4] = readMetaData[63:32];
+	  meta_mem[addr] = readMetaData[31:0];
+      //; }
+      //; elsif ($meta_size == 128) {
+	  meta_mem[addr+12] = readMetaData[127:96];
+	  meta_mem[addr+8] = readMetaData[95:64];
+	  meta_mem[addr+4] = readMetaData[63:32];
+	  meta_mem[addr] = readMetaData[31:0];
+      //; }
+      //; else {
+      //;    die "Invalid meta size.  Must be 8, 16, 24, 32, 64, or 128 bits";
+      //; }
+ // release semapohre
+ semID.put();
+ 
+ // If this is a Tester write to main memory => send transaction to Scoreboard
+ //if ((written_by == TESTER_ID) && (my_ID == MAINMEM_ID))
+ //SendWriteToSB(addr, data, byte_mask, meta, meta_byte_mask);
+  
+endtask //
+	  
+//------------------------------------------------------------------------------
+// `$self->get_module_name()`::WriteInstr(...)
+task `$self->get_module_name()`::WriteInstr(bit [`$addr_size-1`:0] addr, 
+										   bit[`$instr_size-1`:0] instr,
+										   bit [`$instr_size/8-1`:0] instr_mask, 
+										   bit [`$meta_size-1`:0] meta,
+										   bit [`$meta_size/8-1`:0] meta_mask, 
+										   string comment="",
+										   integer written_by=0);
+	  
+
+ //////////////////////////////////////////////////////////
+ // In the common case this method should not be changed //
+ //////////////////////////////////////////////////////////
+ bit [`$instr_size-1`:0] readInstr;
+ bit [`$meta_size-1`:0] readMetaInstr;
+ bit [`$instr_size-1`:0] bit_mask;
+ bit [`$meta_size-1`:0] bit_meta_mask;
+	  
+ //; my $addr_mask = $addr_size . '\'b';
+
+ //; for (my $x = 0; $x < $addr_mask; $x++) {
+ //;   $addr_mask = $addr_mask . "1";
+ //; }
+ 
+ addr = addr & `$addr_mask`;
+	  
+ if ( _DEBUG_ ) $display ("%d:%s:Mem.WriteData() was activated\n",
+                         $time,my_agent_name);
+
+ // lock semaphore:
+ semID.get();
+
+ //write to log
+ if (log_file_handle && (RunWithTrace))
+   begin
+	  $fdisplay (log_file_handle,
+				 "%d:%s:Mem.WriteData(): addr=%8x data=%8x be=%4b meta=%6b meta_be=%1b |%s\n",
+				 $time, my_agent_name, addr, instr, instr_mask, meta,
+				 meta_mask, comment);
+   end  
+
+  // read previous value from memory
+ ReadInstr(addr,readInstr, readMetaInstr, comment, 1);
+
+ bit_mask = {
+			 //; for (my $x = 0; $x < $instr_size/8; $x++){
+			 //;    for (my $y = 0; $y < 8; $y++) {
+			 instr_mask[`$instr_size/8-1-$x`]
+			 //;       if ($x < $instr_size/8-1 || $y < 7) {
+			 ,
+			 //;       }
+			 //;    }
+			 //; }
+				  };
+	  
+ bit_meta_mask = {
+				  //; for (my $x = 0; $x < $meta_size/8; $x++){
+				  //;    for (my $y = 0; $y < 8; $y++) {
+				  meta_mask[`$meta_size/8-1-$x`]
+				  //;       if ($x < $meta_size/8-1 || $y < 7) {
+				  ,
+				  //;       }
+				  //;    }
+				  //; }
+				  };
+	  
+ //calculate new value according to mask
+ readInstr &= ~bit_mask;
+ readInstr |= instr & bit_mask;
+ 
+ readMetaInstr &= ~bit_meta_mask;
+ readMetaInstr |= meta & bit_meta_mask;
+ 
+ //write new value to memory
+	  //; if ($instr_size == 8) {
+	  data_mem[addr] = {24'b0, readInstr};
+	  //; }
+	  //; elsif ($instr_size == 16) {
+	  data_mem[addr] = {16'b0, readInstr};
+	  //; }
+	  //; elsif ($instr_size == 32) {
+	  data_mem[addr] = readInstr;
+	  //; }
+      //; elsif ($instr_size == 64) {
+	  data_mem[addr+4] = readInstr[63:32];
+	  data_mem[addr] = readInstr[31:0];
+      //; }
+      //; elsif ($instr_size == 128) {
+	  data_mem[addr+12] = readInstr[127:96];
+	  data_mem[addr+8] = readInstr[95:64];
+	  data_mem[addr+4] = readInstr[63:32];
+	  data_mem[addr] = readInstr[31:0];
+      //; }
+      //; else {
+      //;    die "Invalid data size.  Must be 8, 16, 32, 64, or 128 bits";
+      //; }
+	  	  
+	  //write new meta value to memory
+	  //; if ($meta_size == 8) {
+	  meta_mem[addr] = {24'b0, readMetaInstr};
+	  //; }
+	  //; elsif ($meta_size == 16) {
+	  meta_mem[addr] = {16'b0, readMetaInstr};
+	  //; }
+	  //; elsif ($meta_size == 24) {
+	  meta_mem[addr] = {8'b0, readMetaInstr};
+	  //; }
+	  //; elsif ($meta_size == 32) {
+	  meta_mem[addr] = readMetaInstr;
+	  //; }
+      //; elsif ($meta_size == 64) {
+	  meta_mem[addr+4] = readMetaInstr[63:32];
+	  meta_mem[addr] = readMetaInstr[31:0];
+      //; }
+      //; elsif ($meta_size == 128) {
+	  meta_mem[addr+12] = readMetaInstr[127:96];
+	  meta_mem[addr+8] = readMetaInstr[95:64];
+	  meta_mem[addr+4] = readMetaInstr[63:32];
+	  meta_mem[addr] = readMetaInstr[31:0];
+      //; }
+      //; else {
+      //;   die "Invalid data size.  Must be 8, 16, 24, 32, 64, or 128 bits";
+      //; }
+
+ // release semapohre
+ semID.put();
+ 
+ // If this is a Tester write to main memory => send transaction to Scoreboard
+ //if ((written_by == TESTER_ID) && (my_ID == MAINMEM_ID))
+ //SendWriteToSB(addr, data, byte_mask, meta, meta_byte_mask);
+  
+endtask //
+//------------------------------------------------------------------------------
+// `$self->get_module_name()`::WriteData(...)
+task `$self->get_module_name()`::WriteInt(bit [`$addr_size-1`:0] addr, 
+										   integer data,
+										   bit [3:0] data_mask, 
+										   integer  meta,
+										   bit [3:0] meta_mask, 
+										   string comment="",
+										   integer written_by=0);
+	  
+
+ //////////////////////////////////////////////////////////
+ // In the common case this method should not be changed //
+ //////////////////////////////////////////////////////////
+ integer  readData;
+ integer readMetaData;
+ bit [3:0] bit_mask;
+ bit [3:0] bit_meta_mask;
+	  
+ //; my $addr_mask = $addr_size . '\'b';
+
+ //; for (my $x = 0; $x < $addr_mask; $x++) {
+ //;   $addr_mask = $addr_mask . "1";
+ //; }
+ 
+ addr = addr & `$addr_mask`;
+	  
+ if ( _DEBUG_ ) $display ("%d:%s:Mem.WriteData() was activated\n",
+                         $time,my_agent_name);
+
+ // lock semaphore:
+ semID.get();
+
+ //write to log
+ if (log_file_handle && (RunWithTrace))
+   begin
+	  $fdisplay (log_file_handle,
+				 "%d:%s:Mem.WriteData(): addr=%8x data=%8x be=%4b meta=%6b meta_be=%1b |%s\n",
+				 $time, my_agent_name, addr, data, data_mask, meta,
+				 meta_mask, comment);
+   end  
+
+  // read previous value from memory
+ ReadInt(addr,readData, readMetaData, comment, 1);
+
+	  bit_mask = {
+				  //; for (my $x = 0; $x < 4; $x++){
+				  //;    for (my $y = 0; $y < 8; $y++) {
+				  data_mask[`3-$x`]
+				  //;       if ($x < 3 || $y < 7) {
+				  ,
+				  //;       }
+				  //;    }
+				  //; }
+				  };
+	  bit_meta_mask = {
+				  //; for (my $x = 0; $x < 4; $x++){
+				  //;    for (my $y = 0; $y < 8; $y++) {
+				  meta_mask[`3-$x`]
+				  //;       if ($x < 3 || $y < 7) {
+				  ,
+				  //;       }
+				  //;    }
+				  //; }
+				  };
+	  
+	  
+	  readData &= ~bit_mask;
+	  readData |= data & bit_mask;
+	  //$display("data addr %h data %h", addr, readData);
+	  readMetaData &= ~bit_meta_mask;
+	  readMetaData |= meta & bit_meta_mask;
+
+	  //write new value to memory
+	  data_mem[addr] = readData;
+
+	  //write new meta value to memory
+	  meta_mem[addr] = readMetaData;
+ // release semapohre
+ semID.put();
+ 
+ // If this is a Tester write to main memory => send transaction to Scoreboard
+ //if ((written_by == TESTER_ID) && (my_ID == MAINMEM_ID))
+ //SendWriteToSB(addr, data, byte_mask, meta, meta_byte_mask);
+  
+endtask //				  
+//------------------------------------------------------------------------------
+// `$self->get_module_name()`::ReadData(...)
+task `$self->get_module_name()`::ReadData(bit [`$addr_size-1`:0] addr, 
+							  output logic [`$data_size-1`:0] data,
+                              output logic [`$meta_size-1`:0] meta, 
+							  input string comment="",
+										  input bit local_access=0);
+	  
+	   // Note: The local_access bit is used to diffrentiate between real accesses
+	   // by memory clients (MemCtrl for instance) and local reads by auxiliary
+	   // functions and by WriteData.
+	   
+	   //////////////////////////////////////////////////////////
+	   // In the common case this method should not be changed //
+	   //////////////////////////////////////////////////////////
+	   
+	   //; my $addr_mask = $addr_size . '\'b';
+	   
+	   //; for (my $x = 0; $x < $addr_mask; $x++) {
+	   //;   $addr_mask = $addr_mask . "1";
+	   //; }
+	  addr = addr & `$addr_mask`;
+	  
+	  if ( _DEBUG_ && (! local_access) )
+		begin
+		   $display ("%d:%s:Mem.ReadData() was activated\n",
+				   $time,my_agent_name);
+		end
+	  
+	  // lock semaphore: (unless this is local access)
+	  if (! local_access)
+		semID.get();
+	  
+	  if (data_mem.exists(addr))
+		begin
+		   //; if ($data_size <= 32) {
+		   data = data_mem[addr][`$data_size-1`:0];
+		   //; }
+		   //; elsif ($data_size == 64){
+		   data[63:32] = data_mem[addr+4];
+		   data[31:0] = data_mem[addr];
+		   //; }
+		   //; elsif ($data_size == 128){
+		   data[127:96] = data_mem[addr+16];
+		   data[95:64] = data_mem[addr+8];
+		   data[63:32] = data_mem[addr+4];
+		   data[31:0] = data_mem[addr];
+		   //; }
+
+		   //; if ($meta_size <= 32) {
+		   meta = meta_mem[addr][`$meta_size-1`:0];
+		   //; }
+		   //; elsif ($meta_size == 64){
+		   meta[63:32] = meta_mem[addr+4];
+		   meta[31:0] = meta_mem[addr];
+		   //; }
+		   //; elsif ($meta_size == 128){
+		   meta[127:96] = meta_mem[addr+16];
+		   meta[95:64] = meta_mem[addr+8];
+		   meta[63:32] = meta_mem[addr+4];
+		   meta[31:0] = meta_mem[addr];
+		   //; }
+		end
+	  else
+		begin
+		   if( this.is_random_value == 0 )
+			 begin
+				data = this.default_data_val;
+				meta = this.default_meta_val;
+			 end
+		   else
+			 begin
+				
+				
+
+				//; if ($data_size == 8) {
+				data = $urandom();
+				data_mem[addr] = {data,data,data,data};
+				//; }
+				//; elsif ($data_size == 16) {
+				data = $urandom();
+				data_mem[addr] = {data,data};
+				//; }
+				//; elsif ($data_size == 32) {
+				data = $urandom();
+				data_mem[addr] = data;
+				//; }
+				//; elsif ($data_size == 64) {
+				data = {$urandom(),$urandom()};
+				data_mem[addr+4] = data[63:32];
+				data_mem[addr] = data[31:0];
+				//; }
+				//; elsif ($data_size == 128) {
+				data = {$urandom(),$urandom(),$urandom(),$urandom};
+				data_mem[addr+12] = data[127:96];
+				data_mem[addr+8] = data[95:64];
+				data_mem[addr+4] = data[63:32];
+				data_mem[addr] = data[31:0];
+				//; }
+				//; else {
+				//;   die "Invalid data size.  Must be 8, 16, 32, 64, or 128 bits";
+				//; }
+				
+				//write new meta value to memory
+				//; if ($meta_size == 8) {
+				meta = $urandom();
+				meta_mem[addr] = {meta, meta, meta, meta};
+				//; }
+				//; elsif ($meta_size == 16) {
+				meta = $urandom();
+				meta_mem[addr] = {meta, meta};
+				//; }
+				//; elsif ($meta_size == 24) {
+				meta = $urandom();
+				meta_mem[addr] = {8'b0, meta};
+				//; }
+				//; elsif ($meta_size == 32) {
+				meta = $urandom();
+				meta_mem[addr] = meta;
+				//; }
+				//; elsif ($meta_size == 64) {
+				meta = {$urandom(), $urandom()};
+				meta_mem[addr+4] = meta[63:32];
+				meta_mem[addr] = meta[31:0];
+				//; }
+				//; elsif ($meta_size == 128) {
+				meta = {$urandom(), $urandom(), $urandom(), $urandom()};
+				meta_mem[addr+12] = meta[127:96];
+				meta_mem[addr+8] = meta[95:64];
+				meta_mem[addr+4] = meta[63:32];
+				meta_mem[addr] = meta[31:0];
+				//; }
+				//; else {
+				//;   die "Invalid meta size.  Must be 8, 16, 24, 32, 64, or 128 bits";
+				//; }
+			 end
+		end
+	  
+	  // if this was not a local access, write to log file.
+	  if ((! local_access) && (log_file_handle) && (RunWithTrace))
+		begin
+		   $fdisplay (log_file_handle,
+					"%d:%s:Mem.ReadData() : addr=%8x data=%8x         meta=%6b           |%s\n",
+					$time, my_agent_name, addr, data, meta, comment);
+		end
+	  
+	  // release semapohre:  (unless this is local access)
+	  if (! local_access)
+		semID.put();
+	  
+endtask //
+	
+//------------------------------------------------------------------------------
+// `$self->get_module_name()`::ReadInstr(...)
+task `$self->get_module_name()`::ReadInstr(bit [`$addr_size-1`:0] addr, 
+							  output logic [`$instr_size-1`:0] instr,
+                              output logic [`$meta_size-1`:0] meta, 
+							  input string comment="",
+										  input bit local_access=0);
+	  
+	   // Note: The local_access bit is used to diffrentiate between real accesses
+	   // by memory clients (MemCtrl for instance) and local reads by auxiliary
+	   // functions and by WriteData.
+	   
+	   //////////////////////////////////////////////////////////
+	   // In the common case this method should not be changed //
+	   //////////////////////////////////////////////////////////
+	   
+	   //; my $addr_mask = $addr_size . '\'b';
+	   
+	   //; for (my $x = 0; $x < $addr_mask; $x++) {
+	   //;   $addr_mask = $addr_mask . "1";
+	   //; }
+	  addr = addr & `$addr_mask`;
+	  
+	  if ( _DEBUG_ && (! local_access) )
+		begin
+		   $display ("%d:%s:Mem.ReadData() was activated\n",
+				   $time,my_agent_name);
+		end
+	  //$display("reading %h", addr);
+	  
+	  // lock semaphore: (unless this is local access)
+	  if (! local_access)
+		semID.get();
+	  
+	  if (data_mem.exists(addr))
+		begin
+		   //; if ($instr_size <= 32) {
+		   instr = data_mem[addr][`$instr_size-1`:0];
+		   //; }
+		   //; elsif ($instr_size == 64){
+		   instr[63:32] = data_mem[addr+4];
+		   instr[31:0] = data_mem[addr];
+		   //$display("instr %h, actInstr %h", instr, {data_mem[addr+4], data_mem[addr]});
+		   
+		   //; }
+		   //; elsif ($instr_size == 128){
+		   instr[127:96] = data_mem[addr+16];
+		   instr[95:64] = data_mem[addr+8];
+		   instr[63:32] = data_mem[addr+4];
+		   instr[31:0] = data_mem[addr];
+		   //; }
+
+		   //; if ($meta_size <= 32) {
+		   meta = meta_mem[addr][`$meta_size-1`:0];
+		   //; }
+		   //; elsif ($meta_size == 64){
+		   meta[63:32] = meta_mem[addr+4];
+		   meta[31:0] = meta_mem[addr];
+		   //; }
+		   //; elsif ($meta_size == 128){
+		   meta[127:96] = meta_mem[addr+16];
+		   meta[95:64] = meta_mem[addr+8];
+		   meta[63:32] = meta_mem[addr+4];
+		   meta[31:0] = meta_mem[addr];
+		   //; }
+		end
+	  else
+		begin
+		   if( this.is_random_value == 0 )
+			 begin
+				instr = this.default_data_val;
+				meta = this.default_meta_val;
+			 end
+		   else
+			 begin
+				instr = $urandom();
+				meta = $urandom();
+				//; if ($instr_size <= 32) {
+				data_mem[addr] = instr;
+				//; }
+				//; else {
+				//;    if ($instr_size == 64) {
+				data_mem[addr+4] = instr[63:32];
+				data_mem[addr] = instr[31:0];
+				//;    }
+				//;    elsif ($instr_size == 128) {
+				data_mem[addr+12] = instr[127:96];
+				data_mem[addr+8] = instr[95:64];
+				data_mem[addr+4] = instr[63:32];
+				data_mem[addr] = instr[31:0];
+				//;    }
+				//;    else {
+				//;        die "Invalid instr size.  Must be 32, 64, or 128 bits";
+				//;    }
+				//; }
+				
+				//write new meta value to memory
+				//; if ($meta_size <= 32) {
+				meta_mem[addr] = meta;
+				//; }
+				//; else {
+				//;    if ($meta_size == 64) {
+				meta_mem[addr+4] = meta[63:32];
+				meta_mem[addr] = meta[31:0];
+				//;    }
+				//;    elsif ($meta_size == 128) {
+				meta_mem[addr+12] = meta[127:96];
+				meta_mem[addr+8] = meta[95:64];
+				meta_mem[addr+4] = meta[63:32];
+				meta_mem[addr] = meta[31:0];
+				//;    }
+				//;    else {
+				//;        die "Invalid meta size.  Must be 32, 64, or 128 bits";
+				//;    }
+				//; }
+			 end
+		end
+	  
+	  // if this was not a local access, write to log file.
+	  if ((! local_access) && (log_file_handle) && (RunWithTrace))
+		begin
+		   $fdisplay (log_file_handle,
+					"%d:%s:Mem.ReadData() : addr=%8x data=%8x         meta=%6b           |%s\n",
+					$time, my_agent_name, addr, instr, meta, comment);
+		end
+	  
+	  // release semapohre:  (unless this is local access)
+	  if (! local_access)
+		semID.put();
+	  
+endtask //
+
+	  
+//------------------------------------------------------------------------------
+// `$self->get_module_name()`::ReadData(...)
+task `$self->get_module_name()`::ReadInt(bit [`$addr_size-1`:0] addr, 
+							  output integer data,
+                              output integer meta, 
+							  input string comment="",
+										  input bit local_access=0);
+	  
+	   // Note: The local_access bit is used to diffrentiate between real accesses
+	   // by memory clients (MemCtrl for instance) and local reads by auxiliary
+	   // functions and by WriteData.
+	   
+	   //////////////////////////////////////////////////////////
+	   // In the common case this method should not be changed //
+	   //////////////////////////////////////////////////////////
+	   
+	   //; my $addr_mask = $addr_size . '\'b';
+	   
+	   //; for (my $x = 0; $x < $addr_mask; $x++) {
+	   //;   $addr_mask = $addr_mask . "1";
+	   //; }
+	  addr = addr & `$addr_mask`;
+	  
+	  if ( _DEBUG_ && (! local_access) )
+		begin
+		   $display ("%d:%s:Mem.ReadData() was activated\n",
+				   $time,my_agent_name);
+		end
+	  
+	  // lock semaphore: (unless this is local access)
+	  if (! local_access)
+		semID.get();
+	  
+	  if (data_mem.exists(addr))
+		begin
+		   data = data_mem[addr];
+		   meta = meta_mem[addr];
+		end
+	  else
+		begin
+		   if( this.is_random_value == 0 )
+			 begin
+				data = this.default_data_val;
+				meta = this.default_meta_val;
+			 end
+		   else
+			 begin
+				data = $urandom();
+				data_mem[addr] = data;
+
+				meta = $urandom();
+				meta_mem[addr] = meta;
+			 end
+		end
+	  
+	  // if this was not a local access, write to log file.
+	  if ((! local_access) && (log_file_handle) && (RunWithTrace))
+		begin
+		   $fdisplay (log_file_handle,
+					"%d:%s:Mem.ReadData() : addr=%8x data=%8x         meta=%6b           |%s\n",
+					$time, my_agent_name, addr, data, meta, comment);
+		end
+	  
+	  // release semapohre:  (unless this is local access)
+	  if (! local_access)
+		semID.put();
+	  
+endtask //
+	  
+//------------------------------------------------------------------------------
+// `$self->get_module_name()`::SetRandomParams(...)
+// SetRandomParams: tasks initialize the random params of the memory:
+// is_random_value: '1' means use random values for reads of addresses that
+// where not written. '0' means use the default_data_value and
+// the default_meta_data_value.
+task `$self->get_module_name()`::SetRandomParams(bit is_random_value_,
+                                     bit [`$data_size-1`:0] default_data_value_=0,
+												 bit [`$meta_size-1`:0] default_meta_value_=0);
+	  
+ //////////////////////////////////////////////////////////
+ // In the common case this method should not be changed //
+ //////////////////////////////////////////////////////////
+	  this.is_random_value = is_random_value_;
+	  this.default_data_val = default_data_value_;
+	  this.default_meta_val = default_meta_value_;
+	  
+	  if (is_random_value)
+		begin
+		   if (log_file_handle)
+			 begin
+				$fdisplay (log_file_handle,
+						   "%d:%s:Mem.SetRandomParams (for all memories): data_value=Random meta_data_value=Random\n",
+				  $time, my_agent_name );
+			 end
+  
+		   $display ( "%d:%s:Mem.SetRandomParams (for all memories): data_value=Random meta_data_value=Random\n",
+					$time, my_agent_name );
+		end
+	  else
+		begin
+		   if (log_file_handle)
+			 begin
+				$fdisplay (log_file_handle,
+						   "%d:%s:Mem.SetRandomParams (for all memories): data_value=%8x meta_data_value=%6b\n",
+						   $time, my_agent_name,
+						   this.default_data_val, this.default_meta_val);
+			 end
+		   $display ("%d:%s:Mem.SetRandomParams (for all memories): data_value=%8x meta_data_value=%6b\n",
+					$time, my_agent_name,
+					this.default_data_val, this.default_meta_val);
+		end
+endtask
+
+//------------------------------------------------------------------------------
+/*
+  GetClosestIndx returns the closest occupied index to <indx> that is in the
+  range of: range_low  <= indx <= range_high
+*/
+	  
+function integer `$self->get_module_name()`::GetClosestIndx(logic [`$addr_size-1`:0] indx,
+                                  bit [`$addr_size-1`:0] range_high = `$addr_size`'b`$range_high`,
+                                  bit [`$addr_size-1`:0] range_low  = 'h0,
+                                  bit [`$addr_size-1`:0] pattern    = 'h0,
+															bit [`$addr_size-1`:0] pattern_mask = 'h0);
+	  
+	  bit [`$addr_size-1`:0] local_indx = indx;
+	  
+	  // First check if this index exists:
+	  integer local_result = data_mem.exists(local_indx);
+	  
+	  // If the indx does not exists, look for the closest one:
+	  if (local_result == 0)
+		begin
+		   local_result = data_mem.next(local_indx);
+		end
+  
+	  /* Continue searching till the right index is found...
+	   * This means: as long as there are more addresses AND they are below
+	   * <range_high> AND (they have still not matched the pattern or they are
+	   * below <range_low>) 
+	   * Reminder to me: assoc_index(NEXT,...) is monotonically increasing
+	   */
+	  while ((local_result == 1) && (local_indx <= range_high) &&
+			 (((local_indx & pattern_mask) != (pattern & pattern_mask)) ||
+			  (local_indx < range_low)))
+		begin
+		   local_result = data_mem.next(local_indx);
+		   
+    // check for upper range
+		   if (local_indx > range_high)
+			 break;
+		end
+  
+	  /*
+       Finally, after trying realy hard, if you FOUND an index IN RANGE, set the
+       <indx> variable to that value, and return 1.
+       Else, don't modify the index and return 0.
+	   */
+	  if ((local_result) &&
+		  (local_indx <= range_high) && (local_indx >= range_low) &&
+		  ((local_indx & pattern_mask) == (pattern & pattern_mask)))
+		begin
+		   indx = local_indx;
+		   GetClosestIndx = local_result;
+		end
+	  else
+		begin
+		   GetClosestIndx = 0;
+		end
+endfunction //
+
+//------------------------------------------------------------------------------
+/*
+  ---UploadFile(...)---
+  UploadFile is a task that receive for a given file name, openes the file, read
+  its content and write it to the memory.
+  <file_name> is the file name to open
+  <base_addr> is an offset that all indices are calculated accordingly. For
+              example, the base address for instruction is usually 0x4000_0000.
+  <new_indx_sign> is a string, representing a new index for the following data
+              words.
+  <word_size> is the size of every word in the file (given in bytes).
+  For example:
+  "01234567   // word1
+   89abcdef   // word2
+   @12        // new index
+   babebabe   // word3
+   cafecafe"  // word4
+  In the above code: word1 will be written to address=<base_addr>, while word2
+  will be written to address=<base_addr>+<word_size> and word3 will be written
+  to address=<base_addr>+12*<word_size>.
+  In other notation, this is:
+  Mem[<base_addr>+<word_size>-1:<base_addr>]<=01234567
+  Mem[<base_addr>+2*<word_size>-1:<base_addr>+<word_size>]<=89abcdef
+  Mem[<base_addr>+13*<word_size>-1:<base_addr>+12*<word_size>]<=babebabe
+  Mem[<base_addr>+14*<word_size>-1:<base_addr>+13*<word_size>]<=cafecafe
+*/
+
+
+task `$self->get_module_name()`::UploadFile(string file_name, bit [`$addr_size-1`:0] base_addr = 0,
+											string new_indx_sign = "@", integer word_size);
+	  
+  integer file_handle;
+  bit [`$addr_size-1`:0] addr=0;
+  bit [`$data_size-1`:0] data=0;
+  bit [`$instr_size-1`:0] instr=0;
+  bit [`$instr_size-1`:0] instrRead;
+  bit [`$meta_size-1`:0] metaRead;
+	  
+  // load input file in read format.
+  file_handle = $fopen(file_name, "r");
+  if (file_handle==0)
+  begin
+    $display("\n\n%d:%s: ERROR: Mem.UploadFile() can not open file %s for reading\n",
+           $time, my_agent_name, file_name);
+    
+    $finish;
+  end
+
+  // Start extracting data from the file:
+  while (!$feof(file_handle)) 
+  begin
+    string line;
+    $fgets(line, file_handle);
+	 
+    // Two kinds of lines supported: address, or data.  
+    // Address lines start with <new_indx_sign>.
+    if (line.match({"^",new_indx_sign,"[0-9a-fA-F]+$"})) 
+    begin
+      string indx_str;
+      indx_str = line.substr(new_indx_sign.len());
+	   
+      addr = base_addr + indx_str.atohex()*word_size;
+      if (log_file_handle && (RunWithTrace))
+      begin       
+	   $fdisplay (log_file_handle,
+                 "%d:%s:Mem.UploadFile() Found new index %8x => address %8x\n",
+                 $time, my_agent_name , indx_str.atohex(), addr);
+      end
+    end
+
+    else if (line.match("^[0-9a-fA-F]{1,16}$")) 
+      begin
+		 if (word_size == `$data_size/8`) 
+		   data = line.atohex();
+		 else
+		   instr = line.atohex();
+		 
+      case (word_size)
+      
+        `$data_size/8`: begin
+
+		   //; my $data_mask = $data_size/8;
+		   //; $data_mask = $data_mask.'\'b';
+		   //; for (my $x = 0; $x < $data_size/8; $x++) {
+		   //;    $data_mask = $data_mask.'1';
+		   //; }
+           WriteData(addr, data, /*byte_mask*/ `$data_mask`,
+                     /*meta*/ 0, /*meta_byte_mask*/ 0,
+                     "(Written by UploadFile)", my_ID);
+		 		   
+        end
+        `$instr_size/8`: begin
+          //WriteInstr(addr+4, data[63:32], /*byte_mask*/ 32'hffffffff,
+          //          /*meta*/ 0, /*meta_byte_mask*/ 0,
+          //          "(Written by UploadFile)", my_ID);
+		  
+		  //; my $instr_mask = $instr_size/8;
+		  //; my $instr_mask = $instr_mask.'\'b';
+		  //; for (my $x = 0; $x < $instr_size/8; $x++) {
+		  //;    $instr_mask = $instr_mask.'1';
+		  //; }
+		   
+          WriteInstr(addr, instr, /*byte_mask*/ `$instr_mask`,
+                    /*meta*/ 0, /*meta_byte_mask*/ 0,
+                    "(Written by UploadFile)", my_ID);
+		   
+		   ReadInstr(addr, instrRead, metaRead);
+		   //$display("instr %h addr %h instrAct %h mask %h", instrRead, addr, instr, `$instr_mask`);
+		   
+        end
+        default: begin
+       
+          $display("\n\n%d:%s: ERROR: Mem.UploadFile() Word size of %0d bytes is not supported\n",
+                 $time, my_agent_name, word_size);
+          
+          $finish;
+        end
+      endcase // case(word_size)
+	   
+      addr = addr + word_size;
+    end
+
+    /*
+      Comments are ignored by vera, so if it is not data/address/
+       empty line/spaces only, print error message
+    */
+    else if (line.len() && !line.match("^\s*-//")) 
+    begin 
+      $display("\n\n%d:%s: ERROR: Mem.UploadFile() found an illegal line:\n\t\"%s\"\n",
+             $time, my_agent_name, line);
+      
+      $finish;
+    end
+  end//end of "while (!feof(fh))..."
+
+  //close input file:
+  $fclose(file_handle);
+
+
+endtask //
+	  
+

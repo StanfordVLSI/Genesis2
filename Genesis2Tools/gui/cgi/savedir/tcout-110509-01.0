@@ -1,0 +1,89 @@
+Content-type: text/html
+
+<script type="text/javascript"><!--
+alert('called include file utils.pl...');
+//--></script>
+
+<head><title>Interactive Chip Generator powered by Genesis</title></head>
+
+<h2>Welcome to the Interactive Chip Generator!</h2>
+
+<table style='width:520'><tr><td>
+The Interactive Chip Generator (ICG) allows you to take an existing design base
+and quickly modify it to produce a new design, customized for your specific needs.
+
+<p>First, choose a base name for your design.  This can be any combination of
+letters, numbers and hyphens, e.g. "mydesign" or "smartmem-bob".
+The Interactive Chip Generator will append a timestamp to the base
+name to create a unique version each time you save your design,
+e.g. "mydesign-100815-134333" would be the version of "mydesign"
+written on August 15, 2010 at 33 seconds after 1:43pm.
+</td></tr></table>
+
+<br />
+
+<script type="text/javascript"><!--
+alert('opendesign = /cgi-bin/genesis_dev_sr/opendesign.pl');
+//--></script>
+
+<form method="get" action="/cgi-bin/genesis_dev_sr/opendesign.pl">
+  <b>Base name for your new design</b> (e.g. "john" or "mary17" or "memtile7"):   <input type="text" name="newdesign" value="mydesign"><br />
+
+  <p>Now, choose an existing design as a base for your new design.
+
+  <p><b>What existing design would you like to start from?</b><br /><br />
+
+  <input type='radio' name='file' value='../designs/tgt0/tgt0-baseline.xml' checked /><tt>../designs/tgt0/tgt0-baseline.xml</tt><br />
+  <br />
+  <input type='radio' name='file' value='../designs/demo/demo-110505-135453.xml'  /><tt>../designs/demo/demo-110505-135453.xml</tt><br />
+  <input type='radio' name='file' value='../designs/demo/demo-110505-135915.xml'  /><tt>../designs/demo/demo-110505-135915.xml</tt><br />
+  <input type='radio' name='file' value='../designs/demo/empty_design.xml'  /><tt>../designs/demo/empty_design.xml</tt><br />
+  <input type='radio' name='file' value='../designs/demo/mydesign-110505-135554.xml'  /><tt>../designs/demo/mydesign-110505-135554.xml</tt><br />
+  <input type='radio' name='file' value='../designs/demo/mydesign-110505-135636.xml'  /><tt>../designs/demo/mydesign-110505-135636.xml</tt><br />
+  <input type='radio' name='file' value='../designs/demo/top.xml'  /><tt>../designs/demo/top.xml</tt><br />
+  <br />
+  <input type='radio' name='file' value='../designs/iterative_wallace_sr/baseline.xml'  /><tt>../designs/iterative_wallace_sr/baseline.xml</tt><br />
+  <input type='radio' name='file' value='../designs/iterative_wallace_sr/config.xml'  /><tt>../designs/iterative_wallace_sr/config.xml</tt><br />
+  <br />
+  <input type='radio' name='file' value='../designs/iterative_wallace_tree/config.xml'  /><tt>../designs/iterative_wallace_tree/config.xml</tt><br />
+  <br />
+  <input type='radio' name='file' value='../designs/mydesign/1proc_2mem_qualified.xml'  /><tt>../designs/mydesign/1proc_2mem_qualified.xml</tt><br />
+  <input type='radio' name='file' value='../designs/mydesign/1proc_2mem.xml'  /><tt>../designs/mydesign/1proc_2mem.xml</tt><br />
+  <input type='radio' name='file' value='../designs/mydesign/1proc_2scratch.xml'  /><tt>../designs/mydesign/1proc_2scratch.xml</tt><br />
+  <input type='radio' name='file' value='../designs/mydesign/new.xml'  /><tt>../designs/mydesign/new.xml</tt><br />
+  <br />
+  <input type='radio' name='file' value='../designs/Ofer_TileGen/in.xml'  /><tt>../designs/Ofer_TileGen/in.xml</tt><br />
+  <br />
+  <input type='radio' name='file' value='../designs/tgt0/demo-110505-151554.xml'  /><tt>../designs/tgt0/demo-110505-151554.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tgt0/empty_design.xml'  /><tt>../designs/tgt0/empty_design.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tgt0/hierarchy_out.xml'  /><tt>../designs/tgt0/hierarchy_out.xml</tt><br />
+  <br />
+  <input type='radio' name='file' value='../designs/tile_official/hierarchy_out.xml'  /><tt>../designs/tile_official/hierarchy_out.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tile_official/megan-110425-215803.xml'  /><tt>../designs/tile_official/megan-110425-215803.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tile_official/mydesign-110413-095350.xml'  /><tt>../designs/tile_official/mydesign-110413-095350.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tile_official/mydesign-110413-095603.xml'  /><tt>../designs/tile_official/mydesign-110413-095603.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tile_official/mydesign-110413-095632.xml'  /><tt>../designs/tile_official/mydesign-110413-095632.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tile_official/mydesign-110413-124805.xml'  /><tt>../designs/tile_official/mydesign-110413-124805.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tile_official/mydesign-110413-124854.xml'  /><tt>../designs/tile_official/mydesign-110413-124854.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tile_official/mydesign-110413-132331.xml'  /><tt>../designs/tile_official/mydesign-110413-132331.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tile_official/mydesign-110413-135027.xml'  /><tt>../designs/tile_official/mydesign-110413-135027.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tile_official/mydesign-110413-135447.xml'  /><tt>../designs/tile_official/mydesign-110413-135447.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tile_official/mydesign-110413-135515.xml'  /><tt>../designs/tile_official/mydesign-110413-135515.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tile_official/mydesign-110413-135540.xml'  /><tt>../designs/tile_official/mydesign-110413-135540.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tile_official/mydesign-110413-142208.xml'  /><tt>../designs/tile_official/mydesign-110413-142208.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tile_official/mydesign-110413-142537.xml'  /><tt>../designs/tile_official/mydesign-110413-142537.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tile_official/mydesign-110413-142612.xml'  /><tt>../designs/tile_official/mydesign-110413-142612.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tile_official/mydesign-110413-154541.xml'  /><tt>../designs/tile_official/mydesign-110413-154541.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tile_official/mydesign-110413-154936.xml'  /><tt>../designs/tile_official/mydesign-110413-154936.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tile_official/mydesign-110413-175216.xml'  /><tt>../designs/tile_official/mydesign-110413-175216.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tile_official/mydesign-110413-175532.xml'  /><tt>../designs/tile_official/mydesign-110413-175532.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tile_official/mydesign-110413-184741.xml'  /><tt>../designs/tile_official/mydesign-110413-184741.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tile_official/mydesign-110414-084843.xml'  /><tt>../designs/tile_official/mydesign-110414-084843.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tile_official/mydesign-110415-084042.xml'  /><tt>../designs/tile_official/mydesign-110415-084042.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tile_official/mydesign-110415-210412.xml'  /><tt>../designs/tile_official/mydesign-110415-210412.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tile_official/mydesign-110416-100359.xml'  /><tt>../designs/tile_official/mydesign-110416-100359.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tile_official/mydesign-110425-110542.xml'  /><tt>../designs/tile_official/mydesign-110425-110542.xml</tt><br />
+  <input type='radio' name='file' value='../designs/tile_official/mydesign-110504-152736.xml'  /><tt>../designs/tile_official/mydesign-110504-152736.xml</tt><br />
+  <br />
+  <p><input type="submit" value="Submit"><br />
+</form>

@@ -1,0 +1,90 @@
+/*************************************************************************
+ ** From Perforce:
+ **
+ ** $Id: //Smart_design/ChipGen/rtl/MemBlocks/memory.vp#6 $
+ ** $DateTime: 2010/06/23 15:57:27 $
+ ** $Change: 8858 $
+ ** $Author: danowitz $
+ *************************************************************************/
+/******************************************************************************
+ * File: memory.vp
+ * Author: Andrew Danowitz
+ * 
+ * Description:
+ * Memory wrapper for chip gen tile.  Used to instantiate all memory
+ * memory instances and generators
+ * 
+ * Required Genesis Parameters (default value):Description
+ * * TYPE (SCRATCH): Default memory type
+ * * WORDS (512): Number of words in the memory
+ * * DATA_SIZE (32): Word size
+ * * META_SIZE (16): Number of meta bits
+ * * REQ_PROC (1): Number of bits to define requester
+ * * ADDR_SIZE (32): Number of address bits
+ * * ADDR (0): Mem block starting address
+ * * OP_SIZE (3): Width of memory opcode bus
+ * * EN_SIZE (6): Width of memory enable port
+ * * RET_CODE_SIZE (3): Size of memory return code bus.
+ * 
+ * Change bar:
+ * -----------
+ * Date          Author   Description
+ * Apr 14, 2010    danowitz Generatable wrapper version
+ *  
+ * 
+ *****************************************************************************/
+
+//; my $TYPE = $self->define_param('TYPE'=>"SCRATCH");
+//; my $WORDS = $self->define_param('WORDS'=>512);
+//; my $DATA_SIZE = $self->define_param('DATA_SIZE'=> 32);
+//; $self->error("Data size must be a multiple of 8") if ($DATA_SIZE % 8 != 0);
+//; my $META_SIZE = $self->define_param('META_SIZE'=>16);
+//; my $REQ_PROC = $self->define_param('REQ_PROC'=>1);
+//; my $ADDR_SIZE = $self->define_param('ADDR_SIZE'=>32);
+//; my $ADDR = $self->define_param('ADDR'=>0);
+//; my $OP_SIZE = $self->define_param('OP_SIZE'=>3);
+//; my $EN_SIZE = $self->define_param('EN_SIZE'=>6);
+//; my $RET_CODE_SIZE = $self->define_param('RET_CODE_SIZE'=>3);
+
+
+module `$self->get_module_name()` (input Clk,
+								   input Reset,
+								   input [`$REQ_PROC-1`:0] requesting_proc_in,
+								   input [`$ADDR_SIZE-1`:0] address_in,
+								   input [`$OP_SIZE-1`:0] opcode_in,
+								   input [`$EN_SIZE-1`:0] en_in,
+								   input [`$DATA_SIZE-1`:0] data_in,
+								   output [`$RET_CODE_SIZE-1`:0] retcode_out,
+								   output [`$DATA_SIZE-1`:0] data_out,
+								   output [`$META_SIZE-1`:0] meta_out
+								   );
+
+/* -----\/----- EXCLUDED -----\/-----
+   logic write;
+   logic read;
+   logic nextRead;
+   logic nextWrite;
+   
+   bit [`$DATA_SIZE-1`:0]									 data_array[*];
+   bit [`$META_SIZE-1`:0]									 metadata_array[*];
+
+   always_ff @ (posedge Clk) begin
+	  if (write)begin
+		 data_array[address_in] <= data_in;
+		 data_out <= data_in;
+	  end
+	  
+	  else if (read) begin
+		 data_out <= data_array[address_in];
+	  end
+   end // UNMATCHED !!
+   
+		
+   // Some code to call the proper mat type to handle the control stuff
+
+ -----/\----- EXCLUDED -----/\----- */
+   
+   //Insert module here
+
+endmodule //
+

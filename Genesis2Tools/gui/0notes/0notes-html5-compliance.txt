@@ -1,0 +1,13 @@
+Continue w/html5 checkings
+html compliance:
+  grep for "Content-type" in cgi/*
+
+Validation
+  - go to http://validator.w3.org/
+  - type in "www-vlsi.stanford.edu/genesis"
+  - Whoops-a-daisy!
+  - more info:
+    - "The State of HTML5 Validation According to Tristan Louis":
+      http://www.readwriteweb.com/hack/2011/08/the-state-of-html5-validation.php
+    - http://www.impressivewebs.com/understanding-html5-validation/
+

@@ -1,0 +1,195 @@
+How to embed range and comment info in the verilog:
+
+Found in ChipGen/FP-Gen/rtl/HardMultiple7.vp:
+
+//; # module parameters
+//; my $width = parameter(Name=>'Width', Val=>1, Min=>1, Step=>1,
+//;                       Doc=>"Signal bit widths");
+//;
+
+Also see ChipGen/FP-Gen/rtl/:
+FMA.vp://; my $pipeline_depth = parameter(Name=>'PipelineDepth',
+Val=>1, List=>[ 0,1,2,3,4,5,6,7 ] ,
+
+MultiplierP_MP.vp://;    $tree = parameter(Name=>'TreeType',
+Val=>'Wallace', List=>['Wallace','OS1','OS2','ZM','Array'],
+
+MultiplierP_MP.vp://; my $useInc = parameter(Name=>'UseInc',
+Val=>'NO', List=>['YES', 'NO'],
+
+
+
+
+Currently have (top.vp):
+
+// Mode of the generation
+//; $self->define_param(MODE=>'VERIF');
+//; $self->define_param(ASSERTION=>'ON');
+
+Instead maybe try:
+
+//; my $mode = parameter(
+//;     Name=>'MODE',
+//;     Val=>'VERIF',
+//;     List=>['VERIF','SYNTH'],
+//;     Doc=>'This is the mode of the generation.'
+//; );
+
+
+Propagate to cmp-baseline.xml:
+
+  <Parameters>
+    <ParameterItem>
+      <Doc>This is the mode of the generation.</Doc>
+      <Name>MODE</Name>
+      <Range>
+        <List>VERIF</List>
+        <List>SYNTH</List>
+      </Range>
+      <Val>VERIF</Val>
+    </ParameterItem>
+    <ParameterItem>
+      <Doc>This is the assertion mode of the generation.</Doc>
+      <Name>ASSERTION</Name>
+      <Range>
+        <List>ON</List>
+        <List>OFF</List>
+      </Range>
+      <Val>ON</Val>
+    </ParameterItem>
+    <ParameterItem>
+      <Doc>In this example, can have up to 64 quads(!)</Doc>
+      <Name>QUAD_ID</Name>
+      <Range>
+        <Min>0</Min>
+        <Max>63</Max>
+        <Step>1</Step>
+      </Range>
+      <Val>0</Val>
+    </ParameterItem>
+    <ParameterItem>
+      <Doc>Any number greater than 0, for illustration.</Doc>
+      <Name>TILE_ID</Name>
+      <Range>
+        <Min>0</Min>
+      </Range>
+      <Val>0</Val>
+    </ParameterItem>
+    <ParameterItem>
+      <Doc></Doc>
+      <Name>NUM_PROCESSOR</Name>
+      <Range></Range>
+      <Val>1</Val>
+    </ParameterItem>
+    <ParameterItem>
+      <Doc></Doc>
+      <Name>NUM_MEM_MATS</Name>
+      <Range>
+        <Min>1</Min>
+        <Max>8</Max>
+      </Range>
+      <Val>1</Val>
+    </ParameterItem>
+  </Parameters>
+
+
+
+
+==============================================================================
+Now: using <input> tag e.g.
+
+  <input
+        class=parmlist_input
+        ititle='This is the mode of the generation. :: VERIF SYNTH'
+        type='text'
+        id=MODE
+        value='VERIF'/>
+
+Next try: use <select> tag e.g.
+
+  <select class=parmlist_input id=MODE>
+    <option>VERIF</option>
+    <option>SYNTH</option>
+  </select>
+
+==============================================================================
+Want input boxes to show choices if range info is available;
+e.g. enumerated choices (range="RED BLUE GREEN YELLOW");
+max/min/step (range="1,100,10") can be expanded if nchoices less than
+50 or whatever.  Thus:
+
+if (range =~ /^\d+,\d+,\d*/) then
+   calculate min, max, step; // e.g. 0,100,20
+   calculate nchoices = ;
+
+   // e.g. "0,100,20" => 6 choices
+   // e.g. "1 to 20,100,20" => 5 choices ((99 to 80) over 20 plus 1)
+   //
+   // e.g. nchoices = int((max-min)/step) + 1
+   // Test: 1,100,20 => 5
+   //       0,100,20 => 6
+   //      -100,0,20 => 6
+
+   if (nchoices > 50) then IGNORE
+   else build a list
+
+else if (range = "\d*,\d*,\d*,") then IGNORE // not enough range info
+else build a list
+
+
+==============================================================================
+Working code from TryIt editor:
+
+<html><body><script type="text/javascript">
+
+//document.write('range="+range+"; list="'+list+'"<br />");
+
+ function build_list_from_range(range) {
+
+     var list = "";
+     if (range.match(/^\d*,\d*,\d*$/)) {
+
+       // E.g. range= "0,100,10" or "1,," or ",,,"
+
+       var ra = range.split(",");
+       var min  = parseInt(ra[0]);  // 0
+       var max  = parseInt(ra[1]);  // 100
+       var step = parseInt(ra[2]);  // 10
+
+       if (step == "") { step = 1; }
+       if (min == "" || max == "") { list = ""; }
+       else {
+            var nchoices = parseInt((max-min)/step) + 1;
+ 
+            list = min;
+            if (nchoices > 1) {
+              for (var i=min+step; i<=max; i+=step) {
+                  list = list + " " + i;
+              }          
+            }
+//            # E.g. now list = "0 10 20 30 40 50 60 70 80 90"
+       }
+
+     }
+     else if (range.match(/\S+/)) { list = range; }
+  document.write('range="' +range+ '"<br />');
+  document.write('list=&nbsp;&nbsp;&nbsp;&nbsp;"' +list+ '"<br /><br />');
+     return list;      
+ }
+
+var range;
+var list="list";
+
+build_list_from_range("0,100,10");build_list_from_range("1,100,10");
+build_list_from_range("on off maybe");
+build_list_from_range("");
+build_list_from_range("  ");
+
+
+
+
+
+</script></body></html>
+
+
+

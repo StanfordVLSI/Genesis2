@@ -1,0 +1,38 @@
+1. ("undefined" vs. "no comment"): Easy to fix.  I'll probably use ""
+   (null) when there's no comment, unless you have a strong preference
+   for something else.  (PS The "no comment" phrase is actually from
+   the XML, e.g. it has "<comment>no comment</comment>")
+
+2. (Comments disappear on change): Oops, this one might take awhile to
+   fix.
+
+3. (Parameter box aligned to right): Don't know the problem yet, but
+   I'm guessing it's easy to fix.
+
+4. (Unnecessary "immutable parameters" headline): should be an easy
+   fix.
+
+--- On Mon, 9/19/11, Ofer Shacham <shacham@alumni.stanford.edu> wrote:
+Also, I noticed that:
+
+1. immutable parameters have a default explanation of "undefined"
+   whereas regular parameters has "no comment". I think "no comment"
+   or "parameter not yet documented" or something to that effect are
+   better than "undefined".
+
+2. When I regenerate the deom, the comments disappear. I'm guessing
+   that's because you planted the comments in the initial xml and not
+   in the actual genesis source code (the .vp file) so the generated
+   xmls, other than the first have no comments in them. True?
+
+3. go to "top.DUT.p0.rf" the parameter box is aligned to the right
+   side for some reason..
+
+4. minor nit-picky detail: when there are no immutable parameters,
+   there is no need to print the "immutable parameters"
+   headline. (E.g., the top level of the demo)
+
+Otherwise, it looks great and I plan to show it off to everyone. I
+might even try to remember to not take the credit for it ;-))
+
+Ofer.

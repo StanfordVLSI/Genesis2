@@ -1,0 +1,745 @@
+/*************************************************************************
+ ** From Perforce:
+ **
+ ** $Id: //Smart_design/ChipGen/rtl/Processor/processor.vp#9 $
+ ** $DateTime: 2010/07/02 21:48:05 $
+ ** $Change: 8878 $
+ ** $Author: danowitz $
+ *************************************************************************/
+/* *****************************************************************************
+ * File: processor.vp
+ *
+ * Description:
+ * -----------------
+ * Top level for tile generator testing.
+ * 
+ * 
+ * Important Notes:
+ * -----------------
+ * 1. TIE port: Assumed to always be {TieEn, TieOp, TieWrData, TieAddr}, where TieOp
+ *	is of width TIE_OPCODE_WIDTH, TieWrData is of width DATA_BUS_WIDTH, 
+ *	and TieAddr of width ADDR_BUS_WIDTH.
+ * 
+ *
+ * Parameters:
+ * -----------------
+ * Instantiation Required Genesis Parameters (default value):Description
+ * * QUAD_ID: Quad number (must be specified or error is thrown)
+ * * TILE_ID: Tile number (must be specified or error is thrown)
+ * * PROC_ID: Processor number (must be specified or error is thrown)
+ * * CFG_IFC_REF - An instance of the reg_file_ifc (used as reference)
+ *
+ * Local Required Genesis Parameters (default value):Description
+ * * USE_SHIM (off): Use a shim processor or a tensilica processor?
+ *   Possible values are {on, off}.
+ * * USE_XT ('SIM4Xtensa'): If not equal to '', define the processor
+ *   in use. Mutualy exclusive with parameter USE_SHIM
+ * * DATA_BUS_WIDTH (32): width of data bus to/from the processor. Possible
+ *   values are {32,64,128}.
+ * * INSTRUCTION_BUS_WIDTH (64): width of data bus to/from the processor. 
+ *   Possible values are {32,64}. FIXME: relate to VLIW
+ * * SPECIAL_DATA_MEM_OPS (Smart Memories ops from $SMASH/rtl/lsu_definitions.v):
+ *   This is a list of memorty operations that the processor can issue to the 
+ *   memory system. This is in addition to the trivial nop, load and store.
+ *   For each operation we define the op name and it's encoding in tie. The
+ *   tie encoding is for interfacing the tensilica processor, and includes all
+ *   bits of the tie op (including valid/wr_en and others).
+ * * TIE_OPCODE_WIDTH (6): width of the tie port opcode field
+ * 
+ * Local suplied Genesis Parameters (default value):Description
+ * * ADDR_BUS_WIDTH (32): width of both data and instruction address busses
+ * * DATA_OP_LIST: Enumerated list of all data port supported operations,
+ *		   Based on the SPECIAL_DATA_MEM_OPS params and the default
+ *		   {'NOP', 'LOAD', 'STORE'} operations
+ * * DATA_OP_WIDTH: Log2 of the number of data operations
+ * * INST_OP_LIST: Enumerated list of all instruction port supported operations
+ *		   ('NOP', 'FETCH', 'LOAD', 'STORE')
+ * * INST_OP_WIDTH: Log2 of the number of instruction operations
+ * 
+ * 
+ * I/O:
+ * -----------
+ * General IO:
+ * * input Clk		: System clock
+ * * input Stall	: If high, processor must be stalled
+ * * input Reset	: System reset
+ * * input PreventReset	: Exists only for p0 of tile 0 of quad 0.
+ * 			  PreventReset is a chip input signal that prevents 
+ *			  processor zero of tile zero of quad zero from being 
+ *			  in a soft reset state. That means that if...
+ * 			  PreventReset == 0: When Reset is de-asserted the 
+ *					     processor is still in SoftReset mode
+ * 			  PreventReset == 1: When Reset is de-asserted the 
+ *					     processor active
+ * 
+ * // Main processor instruction port interface signals:
+ *  input		IRamBusy	: IRAM cannot handle the request. Proc must resend at next cycle.
+ *  input [$inst_w-1:0] IRamData	: Data from IRam to proc
+ *
+ *  output [$inst_w/32-1:0] IRamWordEn	: Per-word enabler for IRAM writes
+ *  output [$inst_w-1:0]    IRamWrData	: Data to be written to the IRAM
+ *  output [$addr_w--1:0]   IRamAddr	: Requested RD/WR address from the IRAM 
+ *  output [$inst_op_w-1:0] IRamOp	: Requested IRAM operation
+ * 
+ * // Main processor DATA port interface signals:
+ *  input [$data_w-1:0]   DRamData	: Data from DRam to proc
+ *
+ *  output [$data_w/8-1:0]  DRamByteEn	: Per-byte enabler for DRAM writes
+ *  output [$data_w-1:0]    DRamWrData	: Data to be written to the DRAM
+ *  output [$addr_w-1:0]    DRamAddr	: Requested RD/WR address from the DRAM
+ *  output [$data_op_w-1:0] DRamOp	: Requested DRAM operation
+ * 
+ * 
+ * // interrupt in signal
+ *  input [15:0] 	      BInterrupt,	// Input interrupt vector
+ *
+ * // FIXME: Some I have no clue signals
+ *  input 		  TDebugInterrupt,	// FIXME: What is the meaning of this signal?
+ *  output 		  XOCDModePulse,	// FIXME: What is the meaning of this signal?
+ *
+ * // Config bus interfaces
+ * CFG_IFC_REF.cfgIn cfgIn: incoming requests
+ * CFG_IFC_REF.cfgOut cfgOut: outgoing responds
+ *
+ * 
+ * // Test mode
+ *  input TMode: if TMode==1 then Test mode on ==> disable all clock gating
+ * 
+ * // JTAG Interface
+ *  input JTDI
+ *  input JTMS
+ *  input JTCK
+ *  input JTRST
+ *  output JTDO 
+ * 
+ * 
+ * 
+ * Change bar:
+ * -----------
+ * Date          Author   Description
+ * Apr 30, 2010  shacham  Init version
+ * May 14, 2010  shacham  Added clk gating for the proce
+ * May 27, 2010  shacham  connected all IRam IO's
+ * Jun 04, 2010  shacham  connected all DRAM/TIE outputs
+ * Jun 05, 2010  shacham  connected all DRAM/TIE inputs
+ * 
+ * ToDo:
+ * -----------
+ * * Flop and connect DRAM/TIE inputs
+ * * Add assertions for tie op followed by data op and vice versa 
+ *   (see $SMASH/TestCommonLib/FoCs/rules/tile_rules for reference)
+ * 
+ * ****************************************************************************/
+//`default_nettype none
+
+//; # Perl Libraries
+//; use POSIX;
+//;
+//; my $cnt = 0;
+//; my $mode = $self->get_top_param('MODE');
+//; my $assertion = $self->get_top_param('ASSERTION');
+
+// ID Parameters:
+//; my $qid = parameter(Name=>'QUAD_ID',Val=>undef);
+//; my $tid = parameter(Name=>'TILE_ID',Val=>undef);
+//; my $pid = parameter(Name=>'PROC_ID',Val=>undef);
+//; if (!defined $qid || !defined $tid || !defined $pid){
+//;	$self->error("Missing QUAD_ID/TILE_ID/PROC_ID");
+//; }
+//;
+
+// Processor type parametres:
+//; my $use_shim = $self->define_param(USE_SHIM => 'off');
+//; $self->error("Value $use_shim is not allowed for parameter USE_SHIM") 
+//;	unless $use_shim =~ m/^(on|off)$/i;
+//; my $use_xt = $self->define_param(USE_XT => 'SIM4Xtensa');
+//; $self->error("Configuration of neither USE_SHIM=$use_shim and USE_XT=$use_xt is prohibited")
+//;	if ($use_shim =~ m/off/i && $use_xt eq '');
+//; $self->error("Configuration of both USE_SHIM=$use_shim and USE_XT=$use_xt is prohibited")
+//;	if ($use_shim !~ m/off/i && $use_xt ne '');
+
+// Processor DRAM/IRAM interface parameters
+//; my $addr_w = $self->force_param(ADDR_BUS_WIDTH => 32);
+//; my $data_w = $self->define_param(DATA_BUS_WIDTH => 32);
+//; my $inst_w = $self->define_param(INSTRUCTION_BUS_WIDTH => 64);
+//; my $tiecode_w = $self->define_param(TIE_OPCODE_WIDTH => 6);
+//; my $special_data_ops = $self->define_param(SPECIAL_DATA_MEM_OPS => 
+//;				       [{name => 'METALOAD',		tiecode => 0b000100},
+//;				        {name => 'METASTORE',		tiecode => 0b100100},
+//;				        {name => 'SYNCLOAD',            tiecode => 0b000010},
+//;				        {name => 'SYNCSTORE',           tiecode => 0b100010},
+//;				        {name => 'RESETLOAD',           tiecode => 0b000011},
+//;				        {name => 'SETSTORE',            tiecode => 0b100011},
+//;				        {name => 'FUTURELOAD',          tiecode => 0b000001},
+//;				        {name => 'RAWLOAD',             tiecode => 0b000101},
+//;				        {name => 'RAWSTORE',            tiecode => 0b100101},
+//;				        {name => 'RAWMETALOAD',         tiecode => 0b000110},
+//;				        {name => 'RAWMETASTORE',        tiecode => 0b100110},
+//;				        {name => 'FIFOLOAD',            tiecode => 0b000111},
+//;				        {name => 'FIFOSTORE',           tiecode => 0b100111},
+//;				        {name => 'CACHEGANGCLEAR',      tiecode => 0b101000},
+//;				        {name => 'CACHECONDGANGCLEAR',  tiecode => 0b101001},
+//;				        {name => 'MATGANGCLEAR',        tiecode => 0b101010},
+//;				        {name => 'MATCONDGANGCLEAR',    tiecode => 0b101011},
+//;				        {name => 'HARDINTCLEAR',        tiecode => 0b101100},
+//;				        {name => 'MEMBAR',              tiecode => 0b010011},
+//;				        {name => 'SM_DHWB',             tiecode => 0b110100},
+//;				        {name => 'SM_DHWBI',            tiecode => 0b110101},
+//;				        {name => 'SM_DHI',              tiecode => 0b110110},
+//;				        {name => 'SM_DII',              tiecode => 0b110111},
+//;				        {name => 'SM_DIWB',             tiecode => 0b111000},
+//;				        {name => 'SM_DIWBI',            tiecode => 0b111001},
+//;				        {name => 'SM_DPFR',             tiecode => 0b111010},
+//;				        {name => 'SM_DPFW',             tiecode => 0b111011},
+//;				        {name => 'SM_IHI',              tiecode => 0b111100},
+//;				        {name => 'SM_III',              tiecode => 0b111101},
+//;				        {name => 'SM_IPF',              tiecode => 0b111110},
+//;				        {name => 'SAFE_LOAD',           tiecode => 0b010000},
+//;				        {name => 'SPEC_CMD',            tiecode => 0b101110},
+//;				       ]);
+//;
+//; # Now generate a simplified list of ops
+//; my $data_op_list = ['NOP', 'LOAD', 'STORE'];
+//; foreach my $data_op (@{$special_data_ops}){
+//;	push(@{$data_op_list}, $data_op->{name});
+//; }
+//; $cnt = 0;
+//; my %data_op_map = (); # used for mapping an op to a code
+//; foreach my $data_op (@{$data_op_list}){
+//;	$data_op_map{$data_op} = $cnt++;
+//; }
+//; my $num_data_ops = scalar(@{$data_op_list});
+//; my $data_op_w = POSIX::ceil(log($num_data_ops)/log(2));
+//;
+//; $self->force_param(DATA_OP_LIST => $data_op_list);
+//; $self->force_param(DATA_OP_WIDTH => $data_op_w);
+//;
+//;
+//;
+//; my $inst_op_list = ['NOP', 'LOAD', 'STORE', 'FETCH'];
+//; $cnt = 0;
+//; my %inst_op_map = (); # used for mapping an op to a code
+//; foreach my $inst_op (@{$inst_op_list}){
+//;	$inst_op_map{$inst_op} = $cnt++;
+//; }
+
+//; my $num_inst_ops = scalar(@{$inst_op_list});
+//; my $inst_op_w = POSIX::ceil(log($num_inst_ops)/log(2));
+//;
+//; $self->force_param(INST_OP_LIST => $inst_op_list);
+//; $self->force_param(INST_OP_WIDTH => $inst_op_w);
+//;
+//; #Address Space parameters:
+//; my %addr_spc = ();
+//; $addr_spc{data_log2_sz} = 31; ## 2 GigaByte
+//; $addr_spc{data_start_addr} = 0x80000000;
+//; $addr_spc{data_sz} = 2**$addr_spc{data_log2_sz};
+//; $addr_spc{data_msb} = $addr_spc{data_log2_sz}-1;
+//; $addr_spc{data_lsb} = POSIX::ceil(log($data_w/8)/log(2));
+//; $addr_spc{data_top_bits} = sprintf("%d'h%x",
+//;				$addr_w-$addr_spc{data_log2_sz}, 
+//;				$addr_spc{data_start_addr} >> $addr_spc{data_log2_sz});
+//; $addr_spc{inst_log2_sz} = 30; ## 1 GigaByte
+//; $addr_spc{inst_start_addr} = 0x40000000;
+//; $addr_spc{inst_sz} = 2**$addr_spc{inst_log2_sz};
+//; $addr_spc{inst_lsb} = POSIX::ceil(log($inst_w/8)/log(2));
+//; $addr_spc{inst_msb} = $addr_spc{inst_log2_sz}-1;
+//; $addr_spc{inst_top_bits} = sprintf("%d'h%x",
+//;				$addr_w-$addr_spc{inst_log2_sz}, 
+//;				$addr_spc{inst_start_addr} >> $addr_spc{inst_log2_sz});
+//;  
+//; $self->force_param(INST_ADDR_SPACE => 
+//;		        sprintf("0x%x: 0x%x", 
+//;				$addr_spc{inst_start_addr}, 
+//;				$addr_spc{inst_start_addr}+$addr_spc{inst_sz}-1));
+//; $self->force_param(DATA_ADDR_SPACE => 
+//;			sprintf("0x%x: 0x%x", 
+//;				$addr_spc{data_start_addr}, 
+//;				$addr_spc{data_start_addr}+$addr_spc{data_sz}-1));
+//;					 
+//;
+
+// CFG interface parameters
+//; my $cfg_ifc_ref = $self->define_param(CFG_IFC_REF => '');
+//; $self->error("Missing parameter: CFG_IFC_REF") if ($cfg_ifc_ref eq '');
+
+module `$self->get_module_name()`
+  (
+   // General IO:
+    input 		  Clk,
+    input 		  Stall,		
+    input 		  Reset,
+   //; if (($qid == 0) && ($tid == 0) && ($pid == 0)){
+    // PreventReset is a chip input signal that prevents processor zero of 
+    // tile zero of quad zero from being in a soft reset state. That means that if
+    // PreventReset == 0: When Reset is de-asserted the processor is still in 
+    //			  SoftReset mode
+    // PreventReset == 1: When Reset is de-asserted the processor active
+    input 		  PreventReset,
+   //; }
+   
+   // Main processor INSTRUCTION port interface signals:
+    input 		  IRamBusy,		// IRAM cannot handle the request. Proc must resend at next cycle.
+    input [`$inst_w-1`:0] IRamData,		// Data from IRam to proc
+
+    output [`$inst_w/32-1`:0] IRamWordEn,	// Per-word enabler for IRAM writes
+    output [`$inst_w-1`:0]    IRamWrData,	// Data to be written to the IRAM
+    output [`$addr_w-1`:0]    IRamAddr,		// Requested RD/WR address from the IRAM 
+    output [`$inst_op_w-1`:0] IRamOp,		// Requested IRAM operation
+
+   // Main processor DATA port interface signals:
+    input [`$data_w-1`:0]     DRamData,		// Data from DRam to proc
+   
+    output [`$data_w/8-1`:0]  DRamByteEn,	// Per-byte enabler for DRAM writes
+    output [`$data_w-1`:0]    DRamWrData,	// Data to be written to the DRAM
+    output [`$addr_w-1`:0]    DRamAddr,		// Requested RD/WR address from the DRAM
+    output [`$data_op_w-1`:0] DRamOp,		// Requested DRAM operation
+
+
+   // interrupt in signal
+    input [15:0] 	      BInterrupt,	// Input interrupt vector
+
+   // FIXME: Some I have no clue signals
+    input 		  TDebugInterrupt,	// FIXME: What is the meaning of this signal?
+    output 		  XOCDModePulse,	// FIXME: What is the meaning of this signal?
+
+   // Config bus interfaces
+   //; my $cfgIn_ifc_obj = $self->clone_inst($cfg_ifc_ref, 'cfgIn');
+   //; my $cfgOut_ifc_obj = $self->clone_inst($cfg_ifc_ref, 'cfgOut');
+   `$cfgIn_ifc_obj->get_module_name()`.cfgIn cfgIn, // incoming requests
+   `$cfgOut_ifc_obj->get_module_name()`.cfgOut cfgOut, // outgoing responds
+
+   
+   // Test mode
+    input 		TMode,
+   
+   // JTAG Interface
+    input 		JTDI,
+    input 		JTMS,
+    input 		JTCK,
+    input 		JTRST,
+    output 		JTDO
+   );
+
+   // JTAG and On-Chip-Debugger (OCD) Signals to/from the processor
+   logic [4:0] TInst;
+   logic       TResetB;
+   logic       TShiftDR;
+   logic       TUpdateDR;
+   logic       TClockDR;
+   logic       TUpdateIR;
+   logic       XTDO;
+   logic       XTDV;
+
+   // Processor debug/status signals
+   logic [31:0] PDebugData;
+   logic [7:0] 	PDebugStatus;
+   logic [31:0] PDebugPC;
+   logic [3:0] 	PDebugLS0Stat;
+   logic [31:0] PDebugLS0Addr;
+   logic [31:0] PDebugLS0Data;
+   logic  	PWaitMode;
+   logic  	XOCDMode;
+   logic 	OCDHaltOnReset;
+   logic  	SoftReset;
+
+   // Processor's versions of inputs
+   logic 		 procReset;
+   logic 		 procClk;
+   logic 		 procStall;
+   logic 		 procIRamBusy;
+   logic [`$inst_w-1`:0] procIRamData;
+   logic [`$data_w-1`:0] procDRamData;
+   
+   logic [15:0] 	 procBInterrupt;
+
+   // Processor's versions of outputs
+   logic [`$addr_spc{inst_msb}`:`$addr_spc{inst_lsb}`] 	 procIRamAddr;
+   logic [`$inst_w-1`:0] 				 procIRamWrData;
+   logic [`$inst_w/32-1`:0] 				 procIRamWordEn;
+   logic 						 procIRamEn;
+   logic 						 procIRamWr;
+   logic 						 procIRamLoadStore;
+
+   logic [`$addr_w-1`:0] 				 procDRamAddr_if_TieEn;
+   logic [`$data_w-1`:0] 				 procDRamWrData_if_TieEn;
+   logic [`$tiecode_w-1`:0] 				 procTieOp;
+   logic 						 procTieEn;
+   
+   logic [`$addr_spc{data_msb}`:`$addr_spc{data_lsb}`] 	 procDRamAddr_if_DRamEn;
+   logic [`$data_w-1`:0] 				 procDRamWrData_if_DRamEn;
+   logic [`$data_w/8-1`:0] 				 procDRamByteEn_if_DRamEn;
+   logic 						 procDRamEn;
+   logic 						 procDRamWr_if_DRamEn;
+
+
+   // internal signals **in proc clock domain** for processor outputs
+   logic [`$inst_op_w-1`:0] 				 procIRamOp;
+   logic [`$data_op_w-1`:0] 				 procDRamOp;
+   logic [`$data_op_w-1`:0] 				 procDramOp_if_TieEn;
+   logic [`$data_op_w-1`:0] 				 procDramOp_if_DRamEn;
+   logic [`$addr_w-1`:0] 				 procDRamAddr;
+   logic [`$data_w-1`:0] 				 procDRamWrData;
+   logic [`$data_w/8-1`:0] 				 procDRamByteEn;
+
+
+   
+   /* **************************************************************************
+    * Flop all processor inputs
+    * *************************************************************************/
+   //; my $flop_inst;
+   //; $flop_inst = $self->unique_inst('flop','Stall_flop', 
+   //;					  'FLOP_WIDTH' => 1,
+   //;					  'FLOP_TYPE' => 'rflop',
+   //;					  'FLOP_DEFAULT' => 0);
+   `$flop_inst->get_module_name()` `$flop_inst->get_instance_name()`
+     (.Clk(Clk), .Reset(Reset), .Enable(/*not used*/),
+      .data_in(Stall),	        .data_out(procStall));
+
+   //; $flop_inst = $self->unique_inst('flop','IRamBusy_flop', 
+   //;					  'FLOP_WIDTH' => 1,
+   //;					  'FLOP_TYPE' => 'rflop',
+   //;					  'FLOP_DEFAULT' => 0);
+   `$flop_inst->get_module_name()` `$flop_inst->get_instance_name()`
+     (.Clk(Clk), .Reset(Reset), .Enable(/*not used*/),
+      .data_in(IRamBusy),	.data_out(procIRamBusy));
+
+   //; $flop_inst = $self->unique_inst('flop','IRamData_flop', 
+   //;					  'FLOP_WIDTH' => $inst_w,
+   //;					  'FLOP_TYPE' => 'rflop',
+   //;					  'FLOP_DEFAULT' => 0);
+   `$flop_inst->get_module_name()` `$flop_inst->get_instance_name()`
+     (.Clk(Clk), .Reset(Reset), .Enable(/*not used*/),
+      .data_in(IRamData),	.data_out(procIRamData));
+
+   //; $flop_inst = $self->unique_inst('flop','DRamData_flop', 
+   //;					  'FLOP_WIDTH' => $data_w,
+   //;					  'FLOP_TYPE' => 'rflop',
+   //;					  'FLOP_DEFAULT' => 0);
+   `$flop_inst->get_module_name()` `$flop_inst->get_instance_name()`
+     (.Clk(Clk), .Reset(Reset), .Enable(/*not used*/),
+      .data_in(DRamData),	.data_out(procDRamData));
+
+   //; $flop_inst = $self->unique_inst('flop','BInterrupt_flop', 
+   //;					  'FLOP_WIDTH' => 16,
+   //;					  'FLOP_TYPE' => 'rflop',
+   //;					  'FLOP_DEFAULT' => 0);
+   `$flop_inst->get_module_name()` `$flop_inst->get_instance_name()`
+     (.Clk(Clk), .Reset(Reset), .Enable(/*not used*/),
+      .data_in(BInterrupt),	.data_out(procBInterrupt));
+
+   /* **************************************************************************
+    * Flop all processor outputs
+    * *************************************************************************/
+   //; $flop_inst = $self->unique_inst('flop','IRamAddr_flop', 
+   //;					  'FLOP_WIDTH' => $addr_spc{inst_msb}-$addr_spc{inst_lsb}+1,
+   //;					  'FLOP_TYPE' => 'rflop',
+   //;					  'FLOP_DEFAULT' => 0);
+   `$flop_inst->get_module_name()` `$flop_inst->get_instance_name()`
+     (.Clk(Clk), .Reset(Reset), .Enable(/*not used*/),
+      .data_in(procIRamAddr),	.data_out(IRamAddr[`$addr_spc{inst_msb}`:`$addr_spc{inst_lsb}`]));
+   assign IRamAddr[`$addr_w-1`:`$addr_spc{inst_msb}+1`] = `$addr_spc{inst_top_bits}`;
+   assign IRamAddr[`$addr_spc{inst_lsb}-1`:0] = '0;
+   
+   //; $flop_inst = $self->unique_inst('flop','IRamWrData_flop', 
+   //;					  'FLOP_WIDTH' => $inst_w,
+   //;					  'FLOP_TYPE' => 'rflop',
+   //;					  'FLOP_DEFAULT' => 0);
+   `$flop_inst->get_module_name()` `$flop_inst->get_instance_name()`
+     (.Clk(Clk), .Reset(Reset), .Enable(/*not used*/),
+      .data_in(procIRamWrData),	.data_out(IRamWrData));
+
+   //; $flop_inst = $self->unique_inst('flop','IRamWordEn_flop', 
+   //;					  'FLOP_WIDTH' => ($inst_w%32),
+   //;					  'FLOP_TYPE' => 'rflop',
+   //;					  'FLOP_DEFAULT' => 0);
+   `$flop_inst->get_module_name()` `$flop_inst->get_instance_name()`
+     (.Clk(Clk), .Reset(Reset), .Enable(/*not used*/),
+      .data_in(procIRamWordEn),	.data_out(IRamWordEn));
+
+   //; $flop_inst = $self->unique_inst('flop','IRamOp_flop', 
+   //;					  'FLOP_WIDTH' => $inst_op_w,
+   //;					  'FLOP_TYPE' => 'rflop',
+   //;					  'FLOP_DEFAULT' => 0);
+   `$flop_inst->get_module_name()` `$flop_inst->get_instance_name()`
+     (.Clk(Clk), .Reset(Reset), .Enable(/*not used*/),
+      .data_in(procIRamOp),	.data_out(IRamOp));
+  
+   //; $flop_inst = $self->unique_inst('flop','DRamAddr_flop', 
+   //;					  'FLOP_WIDTH' => $addr_w,
+   //;					  'FLOP_TYPE' => 'rflop',
+   //;					  'FLOP_DEFAULT' => 0);
+   `$flop_inst->get_module_name()` `$flop_inst->get_instance_name()`
+     (.Clk(Clk), .Reset(Reset), .Enable(/*not used*/),
+      .data_in(procDRamAddr),	.data_out(DRamAddr));
+   
+   //; $flop_inst = $self->unique_inst('flop','DRamWrData_flop', 
+   //;					  'FLOP_WIDTH' => $data_w,
+   //;					  'FLOP_TYPE' => 'rflop',
+   //;					  'FLOP_DEFAULT' => 0);
+   `$flop_inst->get_module_name()` `$flop_inst->get_instance_name()`
+     (.Clk(Clk), .Reset(Reset), .Enable(/*not used*/),
+      .data_in(procDRamWrData),	.data_out(DRamWrData));
+   
+   //; $flop_inst = $self->unique_inst('flop','DRamByteEn_flop', 
+   //;					  'FLOP_WIDTH' => $data_w/8,
+   //;					  'FLOP_TYPE' => 'rflop',
+   //;					  'FLOP_DEFAULT' => 0);
+   `$flop_inst->get_module_name()` `$flop_inst->get_instance_name()`
+     (.Clk(Clk), .Reset(Reset), .Enable(/*not used*/),
+      .data_in(procDRamByteEn),	.data_out(DRamByteEn));
+   
+   //; $flop_inst = $self->unique_inst('flop','DRamOp_flop', 
+   //;					  'FLOP_WIDTH' => $data_op_w,
+   //;					  'FLOP_TYPE' => 'rflop',
+   //;					  'FLOP_DEFAULT' => 0);
+   `$flop_inst->get_module_name()` `$flop_inst->get_instance_name()`
+     (.Clk(Clk), .Reset(Reset), .Enable(/*not used*/),
+      .data_in(procDRamOp),	.data_out(DRamOp));
+
+
+   /* **************************************************************************
+    * Some minimal logic on the processor I/O's
+    * *************************************************************************/
+   // Processor reset logic
+   //; if (($qid == 0) && ($tid == 0) && ($pid == 0)){
+   assign procReset = (SoftReset & ~PreventReset) | Reset;
+   //; }else{
+   assign procReset = SoftReset | Reset;
+   //; }
+
+   
+   // Processor clock generation logic
+   //; my $clk_gen = $self->unique_inst('procClkGen','procClkGen');
+   `$clk_gen->get_module_name()` `$clk_gen->get_instance_name()` 
+     (// inputs
+      .Clk(Clk),
+      .procReset(procReset),
+      .TMode(TMode),
+      .procStall(procStall),
+      // outputs
+      .procClk(procClk)
+      );
+  
+   // Processor IRamOp logic
+   always_comb begin
+      unique case ({procIRamEn, procIRamWr, procIRamLoadStore})
+	{1'b0, 1'b0, 1'b0}: procIRamOp = `$inst_op_w`'d`$inst_op_map{NOP}`;	// NOP
+	{1'b1, 1'b0, 1'b1}: procIRamOp = `$inst_op_w`'d`$inst_op_map{LOAD}`;	// LOAD
+	{1'b1, 1'b1, 1'b1}: procIRamOp = `$inst_op_w`'d`$inst_op_map{STORE}`;	// STORE
+	{1'b1, 1'b0, 1'b0}: procIRamOp = `$inst_op_w`'d`$inst_op_map{FETCH}`;	// FETCH
+	default: procIRamOp = `$inst_op_w`'d`$inst_op_map{NOP}`;		// NOP
+      endcase // case ({procIRamEn, procIRamWr, procIRamLoadStore})
+   end
+   
+   // Processor output DRamOp logic
+   always_comb begin : mux_procDramOp_if_DRamEn
+      unique case (procDRamWr_if_DRamEn)
+	1'b0: procDramOp_if_DRamEn = `$data_op_w`'d`$data_op_map{LOAD}`;	// LOAD
+	1'b1: procDramOp_if_DRamEn = `$data_op_w`'d`$data_op_map{STORE}`;	// STORE
+	default: procDramOp_if_DRamEn = `$data_op_w`'d`$data_op_map{NOP}`;	// NOP
+      endcase // case (procDRamWr_if_DRamEn)
+   end : mux_procDramOp_if_DRamEn
+   
+   always_comb begin : mux_procDramOp_if_TieEn
+      unique case (procTieOp)
+	//; foreach my $data_op (@{$special_data_ops}){
+	`$tiecode_w`'d`$data_op->{tiecode}`: procDramOp_if_TieEn = `$data_op_w`'d`$data_op_map{$data_op->{name}}`;	// `$data_op->{name}`
+	//; }
+	default: procDramOp_if_TieEn = `$data_op_w`'d`$data_op_map{NOP}`;		// NOP
+      endcase // case (procTieOp)
+   end : mux_procDramOp_if_TieEn
+
+   
+   // Processor output DRam or Tie mux logic
+   always_comb begin : mux_DRam_or_Tie
+      unique case ({procDRamEn, procTieEn})
+	{1'b0, 1'b0}: begin			// NO interface active
+	   procDRamOp = `$data_op_w`'d`$data_op_map{NOP}`;
+	   procDRamAddr = `$addr_w`'b0;
+	   procDRamWrData = `$data_w`'b0;
+	   procDRamByteEn = `$data_w/8`'b0;
+	end
+	{1'b0, 1'b1}: begin			// TIE interface active
+	   procDRamOp = procDramOp_if_TieEn;			
+	   procDRamAddr = procDRamAddr_if_TieEn;
+	   procDRamWrData = procDRamWrData_if_TieEn;
+	   procDRamByteEn = `$data_w/8`'b0;
+	end
+	{1'b1, 1'b0}: begin			// DRAM interface active
+	   procDRamOp = procDramOp_if_DRamEn;	
+	   procDRamAddr = {`$addr_spc{data_top_bits}`, procDRamAddr_if_DRamEn, `$addr_spc{data_lsb}`'b0};
+	   procDRamWrData = procDRamWrData_if_DRamEn;
+	   procDRamByteEn = procDRamByteEn_if_DRamEn;
+	end
+	default: begin 
+	   /* Also see assertion Concurrent_dram_and_tie_requests for this case */
+	   procDRamOp = `$data_op_w`'d`$data_op_map{NOP}`;	// NOP
+	   procDRamAddr = `$addr_w`'b0;
+	   procDRamWrData = `$data_w`'b0;
+	   procDRamByteEn = `$data_w/8`'b0;
+	end
+      endcase // case ({procDRamEn, procTieEn})
+   end : mux_DRam_or_Tie
+   
+
+   
+   /* **************************************************************************
+    * Processor instantiation
+    * *************************************************************************/
+   //; my ($proc, $proc_module_name, $proc_inst_name);
+   //; if ($use_shim =~ m/on/i){
+   //;	$proc = $self->unique_inst('procShim', 'processor', 
+   //;				   QUAD_ID=>$qid, TILE_ID=>$tid, PROC_ID=>$pid);
+   //;	$proc_module_name = $proc->get_module_name();
+   //;	$proc_inst_name = $proc->get_instance_name();
+   //; }else{
+   //;	$proc_module_name = $use_xt;
+   //;	$proc_inst_name = "processor";
+   //; }
+   `$proc_module_name` `$proc_inst_name`
+     (
+      // Outputs
+      .IRam0Addr(procIRamAddr), // only bits [`$addr_spc{inst_msb}`:`$addr_spc{inst_lsb}`]
+      .IRam0En(procIRamEn),	
+      .IRam0Wr(procIRamWr),	
+      .IRam0WordEn(procIRamWordEn),
+      .IRam0WrData(procIRamWrData),
+      .IRam0LoadStore(procIRamLoadStore),
+      .DRam0Addr0(procDRamAddr_if_DRamEn), // only bits [`$addr_spc{data_msb}`:`$addr_spc{data_lsb}`]
+      .DRam0En0(procDRamEn),	
+      .DRam0ByteEn0(procDRamByteEn_if_DRamEn),
+      .DRam0Wr0(procDRamWr_if_DRamEn),	
+      .DRam0WrData0(procDRamWrData_if_DRamEn),
+      .PDebugData(PDebugData[31:0]),
+      .PDebugStatus(PDebugStatus[7:0]),
+      .PDebugPC(PDebugPC[31:0]),
+      .PDebugLS0Stat(PDebugLS0Stat[3:0]),
+      .PDebugLS0Addr(PDebugLS0Addr[31:0]),
+      .PDebugLS0Data(PDebugLS0Data[31:0]),
+      .PWaitMode(PWaitMode),	
+      .XTDO(XTDO),	
+      .XTDV(XTDV),	
+      .XOCDMode(XOCDMode),	
+      .XOCDModePulse(XOCDModePulse),
+      .TIE_MemOp_Out({procTieOp[`$tiecode_w-1`:0], procDRamWrData_if_TieEn, procDRamAddr_if_TieEn}),
+      .TIE_MemOp_Out_Req(procTieEn),
+      // Inputs
+      .CLK(procClk),	
+      .BReset(procReset),	
+      .IRam0Data(procIRamData),
+      .DRam0Busy0(1'b0),		
+      .DRam0Data0(procDRamData),
+      .BInterrupt(procBInterrupt),
+      .PRID({4'd0, 4'd`$qid`, 4'd`$tid`, 4'd`$pid`}),
+      .PDebugEnable(1'b1),		
+      .IRam0Busy(procIRamBusy),	
+      .RunStall(1'b0),		
+      .TMode(TMode),	
+      .TResetB(TResetB),	
+      .TClockDR(TClockDR),	
+      .TUpdateDR(TUpdateDR),	
+      .TShiftDR(TShiftDR),	
+      .JTDI(JTDI),	
+      .JTCK(JTCK),		
+      .TInst(TInst[4:0]),	
+      .TUpdateIR(TUpdateIR),	
+      .OCDHaltOnReset(OCDHaltOnReset), 
+      .TDebugInterrupt(TDebugInterrupt),
+      .TIE_MemOp_In(procDRamData)
+      );
+
+   // Instantiate a JTAG Tap for the processor OCD (on chip debugger)
+   SIM4TAP      tap
+     (
+      // Outputs
+      .JTDO(JTDO),
+      .TResetB(TResetB),
+      .TShiftDR(TShiftDR),
+      .TUpdateDR(TUpdateDR),
+      .TClockDR(TClockDR),
+      .TInst(TInst[4:0]),
+      .TUpdateIR(TUpdateIR),
+      // Inputs
+      .JTMS(JTMS),
+      .JTCK(JTCK),
+      .JTRST(JTRST),
+      .JTDI(JTDI),
+      .TMode(TMode),
+      .XTDO(XTDO),
+      .XTDV(XTDV)
+      );
+
+
+   // Instantiate a register file for the debug signals comming out of the
+   // processor.
+   //; my $reg_list = 
+   //;    [{name => 'PDebugData',	width => 32,			IEO => 'i', comment => 'Processor debug data from W stage'}, 
+   //;	   {name => 'PDebugStatus',	width => 8,			IEO => 'i', comment => 'Debug status during W stage'},
+   //;	   {name => 'PDebugPC',		width => 32,			IEO => 'i', comment => 'Processor PC'},
+   //;	   {name => 'PDebugLS0Stat',	width => 4,			IEO => 'i', comment => 'Processor LSU status'},
+   //;	   {name => 'PDebugLS0Addr',	width => 32,			IEO => 'i', comment => 'Processor LSU address'},
+   //;	   {name => 'PDebugLS0Data',	width => 32,			IEO => 'i', comment => 'Processor LSU data'},
+   //;	   {name => 'PWaitMode',	width => 1,			IEO => 'i', comment => 'Processor waiting for interrupt after waiti'},
+   //;	   {name => 'XOCDMode',		width => 1,			IEO => 'i', comment => 'Processor entered OCD mode'}, 
+   //;	   {name => 'OCDHaltOnReset',	width => 1,	default => 0,	IEO => 'o', comment => 'If set processor enters debug state after reset'}, 
+   //;	   {name => 'SoftReset',	width => 1,	default => 1,	IEO => 'o', comment => 'Processor Reset signal'}, 
+   //;	  ];
+   //; my $reg_file = $self->unique_inst('reg_file', 'rf',
+   //;					 IFC_REF => $cfg_ifc_ref,
+   //;					 REG_LIST => $reg_list);
+   `$reg_file->get_module_name()` `$reg_file->get_instance_name()`
+     (
+      .Reset(Reset),
+      .Clk(Clk),
+      .cfgIn(cfgIn),
+      .cfgOut(cfgOut),
+      .TMode(TMode),
+      // signals to register      
+      .PDebugData_d(PDebugData),
+      .PDebugStatus_d(PDebugStatus),
+      .PDebugPC_d(PDebugPC),
+      .PDebugLS0Stat_d(PDebugLS0Stat),
+      .PDebugLS0Addr_d(PDebugLS0Addr),
+      .PDebugLS0Data_d(PDebugLS0Data),
+      .PWaitMode_d(PWaitMode),
+      .XOCDMode_d(XOCDMode),
+      // registered outputs
+      .OCDHaltOnReset_q(OCDHaltOnReset),
+      .SoftReset_q(SoftReset)
+      );
+
+
+   
+   //; if ($assertion =~ m/on/i) {
+   /* **************************************************************************
+    * Assertions
+    * *************************************************************************/
+   Illegal_iram_request: assert property(@(posedge Clk) 
+					 ((Reset) ||
+					  {procIRamEn, procIRamWr, procIRamLoadStore} == {1'b0, 1'b0, 1'b0} || 
+					  {procIRamEn, procIRamWr, procIRamLoadStore} == {1'b1, 1'b0, 1'b1} ||
+					  {procIRamEn, procIRamWr, procIRamLoadStore} == {1'b1, 1'b1, 1'b1} ||
+					  {procIRamEn, procIRamWr, procIRamLoadStore} == {1'b1, 1'b0, 1'b0}))
+     else 
+       begin
+	  $error("\nSVA ERROR: Illegal IRam request: procIRamEn=%1b, procIRamWr=%1b, procIRamLoadStore=%1b\n",
+		 procIRamEn, procIRamWr, procIRamLoadStore);
+	  $finish(2);
+       end // UNMATCHED !!
+   
+
+   Concurrent_dram_and_tie_requests: assert property(@(posedge Clk)
+						     ((Reset) || (procDRamEn==1'b0) ||  (procTieEn==1'b0)))
+     else begin
+	$error("\nSVA ERROR: Concurrent DRam and TIE requests: procDRamEn=%1b and procTieEn=%1b\n",
+	       procDRamEn, procTieEn);
+	$finish(2);
+     end // UNMATCHED !!
+
+   //; } # end of "if ($assertion =~ m/on..."
+   
+
+endmodule // `$self->get_module_name()`
+
+//`default_nettype wire

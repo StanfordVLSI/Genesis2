@@ -1,0 +1,206 @@
+p4 changes -l -u steveri | sed 's/\t/ /;s/^Change //;s/ by steveri.*//;s/ on 20.../: /' | awk 'NR%4==1{printf $0;}NR%4==3{print}' | less
+------------------------
+11469: 12/18 FFT: Completed support for 0.25, 0.5 butts per cycle.
+11462: 12/17 FFT: BIG func'l diff: changed "clk" to "fftclk" where needed.
+11460: 12/17 FFT: Narrowed parameter ranges, eliminated unsafe parameters.
+11430: 12/07 FFT: Support for remote execution of makefile (ssh to neva-2).
+11429: 12/07 Fully-elab hostname lets stewie work from outside stanford.
+11427: 12/07 Cross-browser support for forms, works on IE, Safari, Chrome.
+11410: 12/03 Rudimentary support for GUI to run sims/tests (gui_extras).
+11399: 11/29 Improved process for deleting unwanted designs.
+11398: 11/29 Upgraded the build-release process, added comments.
+11397: 11/29 Fixed CMP demo to use parameter() instead of get_param()...
+11396: 11/28 Added Archive libs e.g. Zip.pm to Perl libraries.
+---
+11395: RELEASE: Testing the new "Genesis2Tools" protocol (11/27/2012)
+---
+10683: RELEASE: Support for new genesis2 flag "-synthtop".
+10681 07/05: Added stat-collection email to monitor feature usefulness.
+10680 07/05: Removed "empty xml" warning per Ofer request.
+10666 07/03: Support for new genesis2 flag "-synthtop"
+10643 06/26: Safety chk; cant easily lv module w/pending changes (bug 775).
+---
+10639: RELEASE: change-radix buttons, html compliance.
+10638 06/24: ~/gui/designs now points to vlsiweb:/tmp (bad idea!??)
+10633 06/22: Check for outstanding hashlist changes when leaving a module.
+10631 06/21: HTML compliance for editdesigns.pl
+10627 06/20: HTML compliance for 0-main-template.php
+10625 06/20: Added HTML compliance to choosedesign.pl.
+10624 06/20: Added HTML compliance to index* (splash) pages.
+10616 06/14: Cleaned up the default design list.
+10614 06/14: More robust subparm-submit; if user forgets, we do it.
+10603 06/12: Added radix buttons to list-of-hash type parms.
+10600 06/12: Added a way to track changes for release notes.
+10598 06/12: Instant range-checking for inputs w defined "min" or "max".
+---
+10594: RELEASE: bug in range-checking
+10594 06/11: Fixed bug; range info was being displayed in text boxes.
+10592 06/11: No more need for user to muck with PERL5LIB environment variable.
+---
+10587: RELEASE - better way of displaying array of hashes (default)
+10587 06/07: Working array-edit buttons for new regime etc.
+10585 06/05: Decided to use upper-case for hex numbers
+10584 06/05: Got rid of SoC demo, now only use CMP demo.
+10581 06/05: NEW_ARR_EDIT_MODE is now the default.
+10580 06/05: Got rid of OFER_MODE
+---
+10575: RELEASE - better way of displaying array of hashes (optional)
+10577 06/04: Wow array-edit buttons seem to work in new regime!: 
+10571 05/31: New-regime-sublists now work!  (If ofer-mode is on.)
+---
+10566: RELEASE - new change-radix buttons; support for *.sv files; clone-to-orig shortcut
+10563 05/30: Added bin-to-hex test parms.
+10559 05/29: Big big changes to stewie script; yet more error checks and user friendliness.
+10549 05/18: Added default-hex for values g.t. 256.
+10548 05/18: Check in working change-radix button; still need cleanup.
+10538 05/17: Added support for download of *.sv as well as *.v files.
+10527 05/15: Added shortcut button to get from clone to original module.
+---
+10519: RELEASE
+10519 05/14: Redo of previous release; significantly smaller because exclude savedir.
+10514 05/13: Added top-level array of hashes to cmp design example.
+10513 05/13: Fixed some problems with designdir management.
+10506 05/10: Fixed problem with hashes/arrays at top level.
+10501 05/08: Fixed a problem with missing setup.cshrc.
+10500 05/08: Changed how stewie deals with start directory.
+10499 05/08: Slight update to find-updates.
+10498 05/08: Back to earlier/better setup file.
+---
+10497: RELEASE - latest release fixes multiline-comment problem.
+10496 05/07: Don't use <br>'s in place of newline.
+10495 05/07: Added support for multiline comments.
+---
+10493: RELEASE - (Genesis2 release; no change to gui)
+---
+10489: RELEASE - fixed problems with setup files, empty xml files.
+10488 05/04: Small problem with the xml2js driver.
+10487 05/04: Fixed multiple problems with "emptydesign.xml" type files.
+10478 05/03: Cleaned up setup file.  Didn't test it.  Naughty naughty!
+10477 05/03: Improved process for building tarballs and releases.
+10476 05/03: Added code to make stewie work better on kiwi.
+---
+10468: RELEASE
+10462 05/01: Support for parm val lists and ranges (min/max/step) (finally!).
+10440 04/27: Turned parm floatboxes back on.
+10438 04/24: Fixed a domain-name bug; added code to pre-populate design examples.
+10437 04/24: Fixed a major bug in the way the gui finds a design(!)
+10434 04/24: Changed example from tgt0 to cmp.
+10428 04/20: Fixed a couple egregious mistakes with backup, return vs. exit.
+10427 04/20: Stanford-specific domain check and errors; better "list" format.
+10425 04/20: Added some HTTP libraries
+10420 04/19: Ditching tgt0 in favor of cmp
+10419 04/19: Improved user interface; plus creates empty.xml where needed.
+10418 04/19: Better format for "stewie list".
+10413 04/17: Test script to see how well a design works with stewie/gui.
+---
+10401: RELEASE
+---
+10407: RELEASE - fixed problems with setup file for kiwi.
+10402 04/12: Fixed problems with setup file for kiwi.
+---
+10389: RELEASE
+10389 04/10: Improved release procedure
+10387 04/09: "start" will now build/update distribution where needed.
+10368 04/05: kiwi did not understand "localhost"(!)
+10344 04/02: Potential problem with calculation of "mydir"
+10340 04/02: Now using my own "php.pl" in place of "/usr/bin/php".
+10333 03/30: Automatically build "empty.xml" if none exists.
+---
+10334: RELEASE
+10330 03/29: Design dirs now populated with SysCfgs/*.xml in add'n to just *.xml.
+10328 03/29: Dir no longer optional on command line for "start".
+---
+10315: RELEASE
+10312 03/25: Extensive modifications to stewie for improved UX.
+10309 03/25: Cleaned and simplified the setup file.
+10286 03/18: Okay no longer need '.' (dot) in your path to run stewie.
+10285 03/17: Stewie now checks w/user to verify setup.cshrc is correct for the site.
+10283 03/17: If no scratch dir on "start", stewie will build one.
+---
+10239: RELEASE
+10238 03/06: Better support for index and CONFIG setup.
+10237 03/06: Changed stewie config files to better support stewie setup.
+10234 03/06: Hacked in a fix for Ofer's problem where cgtop.BaseModuleName != "top".
+10230 03/05: Fixed xml file descriptions on download page.
+10229 03/05: Download now includes makefiles.
+10228 03/05: Added path for $SMASH/gui/bin
+10227 03/05: Fixed problem with stewie not seeing servers from other users.
+10226 03/05: Problems with debug messages...
+10225 03/05: Oops stewie had the wrong name for CONFIG.TXT.
+10224 03/05: Lack of warning caused garbage symlinks in random places.
+10223 03/05: More user friendliness.
+10222 03/05: Slightly enhanced user-friendliness.
+10221 03/05: Just a little housecleaning.
+10216 03/04: Oops had wrong value for GUI_HOME_URL.
+10215 03/04:  Order design list so "small_"/"tiny_" designs are at the end.
+10214 03/04: Support for better information from "stewie list".
+10199 03/02: Oops forgot to add the wrapper!
+10198 03/02: Slightly improved doc/debugging.
+10197 03/02: Hello.  I am Stewie the Standalone GUI.
+10192 03/01: Who messed up the secret buttons??
+10191 03/01: Updated "file-already-exists" safety check.
+10178 02/28: Another piece of the puzzle---will need to rename it later.
+10177 02/28: Support for new miniserver-based standalone gui.
+10176 02/28: Added better warnings for "empty" files.
+10175 02/28: bye bye
+10174 02/28: foo
+10173 02/28: Notes on what to do for "empty" files.
+10166 02/27: Now it automatically launches Firefox for you.
+10163 02/26: Altered install script to include site-specific setup.cshrc
+10153 02/23: Removed an outdated comment.
+---
+10152: RELEASE
+10150 02/23: Updated the tarball unpacking info to reflect bz2 instead of gz etc.
+10148 02/23: Using bzip instead of gzip for tarfile, to be compatible w/Genesis.
+10146 02/22: Problems and potential problems with CONFIG.TXT and standalone mode.
+10145 02/22: Added a comment/reminder to delete this unused file.
+10138 02/21: Last file cleanup for this round.
+10137 02/21: Cleaned the next file in the list.
+10136 02/21: Code cleaning...
+10131 02/21: Driver for standalone gui.
+10130 02/21: Scary: standalone gui.  It'll need to be cleaned up later.
+---
+10114: RELEASE
+10113 02/16: HTML compliance.
+10112 02/16: Added sizes to download files.
+10103 02/15: Use official Genesis instead of development version.
+---
+10099: RELEASE
+10099 02/15: Download now includes small, tiny and change files.
+10097 02/15: Now find-updates.csh defaults to a "brief"/"quiet" output.
+10096 02/15: Tiny xml: fixed an infinite-loop bug in build-changes script.
+10095 02/13: Run this script from vlsiweb to see what needs updating.
+10094 02/13: Support for tiny mode.
+10093 02/13: Got rid of a couple of annoying debug messages.
+10092 02/13: New tiny-xml version of tgt0, for testing and demo purposes.
+10091 02/13: Cleaned up the code a bit; new version is functionally equivalent to old.
+10090 02/13: Forgot to delete placeholder for UGTX button.
+10089 02/13: Undo explicit UGTX (tiny-xml) mode---now it's detected automatically based on filenames...
+10079 02/09: Initial support for tiny xml, not yet fully implemented.
+10077 02/08: Cleaned up the code a little.
+10076 02/08: Prep for tiny-xml mode.
+10075 02/08: Forgot to check in the new UGTX button (see prev change).
+10074 02/08: Added support for UGTX "Use-and-Generate-Tiny-XML" mode.
+10057 02/06: Prettied up the module boxes, made them smaller etc.
+10043 02/02: Changed simple copy to deep copy for cloned array elements.
+10042 02/02: Changed the comments around a bit.  Stupid change, really.
+10037 02/01: No change; just comments.
+10035 01/31: Slight update to README file.
+---
+10034: RELEASE
+10034 01/31: Latest gui release
+10033 01/31: Improvements to INSTALL script.
+10028 01/30: Fixed a little "glob" bug in genesis_dev_sr
+10016 01/26: Built a new release w/latest bug fix.
+10015 01/26: Some parms had no comments, and that was causing problems.
+10011 01/25: Done with comparefiles.csh (a helper file for an old version of publish.csh).
+10010 01/25: publish.csh has been eliminated in favor of build_tarfile and INSTALL.sh
+10009 01/25: Slight update to one of the README files.
+10007 01/25: Latest gui release.
+10006 01/25: README files for gui installation scripts.
+10002 01/20: Packing, unpacking and installation scripts and instructions.
+10001 01/20: If "designs" directory is missing create a blank one.
+10000 01/20: If design file is missing, create a blank one.
+9999 01/20: If "scratch" directory is missing, build_new_php() will create it.
+9991 01/09: Maybe this fixed something, I dunno.
+...

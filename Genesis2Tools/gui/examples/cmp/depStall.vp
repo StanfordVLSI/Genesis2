@@ -1,0 +1,78 @@
+/*************************************************************************
+ ** From Perforce:
+ **
+ ** $Id: //Smart_design/ChipGen/rtl/depStall.vp#7 $
+ ** $DateTime: 2010/06/28 16:45:11 $
+ ** $Change: 8870 $
+ ** $Author: danowitz $
+ *************************************************************************/
+/******************************************************************************
+ * File: depStall.vp
+ * Author: Andrew Danowitz
+ * 
+ * Description:
+ * Dependency stall wrapper for tile.
+ * 
+ * Required Genesis Parameters (default value):Description
+ * * ADDR_SIZE (32): Physical address size
+ * * OP_SIZE (3): Number of words in the memory
+ * * DATA_SIZE (32): Data size
+ * * INSTR_SIZE (32): Instr size
+ * * TARG_SIZE (2): Width of mat target bus
+ * 
+ * Change bar:
+ * -----------
+ * Date          Author   Description
+ * Apr 14, 2010  danowitz Generatable wrapper version
+ * Jun 21, 2010  danowitz decoupled data and instr op sizes 
+ * Jun 22, 2010  danowitz added byte and word enable signals
+ * Jun 22, 2010  danowitz corrected enable widths
+ * Jun 28, 2010  danowitz Wired inputs to outputs
+ * 
+ *****************************************************************************/
+
+
+//; my $ADDR_SIZE = $self->define_param('ADDR_SIZE', 32);
+//; my $DATA_OP_SIZE = $self->define_param('DATA_OP_SIZE', 3);
+//; my $INSTR_OP_SIZE = $self->define_param('INSTR_OP_SIZE', 3);
+//; my $DATA_SIZE = $self->define_param('DATA_SIZE', 32);
+//; my $INSTR_SIZE = $self->define_param('INSTR_SIZE', 32);
+//; my $TARG_SIZE = $self->define_param('TARG_SIZE', 1);
+
+module `$self->get_module_name()` (input [`$DATA_SIZE-1`:0] data_in,
+								   input [`$DATA_OP_SIZE-1`:0] data_op_in,
+								   input [`$DATA_SIZE/8-1`:0] data_en_in,
+								   input [`$ADDR_SIZE-1`:0] data_addr_in,
+								   input [`$TARG_SIZE-1`:0] data_targ_in,
+								   input [`$INSTR_SIZE-1`:0] instr_in,
+								   input [`$INSTR_OP_SIZE-1`:0] instr_op_in,
+								   input [`$INSTR_SIZE/32-1`:0] instr_en_in,
+								   input [`$ADDR_SIZE-1`:0] instr_addr_in,
+								   input [`$TARG_SIZE-1`:0] instr_targ_in,
+								   output logic [`$DATA_SIZE-1`:0] data_out,
+								   output logic [`$DATA_OP_SIZE-1`:0] data_op_out,
+								   output logic [`$DATA_SIZE/8-1`:0] data_en_out,
+								   output logic [`$ADDR_SIZE-1`:0] data_addr_out,
+								   output logic [`$TARG_SIZE-1`:0] data_targ_out,
+								   output logic [`$INSTR_SIZE-1`:0] instr_out,
+								   output logic [`$INSTR_OP_SIZE-1`:0] instr_op_out,
+								   output logic [`$INSTR_SIZE/32-1`:0] instr_en_out,
+								   output logic [`$ADDR_SIZE-1`:0] instr_addr_out,
+								   output logic [`$TARG_SIZE-1`:0] instr_targ_out,
+								   output logic data_stall_out,
+								   output logic instr_stall_out
+								   );
+
+   // Put module here!
+   assign 								  data_out = data_in;
+   assign 								  data_op_out = data_op_in;
+   assign 								  data_en_out = data_en_in;
+   assign 								  data_addr_out = data_addr_in;
+   assign 								  data_targ_out = data_targ_in;
+   assign 								  instr_out = instr_in;
+   assign 								  instr_op_out = instr_op_in;
+   assign 								  instr_en_out = instr_en_in;
+   assign 								  instr_addr_out = instr_addr_in;
+   assign 								  instr_targ_out = instr_targ_in;
+   
+endmodule //

@@ -1,0 +1,27 @@
+It appears to be choking on a comment.  That's a good thing, because
+now we can finally start debugging comments.  I haven't looked yet to
+see what's in the .vp source, but the xml that's being generated looks
+like this (see
+/home/wachs/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest/gui/1proc_2dummy_new.xml):
+
+
+    <ParameterItem>
+      <Doc></Doc>
+      <Name>Number of Free (deallocate) Ports</Name>
+      <Range></Range>
+      <Val>1</Val>
+    </ParameterItem>
+
+I.e. it appears that somebody thought that "Number of Free..." was the
+*name* of the parameter <Name> , rather than a comment field <Comment>...
+
+...which provokes the xml-to-js script to try and build this:
+
+cgtop.SubInstances.DUT
+     .SubInstances.drh0
+     .SubInstances.rh2pc_state.Comments.Number of Free (deallocate)
+     .Parameters.Number of Free (deallocate) Ports = "1";
+
+This appears to be a bug with either the source code using the wrong
+syntax, or Genesis2 interpreting the syntax incorrectly...I'll let you
+and Ofer fight it out to decide which is the case...

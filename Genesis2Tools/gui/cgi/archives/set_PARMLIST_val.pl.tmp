@@ -1,0 +1,96 @@
+use strict;
+
+my %TMP;
+
+#$TMP{a}{b} = 1;
+
+my %hashtmp;
+
+$TMP{a}{b} = \%hashtmp;
+
+my $ptr;
+
+$ptr = $TMP{a}{b};
+
+$ptr->{c} = "hooha";
+
+print "\nhey\n";
+print $TMP{a}{b}{c};
+print "\nhey\n";
+
+exit;
+
+
+
+my $DBG9 = 0;
+
+my %PARMLIST;
+
+test_set_PARMLIST_val();
+
+sub test_set_PARMLIST_val {
+    set_PARMLIST_val("a.b.c", "abc", \%PARMLIST );
+    set_PARMLIST_val("a.b.e", "abe", \%PARMLIST );
+    set_PARMLIST_val("d",     "17d", \%PARMLIST );
+
+    print "PARMLIST{a}{b}{c} = $PARMLIST{a}{b}{c}\n";
+    print "PARMLIST{a}{b}{e} = $PARMLIST{a}{b}{e}\n";
+    print "PARMLIST{d}.....  = $PARMLIST{d}\n";
+    print "PARMLIST{a}{c}..  = $PARMLIST{a}{c}\n";
+
+    print "\n";
+}
+
+
+exit;
+
+
+sub set_PARMLIST_val {
+    my $field = shift(@_);    # E.g. "a.b.c"
+    my $value = shift(@_);    # E.g. "17"
+    my $plr   = shift(@_);    # Reference to hash %PARMLIST
+
+    #################################################################
+    # E.g. if $field = "a.b.c"
+    #         $value = "17"
+    #         $plr = \%PARMLIST
+    # then set $PARMLIST{a}{b}{c} = 17
+
+    my @parmpath = split(/\./ , $field);  # "a.b.c" => ("a","b","c")
+
+    my @ptr = ($plr);    # E.g. \%PARMLIST
+
+    my $i = 0;
+    for ($i = 0; $i < $#parmpath; $i++) {
+
+	whil
+
+	my $p = $parmpath[$i];
+
+	if (defined %{$ptr[$i]}->{$p}) {
+	    debug9("already have a hash for {$p}\n");
+	}
+	else {
+	    debug9("must create a new hash for {$p}\n");
+	    my %hashtmp;
+	    %{$ptr[$i]}->{$p} = \%hashtmp;
+	}
+	$ptr[$i+1] = $ptr[$i]->{$p};
+	debug9("ptr[".($i+1)."] = $ptr[$i+1]\n\n");
+    }
+
+    %{$ptr[$i]}->{$parmpath[$i]} = $value;
+
+    if ($DBG9) {
+	print "PARMLIST";
+	for ($i = 0; $i <= $#parmpath; $i++) {
+	    print "{$parmpath[$i]}";
+	}
+	print " = $value\n";
+    }
+}
+
+sub debug9 {
+    my $msg = shift @_;
+    if ($DBG9) { print $msg; }
+}

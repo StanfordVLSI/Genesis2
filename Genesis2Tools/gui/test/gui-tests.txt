@@ -1,0 +1,18 @@
+========================================================================
+Test of delete-item:
+  open demo design, go to DUT/p0/SPECIAL_DATA_MEM_OPS
+  delete item 0;
+  change item 0;
+  leave and come back;
+  repeat;
+  turn on debug; should see:
+  
+SUBPARMS = 
+    &SPECIAL_DATA_MEM_OPS.0=%.deleteme
+    &SPECIAL_DATA_MEM_OPS.0.name=METASTOREfoo
+    &SPECIAL_DATA_MEM_OPS.0.tiecode=36
+
+    &SPECIAL_DATA_MEM_OPS.0=%.deleteme
+    &SPECIAL_DATA_MEM_OPS.0.name=SYNCLOADbar
+    &SPECIAL_DATA_MEM_OPS.0.tiecode=2
+========================================================================

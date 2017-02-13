@@ -1,0 +1,62 @@
+newdesign=clyde&curdesign=..%2Fdesigns%2Ftgt0%2Ftgt0-baseline.js&modpath=top&DBG=1&ASSERTION=OFF&MODE=VERIF&NUM_MEM_MATS=1&NUM_PROCESSOR=2&QUAD_ID=1&TILE_ID=1&SPECIAL_DATA_MEM_OPS.2.tiecode=foo
+Content-type: text/html
+
+Found design dir "../designs/tgt0"
+
+Looking for module "top"
+
+curdesign = ../designs/tgt0/tgt0-baseline.xml
+directory = ../designs/tgt0
+modpath   = top
+newdesign = clyde-110621-155411
+
+Creating change file "../designs/tgt0/SysCfgs/clyde-110621-155411-changes.xml"
+
+EUREKA1 found target module
+
+
+PARMS:
+    <ParameterItem>
+      <Doc></Doc>
+      <Name>TILE_ID</Name>
+      <Range></Range>
+      <Val>1</Val>
+    </ParameterItem>
+    <ParameterItem>
+      <Doc></Doc>
+      <Name>ASSERTION</Name>
+      <Range></Range>
+      <Val>OFF</Val>
+    </ParameterItem>
+    <ParameterItem>
+      <Doc></Doc>
+      <Name>NUM_PROCESSOR</Name>
+      <Range></Range>
+      <Val>2</Val>
+    </ParameterItem>
+    <ParameterItem>
+      <Doc></Doc>
+      <Name>NUM_MEM_MATS</Name>
+      <Range></Range>
+      <Val>1</Val>
+    </ParameterItem>
+    <ParameterItem>
+      <Doc></Doc>
+      <Name>QUAD_ID</Name>
+      <Range></Range>
+      <Val>1</Val>
+    </ParameterItem>
+    <ParameterItem>
+      <Doc></Doc>
+      <Name>SPECIAL_DATA_MEM_OPS.2.tiecode</Name>
+      <Range></Range>
+      <Val>foo</Val>
+    </ParameterItem>
+    <ParameterItem>
+      <Doc></Doc>
+      <Name>MODE</Name>
+      <Range></Range>
+      <Val>VERIF</Val>
+    </ParameterItem>
+
+

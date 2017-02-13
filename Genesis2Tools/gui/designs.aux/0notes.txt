@@ -1,0 +1,158 @@
+========================================================================
+
+Design tracking...
+
+Better might be a history list e.g.
+  <design-history>
+    CMP/cmp-baseline
+    CMP/cmp-baseline-clyde0
+    CMP/cmp-baseline-clyde1
+  </design-history>
+
+========================================================================
+updatedesign.pl needs to abort if updatedesign.csh fails....!!!
+
+updatedesign.pl seems to be largely working!  still to do:
+
+  - "updatedesign.csh" needs to do the final xml-2-js translation
+
+  - then "updatedesign.pl" should be able to transfer to the newly-updated file.
+
+  - resolve security issues; currently design dir must be writable by ALL
+    so that browser ("www-data") can use it.  Future options: copy entire
+    design to a "www" scratch area writable by "www-data" etc.
+
+  - should write an "alert" subroutine that does "<script>alert()</script>" etc.
+
+  - CLEAN UP THE CODE
+========================================================================
+Beginning xml file is "cmp-baseline.js"
+  - "submit-changes" builds "cmp-clyde-10080-{000,001,002...}-in.xml"
+  - then it uses that to build "cmp-clyde-100801-{000,001,002...}-out.xml"
+  - then it builds "cmp-clyde-100801-{000,001,002...}.js"
+
+"submit-changes" should...
+  - call "cgi/update.pl?cgtop.foo.bar.NUM_PROCS=4&cgtop.baz.bubmle.ID=775"
+  - build a .xml file "designs/cmp/clyde-changes-100801-<pid>.xml"
+  - run genesis2 command to build new xml file "clyde-100801-<pid>.xml"
+    - Genesis2.pl -gen -top top -depend depend.list -product genesis_vlog.vf -hierarchy clyde-100801-<pid>-out.xml -debug 0 -xml clyde-changes-100801-<pid>.xml
+  - read in resulting new file "clyde-100801-<pid>.xml"
+  - navigate to previous position
+  - notify user of new design-file name
+  - make a list of changes and associated files (for "undo")
+
+========================================================================
+interactive genesis:
+  on open:
+    prompt for INPUTFILE filename (ls -lt menu) or NEW design
+    read design database or DEFAULT
+
+  on submit:
+    1. check to see if "OUTPUTFILE" is defined; if not, prompt for an output filename and copy design to userdesigns/OUTPUTFILE
+    2. append new definition to end of OUTPUTFILE
+
+------------------------------------------------------------------------
+
+  to begin: cgi script builds/copies a unique data base mydesign-44017.js plus all the relevant scripts
+  - begin new design ______ or "load existing design: [list]"
+  - "type a name for your design: foo"
+  - mydesign-44017.js includes myid=44017, myname="foo"
+
+  then, cgi script transfers control to ig
+
+save data on client: http://4umi.com/web/javascript/filewrite.php
+
+
+-----
+see "test2.pl" for what to do next
+  - move "todo" list to a better location!!!
+
+
+
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+Demo:
+  - Goto "Interactive Chip Generator powered by Genesis" at http://vlsiweb/ig
+  - Enter a name "demo" and choose base design "../designs/CMP/cmp-baseline.js"
+
+
+
+
+<table class=parms style='height:100%'>
+  <tr><td class=parmboxtitle><b>Parameters for module "top"</b></td></tr>
+  <tr><td class=parmboxparms><small><form style='white-space: nowrap'>
+  ASSERTION <input type='text' id=parm0 value='ON'/><br />
+  MODE <input type='text' id=parm1 value='VERIF'/><br />
+  NUM_MEM_MATS <input type='text' id=parm2 value='1'/><br />
+  NUM_PROCESSOR <input type='text' id=parm3 value='1'/><br />
+  QUAD_ID <input type='text' id=parm4 value='0'/><br />
+  TILE_ID <input type='text' id=parm5 value='0'/><br />
+</form></small>
+</td></tr>
+  <tr><td><table width=100%><tr>
+  <td width=50% height=0% style='text-align:center'></td>
+  <td class=button id=changebutton style='white-space:nowrap;text-align:center'>      <b>&nbsp;Submit changes&nbsp;</b></td>
+</tr></table></td></tr>
+</table>
+
+HOW TO ITERATE THROUGH A FORM...?
+
+http://pietschsoft.com/post/2006/06/01/JavaScript-Loop-through-all-elements-in-a-form.aspx
+
+<html> 
+<head> 
+<script type="text/javascript"> 
+function DisplayFormValues() {
+  var str = '';
+  var elem = document.getElementById('frmMain').elements;
+  for(var i = 0; i < elem.length; i++) {
+    str += "<b>Type:</b>"  + elem[i].type + "&nbsp&nbsp";
+    str += "<b>Name:</b>" + elem[i].name + "&nbsp;&nbsp;";
+    str += "<b>Value:</b><i>"  + elem[i].value + "</i>&nbsp;&nbsp;";
+    str += "<BR>";
+   }
+document.getElementById('lblValues').innerHTML = str; }
+
+</script> </head> <body>  <form id="frmMain" name="frmMain"> <input type="hidden" name="ElemHidden" value="some hidden text" /> <input type="text" name="ElemText" value="some text" /><br /> <textarea name="ElemTextArea">Some text area text</textarea><br /> <br /> <input type="button" value="Test" onclick="DisplayFormValues();"  /> </form> <hr />  <div id="lblValues"></div> </body> </html>
+
+
+
+
+
+/bin/rm -rf cmp; mkdesign TileGenTest cmp
+  - Copies TileGenTest to cmp;
+  - runs "make" to produce .xml file "hierarchy_out.xml".
+
+../xml-decoder/decode.pl < cmp/hierarchy_out.xml \
+  | grep -v DBG | grep . | grep JS | sed 's/JS //g' | sed 's/JS//g' \
+  > CMP/cmp-baseline.js
+
+
+
+OLD 4/25/2011
+OLD ---------
+OLD The gui now supports the new XML formats.  In fact, it auto-detects
+OLD whether a given design is old or new format and acts accordingly.  The
+OLD default is to use new mode only, but when it detects old format, it
+OLD pops up a little warning message, and then goes ahead and tries to use
+OLD the old Genesis.
+OLD 
+OLD I don't want to publish this as the "official" version until you've
+OLD had a chance to try it out and give me your feedback---please use it
+OLD to run through whatever demos you like to use and let me know what
+OLD needs fixing.  The URL for the development version is 
+OLD 
+OLD http://vlsiweb/genesis_dev_sr
+OLD 
+OLD When you try out the standard demo it should use new-version XML.  If
+OLD you want to compare to the old version, you can use "choose design" on
+OLD either "CMP/cmp-baseline-new.xml" or "cmp/new-regime.xml"
+OLD 
+OLD Enjoy!
+OLD Steve
+OLD 
+OLD PS I recommend trying out both Firefox and IE versions, at least, if
+OLD you can.  Thanks...
+
+

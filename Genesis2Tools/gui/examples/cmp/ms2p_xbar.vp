@@ -1,0 +1,68 @@
+/******************************************************************************
+ * File: ms2p_xbar.vp
+ * Author: Andrew Danowitz
+ * 
+ * Description:
+ * Memory wrapper for chip gen tile.  Used to instantiate all memory
+ * memory instances and generators
+ * 
+ * Required Genesis Parameters (default value):Description
+ * * INPUT_GROUPS (1): Number of input signal groups to the crossbar (i.e. a
+ *                     tile with 2 memory blocks would have 2 input groups)
+ * * INPUT_WIDTHS ([32,3,32,63,3,63]): Input signal sizes
+ * * OUTPUT_GROUPS (1): Number of output signal groups to the crossbar
+ * * OUTPUT_WIDTHS ([32,3,32,63,3,63): Output signal sizes
+ * * PC_SIZE (67): Size of signal going to protocol controller
+ * 
+ * Change bar:
+ * -----------
+ * Date          Author   Description
+ * Apr 14, 2010    danowitz Generatable wrapper version
+ *  
+ * 
+ *****************************************************************************/
+
+
+//; my $INPUT_GROUPS = $self->define_param('INPUT_GROUPS' => 1);
+//; my $INPUT_WIDTHS_REF = $self->define_param('INPUT_WIDTHS'=>[32,3,32,63,3,63]);
+//; my $OUTPUT_GROUPS = $self->define_param('OUTPUT_GROUPS', 1);
+//; my $OUTPUT_WIDTHS_REF = $self->define_param('OUTPUT_WIDTHS'=>[32,3,32,63,3,63]);
+//; my $PC_SIZE = $self->define_param('PC_SIZE', 67);
+
+//; my $GROUPCOUNT = 0;
+//; my $PORTCOUNT = 0;
+//   
+
+//; my @INPUT_WIDTHS = @$INPUT_WIDTHS_REF;
+//; my @OUTPUT_WIDTHS = @$OUTPUT_WIDTHS_REF;
+  
+module `$self->get_module_name()` (
+								   //; for ($GROUPCOUNT = 0; $GROUPCOUNT < $INPUT_GROUPS; $GROUPCOUNT ++) {
+								   input [`$INPUT_WIDTHS[$PORTCOUNT]-1`:0] req_proc_`$GROUPCOUNT`,
+								   //; $PORTCOUNT++;
+								   input [`$INPUT_WIDTHS[$PORTCOUNT]-1`:0] return_code_in_`$GROUPCOUNT`,
+								   //; $PORTCOUNT++;
+								   input [`$INPUT_WIDTHS[$PORTCOUNT]-1`:0] return_data_in_`$GROUPCOUNT`,
+								   //; $PORTCOUNT++;
+								   input [`$INPUT_WIDTHS[$PORTCOUNT]-1`:0] return_meta_in_`$GROUPCOUNT`,
+								   //; $PORTCOUNT++;
+						           //; }
+								   //; $PORTCOUNT = 0;
+								   //; for ($GROUPCOUNT = 0; $GROUPCOUNT < $OUTPUT_GROUPS; $GROUPCOUNT ++) {
+								   output logic [`$OUTPUT_WIDTHS[$PORTCOUNT]-1`:0] ret_data_out_`$GROUPCOUNT`,
+								   //; $PORTCOUNT++;
+								   output logic [`$OUTPUT_WIDTHS[$PORTCOUNT]-1`:0] ret_meta_out_`$GROUPCOUNT`,
+								   //; $PORTCOUNT++;
+								   output logic [`$OUTPUT_WIDTHS[$PORTCOUNT]-1`:0] ret_instr_out_`$GROUPCOUNT`,
+								   //; $PORTCOUNT++;
+								   output logic [`$OUTPUT_WIDTHS[$PORTCOUNT]-1`:0] ret_instrmeta_out_`$GROUPCOUNT`,
+								   //; $PORTCOUNT++;
+								   input [`$OUTPUT_WIDTHS[$PORTCOUNT]-1`:0] op_code_in_`$GROUPCOUNT`,
+								   //; $PORTCOUNT++;
+								   //; }
+								   output logic [`$PC_SIZE-1`:0] to_pc
+								   );
+
+   //insert module here
+
+endmodule //

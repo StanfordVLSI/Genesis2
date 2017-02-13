@@ -1,0 +1,94 @@
+/******************************************************************
+ * File: top.vp
+ * Simple top level that instantiates two register files 
+ *****************************************************************/
+
+module `mname`();
+   /******************************************************************
+    * Calls to the unique_inst method generate function invoke the 
+    * generation of the relevant modules based on the template. 
+    * Verilog instantiation is (intentionally) separated and must 
+    * appear after the object was created.
+    * ***************************************************************/
+
+   // First, for the sake of this example,
+   //  let's assume that these are the signals we care about:
+   logic [31:0] DataOut1;
+   logic [7:0] 	Status1;
+   logic [31:0] DataIn1;
+   logic 	DataRdy1; // qualifier for DataIn
+   logic 	SoftReset1;
+   
+   logic [31:0] DataOut2;
+   logic [7:0] 	Status2;
+   logic [31:0] DataIn2;
+   logic 	DataRdy2; // qualifier for DataIn
+   logic 	SoftReset2;
+
+   // And also some generic wires
+   logic 	Clk;
+   logic 	Reset;
+   
+   // Config interfaces to connect to/from the register files:
+   // For this example, we generate one and then clone it multiple times.
+   // We could have also easily just generate it with the same parameters
+   // which would have yielded the same results.
+   // 
+   //; # Create the cfg interface object
+   //; my $tst_rf1_cfg_ifc_obj = generate('cfg_ifc', 'tst_rf1_cfg_ifc',
+   //;                                    CFG_BUS_WIDTH => 32,
+   //;                                    CFG_ADDR_WIDTH => 32,
+   //;                                    CFG_OPCODE_WIDTH => 2   );
+   //; # Replicate the config interface
+   //; my $rf1_rf2_cfg_ifc_obj = clone($tst_rf1_cfg_ifc_obj, 'rf1_rf2_cfg_ifc');
+   //; my $rf2_tst_cfg_ifc_obj = clone($tst_rf1_cfg_ifc_obj, 'rf2_tst_cfg_ifc');
+   `$tst_rf1_cfg_ifc_obj->instantiate`();
+   `$rf1_rf2_cfg_ifc_obj->instantiate`();
+   `$rf2_tst_cfg_ifc_obj->instantiate`();
+
+
+   
+   // Instantiate the first register file 
+   //; my $reg_list = 
+   //;    [{name => 'DataOut', width => 32, IEO => 'i', comment => 'Proc debug data'},
+   //;     {name => 'Status',  width => 8, IEO => 'i', comment => 'Debug status'},
+   //;     {name => 'DataIn',  width => 32, IEO => 'ie', comment => 'Returned data'},
+   //;     {name => 'SoftReset', width => 1, IEO => 'o', comment => 'Proc Reset signal'}, 
+   //;    ];
+   //; my $reg_file = generate('reg_file', 'rf1',
+   //;                         IFC_REF => $tst_rf1_cfg_ifc_obj,
+   //;                         REG_LIST => $reg_list);
+   `$reg_file->instantiate`
+     (
+      .Reset(Reset),
+      .Clk(Clk),
+      .cfgIn(tst_rf1_cfg_ifc), // from testbench
+      .cfgOut(rf1_rf2_cfg_ifc),// to reg file 2
+      // signals to register      
+      .DataOut_d(DataOut1),
+      .Status_d(Status1),
+      .DataIn_d(DataIn1),
+      .DataIn_en(DataRdy1),
+      // registered outputs
+      .SoftReset_q(SoftReset1)
+      );
+
+   // Instantiate the second register file 
+   //; my $reg_file = generate('reg_file', 'rf2',
+   //;                         IFC_REF => $tst_rf1_cfg_ifc_obj,
+   //;                         REG_LIST => $reg_list);
+   `$reg_file->instantiate`
+     (
+      .Reset(Reset),
+      .Clk(Clk),
+      .cfgIn(rf1_rf2_cfg_ifc), // from reg file 2
+      .cfgOut(rf2_tst_cfg_ifc),// to testbench
+      // signals to register      
+      .DataOut_d(DataOut2),
+      .Status_d(Status2),
+      .DataIn_d(DataIn2),
+      .DataIn_en(DataRdy2),
+      // registered outputs
+      .SoftReset_q(SoftReset2)
+      );
+endmodule // `mname`

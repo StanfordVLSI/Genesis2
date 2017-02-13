@@ -1,0 +1,93 @@
+/* *****************************************************************************
+ * File: flop.vp
+ * Author: Andrew Danowitz
+ * 
+ * Description:
+ * My first attempt in using Genesis to make a flip-flop generator.
+ * 
+ * Required Genesis Controlable Parameters:
+ * * flop_type  - flop, rflop, eflop, or reflop
+ * * flop_width  - list of sizes corresponding to each register
+ * * reg_defaults - list of default values stored in each register
+ * * flop, rflop, eflop - enum values corresponding to flop type
+ * * flop_default - value to default to on reset (in decimal)
+ *
+ * Change bar:
+ * -----------
+ * Date          Author   Description
+ * Jan 20, 2010  danowitz init version
+ * 
+ *  
+ * 
+ * ****************************************************************************/
+
+/*******************************************************************************
+ * Simulation Control Definitions
+ ******************************************************************************/
+@ifdef MAGIC_TASKS_ON
+  @warning Magic Tasks Are ON!
+@endif
+
+@ifndef ASSERTIONS_ON
+  @warning Assertions are OFF!
+@endif
+
+@ifndef FLOP_TYPE
+  @warning "FLOP_TYPE"
+  @error flop_gen requires a flop type (CONSTANT, FLOP, EFLOP, REFLOP, or RFLOP)
+@endif
+
+@ifndef FLOP_DEFAULT
+	@define FLOP_DEFAULT 0
+@endif
+
+@if (FLOP_TYPE ne CONSTANT && FLOP_TYPE ne FLOP && FLOP_TYPE ne EFLOP && FLOP_TYPE ne REFLOP && FLOP_TYPE ne RFLOP)
+	@error flop_gen requires a flop type FLOP_TYPE (CONSTANT, FLOP, EFLOP, REFLOP, or RFLOP)
+@endif
+
+@ifndef FLOP_WIDTH
+  @error flop_gen requires a flop width
+@endif
+
+module flop(
+    //inputs
+	@if (FLOP_TYPE ne CONSTANT)
+	    input 					  Clk,
+    	@if (FLOP_TYPE eq RFLOP || FLOP_TYPE eq REFLOP)
+    	input 					  Reset,
+    	@endif
+    	@if (FLOP_TYPE eq EFLOP || FLOP_TYPE eq REFLOP)
+        input					  Enable,
+    	@endif
+    	input [FLOP_WIDTH-1:0] 			  data_in,
+    //outputs
+	@endif
+	    output reg [FLOP_WIDTH-1:0]			  data_out
+);
+
+	@if (FLOP_TYPE eq CONSTANT)
+	data_out = FLOP_WIDTH'b{FLOP_DEFAULT};
+	@else
+    always @ (posedge Clk) begin
+	@if FLOP_TYPE == RFLOP || FLOP_TYPE == REFLOP
+	    if (Reset) begin
+		data_out <= FLOP_WIDTH'd{FLOP_DEFAULT};
+	    end
+	@endif
+	
+		else begin
+
+	    @if FLOP_TYPE == EFLOP || REFLOP
+			if (Enable) begin
+	    @endif
+		
+			data_out <= data_in;
+
+	    @if FLOP_TYPE == EFLOP || FLOP_TYPE == REFLOP
+			end
+	    @endif
+
+		end
+    end
+	@endif
+endmodule

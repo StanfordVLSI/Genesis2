@@ -1,0 +1,22 @@
+module `mname` (
+	//; my $signal_width=parameter(Name=>'SIGWIDTH', Val=>4);
+	//; my $mux_width=parameter(Name=>'MUXWIDTH', Val=>4);
+	input logic [`$signal_width-1`:0] in [`$mux_width-1`:0],
+	input logic [`$mux_width-1`:0] sel,
+	output logic [`$signal_width-1`:0] out
+		);
+  always_comb 
+    begin
+       out = in[0]; // default
+       unique case (1'b1)
+	 //; foreach my $idx (0 .. $mux_width-1){
+	 sel[`$idx`]: out = in [`$idx`];
+	 //; }
+       endcase
+
+       assert ($onehot(sel)) 
+	 else $error("select is not one hot");
+    end // always_comb begin
+   
+       
+endmodule

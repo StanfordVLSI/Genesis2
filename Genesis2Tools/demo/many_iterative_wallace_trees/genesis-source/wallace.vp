@@ -1,0 +1,55 @@
+//;# Import Libs
+//; use POSIX qw(floor);
+
+// PARAMETERS
+//; my $N = parameter(name=>'N', val=>4, Min=>2, Step=>1);
+
+// Wallace tree for N=`$N` partioal products of width N=`$N` //
+module `mname` 
+  ( input logic [`$N-1`:0] pp[`$N-1`:0],
+    output logic [`2*$N-1`:0] sum,carry		   
+   );
+
+   //; my $hight = $N; my $width = 2*$N;  
+   //; my $step = 0;
+   // make pps rectangular (insert 0s!)  
+   logic [`2*$N-1`:0] 	      pp0_step`$step`;
+   assign pp0_step`$step` = {{(`$N`){1'b0}}, pp[0]};
+   //; for (my $i=1; $i<$N; $i++) {
+   logic [`2*$N-1`:0] 	      pp`$i`_step`$step`;
+   assign pp`$i`_step`$step` = {{(`$N-$i`){1'b0}}, pp[`$i`], {`$i`{1'b0}}};
+   //; }
+
+
+   //; while($hight > 2){
+   //;   $step++; $width++;
+   // STARTING TREE REDUCTION STEP `$step`
+   //;   for (my $i=0; $i < floor($hight/3); $i++){
+   logic [`$width-1`:0]       pp`2*$i`_step`$step`;
+   logic [`$width-1`:0]       pp`2*$i+1`_step`$step`;
+   //; my $csa_obj = generate("CSA","csa_step${step}_${i}",
+   //;                        Width=>$width-1);
+   `$csa_obj->instantiate` (.a(pp`3*$i`_step`$step-1`),
+      		      .b(pp`3*$i+1`_step`$step-1`), 
+      		      .c(pp`3*$i+2`_step`$step-1`),
+      		      .s(pp`2*$i`_step`$step`[`$width-2`:0]), 
+      		      .co(pp`2*$i+1`_step`$step`[`$width-1`:1]));
+   
+   assign pp`2*$i`_step`$step`[`$width-1`] = 1'b0;
+   assign pp`2*$i+1`_step`$step`[0] = 1'b0;
+   //;    }
+  
+   // Left overs:
+   //;   for (my $i=0; $i < $hight%3; $i++){
+   //;     my $old_idx = $i + 3*floor($hight/3);
+   //;     my $new_idx = $i + 2 * floor($hight/3);
+   logic [`$width-1`:0] pp`$new_idx`_step`$step`;
+   assign pp`$new_idx`_step`$step` = {1'b0, pp`$old_idx`_step`$step-1`};
+   //;   } 
+   //; $hight = 2 * floor($hight/3) + $hight%3;
+   //; } # end of "while($hight > 2)..."
+
+   // Ignore all the top bits and assign final PPs to output
+   assign sum = pp0_step`$step`[`2*$N-1`:0];
+   assign carry = pp1_step`$step`[`2*$N-1`:0];  
+endmodule : `mname` 

@@ -1,0 +1,232 @@
+#!/usr/bin/perl
+use strict;
+
+my $DBG9 = 0;
+my $DBG  = 0;
+
+if (0) { $DBG = 1; test_rewrite_parmstring(); }
+
+sub test_rewrite_parmstring {
+
+  my $parms = "p1&p2&p3&p4"
+      ."&SPECIAL_DATA_MEM_OPS.2.tiecode=2baz"
+      ."&SPECIAL_DATA_MEM_OPS.2=%.cloneme";
+  my ($parms,$clones,$deletes) = rewrite_parmstring($parms);
+
+  my $parms = "p1&p2&p3&p4"
+      ."&SPECIAL_DATA_MEM_OPS.2=%.cloneme"
+      ."&SPECIAL_DATA_MEM_OPS.2.tiecode=2baz";
+  my ($parms,$clones,$deletes) = rewrite_parmstring($parms);
+
+  my $parms = "newdesign=udtest"
+      ."&curdesign=updatedesign.dir%2Ftest%2Ftgt0-baseline.js"
+      ."&modpath=top.DUT.p0&DBG=1"
+      ."&USE_SHIM=bar"
+      ."&SPECIAL_DATA_MEM_OPS.0.name=4bart"
+      ."&SPECIAL_DATA_MEM_OPS.0.tiecode=0foo"
+      ."&SPECIAL_DATA_MEM_OPS.2.tiecode=2baz"
+      ."&SPECIAL_DATA_MEM_OPS.2=%.cloneme"
+      ."&SPECIAL_DATA_MEM_OPS.0=%.deleteme";
+  my ($parms,$clones,$deletes) = rewrite_parmstring($parms);
+
+  my $parms = "newdesign=udtest"
+      ."&curdesign=updatedesign.dir%2Ftest%2Ftgt0-baseline.js"
+      ."&modpath=top.DUT.p0&DBG=1"
+      ."&USE_SHIM=bar"
+      ."&SPECIAL_DATA_MEM_OPS.0.name=4bar"
+      ."&SPECIAL_DATA_MEM_OPS.0.tiecode=0foo"
+      ."&SPECIAL_DATA_MEM_OPS.2.tiecode=2baz"
+      ."&SPECIAL_DATA_MEM_OPS.0=%.cloneme";
+  my ($parms,$clones,$deletes) = rewrite_parmstring($parms);
+
+  exit;
+}
+
+sub rewrite_parmstring {
+
+  ########################################################################
+  # Given a set of parms that includes a CLONE_ME command e.g.
+  #
+  #    $parms = "newdesign=udtest"
+  #	."&curdesign=updatedesign.dir%2Ftest%2Ftgt0-baseline.js"
+  #	."&modpath=top.DUT.p0&DBG=1"
+  #	."&USE_SHIM=bar"
+  #	."&SPECIAL_DATA_MEM_OPS.0.name=4bar"
+  #	."&SPECIAL_DATA_MEM_OPS.0.tiecode=0foo"
+  #	."&SPECIAL_DATA_MEM_OPS.2.tiecode=2baz"
+  #	."&SPECIAL_DATA_MEM_OPS.0=%.cloneme";
+  #
+  # Rewrite such that when we reach "SPECIAL_DATA_MEM_OPS.0", that item
+  # gets cloned, and the others get renamed to support the new order.
+  # Example of rewritten parms:
+  #
+  #    $parms = "newdesign=udtest"
+  #	."&curdesign=updatedesign.dir%2Ftest%2Ftgt0-baseline.js"
+  #	."&modpath=top.DUT.p0&DBG=1"
+  #	."&USE_SHIM=bar"
+  #	."&SPECIAL_DATA_MEM_OPS.0=%.cloneme"; # Okay this won't fly
+  #	."&SPECIAL_DATA_MEM_OPS.1.name=4bar"
+  #	."&SPECIAL_DATA_MEM_OPS.1.tiecode=0foo"
+  #	."&SPECIAL_DATA_MEM_OPS.3.tiecode=2baz"
+  #
+  # Similar for "DELETE_ME" command
+  #
+  ########################################################################
+  # if command = "%.cloneme:
+  # header = "SPECIAL_DATA_MEM_OPS.0" ($parmname); $clone_ix = 0;
+  # Add 
+  # 
+  # search backward through list of parms, look for
+  # $parmname =~ /SPECIAL_DATA_MEM_OPS.($arraynum)
+  #
+  # if ($arraynum > $clone_ix), rewrite parm, replacing arraynum w/(arraynum+1)
+  # Later, remember to CHANGE FIRST, THEN CLONE
+  #
+  ########################################################################
+  # if command = e.g. "SPECIAL_DATA_MEM_OPS.0=%.deleteme"
+  #
+  # $parmname = "SPECIAL_DATA_MEM_OPS.0"; $clone_ix = 0;
+  #
+  # search backward through list of parms, look for
+  # $parmname =~ /SPECIAL_DATA_MEM_OPS.($arraynum)
+  #
+  # if ($arraynum == $clone_ix), remove parm (unless its a CLONE or DELETE)
+  # if ($arraynum > $clone_ix), rewrite parm, replacing arraynum w/(arraynum-1)
+  ########################################################################
+  # Final sweep through parms
+  #
+  # take out "CLONE" and "DELETE" commands, add instead to lists
+  # CLONEME and DELETEME e.g. result from example above should be:
+  #
+  #    $parms = "newdesign=udtest"
+  #	."&curdesign=updatedesign.dir%2Ftest%2Ftgt0-baseline.js"
+  #	."&modpath=top.DUT.p0&DBG=1"
+  #	."&USE_SHIM=bar"
+  #	."&SPECIAL_DATA_MEM_OPS.2.name=4bar"
+  #	."&SPECIAL_DATA_MEM_OPS.2.tiecode=0foo"
+  #	."&SPECIAL_DATA_MEM_OPS.4.tiecode=2baz"
+  #
+  # and CLONEME["SPECIAL_DATA_MEM_OPS.0"] = true;
+  ########################################################################
+
+  my $parmstring = shift @_;
+
+  my @parmpairs  = split /\&/ , $parmstring;
+
+  # First four parms are meta-parms.
+  my @preparms = @parmpairs[0..3];
+  for (my $i=1; $i<=4; $i++) { shift @parmpairs; }
+
+  if ($DBG) {
+      print "parmstring= $parmstring\n\n";
+      print "preparms=   @preparms\n";
+      print "parmpairs=  @parmpairs\n\n";
+  }
+
+  my @oldparmpairs = @parmpairs;
+
+# for (my $i=0; $i<=$#parmpairs; $i++) {
+  for (my $i=0; defined $parmpairs[$i]; $i++) {
+      my $pair = $parmpairs[$i];                # E.g. "foo=bar" is a pair
+
+      if ($pair=~m/([^=]+)=(.*)/) {
+          my $field = $1; my $value = $2;
+          $value =~ s/\+/ /g;                                 # Unencode "+" => space
+          $value =~ s/%([\dA-Fa-f]{2})/pack("C", hex($1))/eg; # Unencode e.g. "%2C"
+
+          if ($DBG9) { print "    fv= $field , $value\n"; }
+
+          # E.g. &<field>=<value> might be "&SPECIAL_DATA_MEM_OPS.30=%.deleteme"
+          if ($value eq "%.cloneme" || $value eq "%.deleteme") {
+              (my $inc, @parmpairs) = process_clone_or_delete($i, $field, $value, @parmpairs);
+              $i += $inc;
+          }
+      }
+  }
+  if ($DBG) {
+      print "after pass 1: oldparmpairs,newparmpairs=\n@oldparmpairs\n@parmpairs\n\n";
+  }
+
+  # Now make a final pass to pull out the CLONE and DELETEME commands
+
+  my @newparmpairs;
+  my @delete_list;
+  my @clone_list;
+  for (my $i=0; $i<=$#parmpairs; $i++) {
+      my $pair = $parmpairs[$i];                # E.g. "foo=bar" is a pair
+      
+      if ($pair eq "DELETED") { next; }
+
+      elsif ($pair =~ /(.*)[=][%][.]deleteme$/) {
+          if ($DBG9) { print "add $1 to DELETE list\n"; }
+          push(@delete_list, $1);
+      }
+      elsif ($pair =~ /(.*)[=][%][.]cloneme$/) {
+          if ($DBG9) { print "add $1 to CLONE list\n"; }
+          push(@clone_list, $1);
+      }
+      else {
+          push(@newparmpairs, $parmpairs[$i]);
+      }
+  }
+  if ($DBG) {
+      print "after pass 2: oldparmpairs,newparmpairs=\n@parmpairs\n@newparmpairs\n\n";
+      print "clone:  @clone_list\n";
+      print "delete: @delete_list\n\n";
+  }
+
+  return(
+         join("&", (@preparms,@newparmpairs)),
+         join("&", @clone_list),
+         join("&", @delete_list)
+         );
+}
+
+# Check cloneme/deleteme command against all successive parm-change commands and rewrite appropriately
+# E.g. if list = ("deleteme item0", "change item0") that translates to
+# ("deleteme item0", "change item1")
+#
+# WTF?  If we process parms in order, everything should just work, right??
+
+sub process_clone_or_delete {
+    my $clone_index = shift @_; # E.g. "17"
+    my $clone_item  = shift @_; # E.g. "SPECIAL_DATA_MEM_OPS.17"
+    my $command     = shift @_; # "%.cloneme" or "%.deleteme"
+
+    my @parmpairs = @_;
+
+    $clone_item =~ /(.*)[.](\d+)$/;
+    my $clone_name = $1; my $clone_num = $2;
+
+    my $inc=0;
+
+    my $clone_re = qr/^($clone_name\.)(\d+)([.=].*)/;
+    for (my $j=0; $j<$clone_index; $j++) {
+       #print "checking item $j = $parmpairs[$j]\n\n";
+        if ($parmpairs[$j] =~ $clone_re) {
+            my $prefix = $1; my $ix = $2; my $suffix = $3;
+            if ($ix > $clone_num) {
+                $ix = ($command eq "%.cloneme")? ($ix+1) : ($ix-1) ;
+                $parmpairs[$j] = "$prefix$ix$suffix";
+            }
+            elsif ($ix == $clone_num && $command eq "%.deleteme") {
+                if (! ($parmpairs[$j] =~ /[%][.].*me$/)) { # Don't delete commands!!
+                    $parmpairs[$j] = "DELETED";
+                }
+            }
+            elsif ($ix == $clone_num && $command eq "%.cloneme") {
+                if (! ($parmpairs[$j] =~ /[%][.].*me$/)) { # Don't change commands!!
+                    if ($DBG9) { print "before: @parmpairs\n"; }
+
+                    splice @parmpairs, $j+1, 0, $prefix.($ix+1).$suffix; $j++;
+
+                    if ($DBG9) { print "after: @parmpairs\n\n"; }
+                    $clone_index++; $inc++;
+                }
+            }
+        }
+    }
+    return ($inc,@parmpairs);
+}
+
+1;

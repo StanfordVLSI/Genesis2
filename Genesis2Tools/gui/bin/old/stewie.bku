@@ -1,0 +1,188 @@
+#! /bin/bash
+# No #! directive means /bin/sh...right???
+
+#  stewie setup . 
+#    - (assumes running from unpacked tarball)
+#    - link CONFIG.TXT => configs/CONFIG_stewie.txt
+#    - link index.htm => configs/index_stewie.htm
+#  stewie clone /tmp/foo
+#    - same as "setup" except builds a new installation in indicated directory
+#  stewie kill
+#    - finds and kills running stewie server(s)
+#  stewie start <portno>
+#    - starts a new stewie server on port "portno" (default=first available)
+#  stewie restart <portno>
+#    - kill existing server and restart
+
+stewie_help () {
+  cmd=`basename $0`
+  cmd=${0##*/}
+
+  echo "Usage:"
+  echo
+  echo "  $cmd clone <olddir> <newdir> # clone existing installation olddir and put it in newdir"
+  echo "  $cmd setup <dir> <port>      # ready the stewie install at <dir>, port <port>"
+  echo "  $cmd start [dir] [port]      # start stewie for <dir> using indicated port (default = next avail)"
+  echo "  $cmd list                    # Find and list running stewie servers"
+  echo "  $cmd kill                    # kill existing stewie server(s)"
+  echo "  $cmd restart [dir] [port]    # kill and then restart (see above)"
+  echo
+  echo "Examples:"
+  echo "  $cmd setup /tmp/stewie 8080"
+  echo
+}
+
+stewie_setup() {
+
+    # E.g. "stewie_setup setup /tmp/stewie 8080"
+    if `test \( $# -ne 2 \)`; then stewie_help; exit; fi
+    dir=$1; port=$2;
+
+    cd $dir
+
+    f=index.htm
+    if `test -e $f`; then echo "WARNING: Deleting existing $f"; rm $f; fi
+
+    f=CONFIG.TXT
+    if `test -e $f`; then echo "WARNING: Deleting existing $f"; rm $f; fi
+
+    URL="http://"`hostname`":"$port   # E.g. "http://neva-2.stanford.edu:8080"
+    echo
+
+    index=configs/index_stewie.htm;
+    echo "Building new index.htm with $URL and $dir..."
+    if `test \! -e $index`; then
+        echo; echo "ERROR Cannot find $dir/$index."; stewie_help; exit;
+    fi
+    cat $index\
+        | sed "s|STEWIE_BASE_HREF_HERE|$URL|g"\
+        | sed "s|STEWIE_DIR_HERE|$dir|g"\
+        > index.htm
+
+    config=configs/CONFIG_stewie.txt
+    echo "Building new CONFIG.TXT with $URL and $dir..."
+    if `test \! -e $config`; then
+        echo; echo "ERROR Cannot find $dir/$config."; stewie_help; exit;
+    fi
+    cat $config\
+        | sed "s|STEWIE_BASE_HREF_HERE|$URL|g"\
+        | sed "s|STEWIE_DIR_HERE|$dir|g"\
+        > CONFIG.TXT
+}
+
+if `test \( $# -eq 0 \)`; then stewie_help; exit; fi
+
+case "$1" in
+
+    (clone) {
+        olddir=$2; newdir=$3;
+        echo -n "\nClone from \"$olddir\" to \"$newdir\", right (y or n)? "; read answer;
+        answer=${answer:0:1} # First char only
+        if `test "$answer" = 'n' -o "$answer" = 'N'`; then
+            echo "Okay bye"; exit;
+        fi
+        echo
+        
+      # Make sure destination does not yet exist
+        if `test -e $newdir`; then
+            echo "Oops looks like $newdir already exists and I don't want to write over it."
+            echo "Please delete $newdir and try again."
+            exit;
+        fi
+
+        tarball=/tmp/gui.tar.bz2
+
+      # Build an up-to-date tarfile (creates $tarball)
+        $olddir/configs/install/build_tarfile.sh
+
+      # Expand the tarball to create /tmp/gui-unpack-$$/gui
+        mkdir /tmp/gui-unpack-$$
+        cd /tmp/gui-unpack-$$
+        tar xjf $tarball || exit
+        /bin/rm $tarball          # Finished w/tarball
+
+        echo "Okay copying gui to its new home \"$newdir\""; echo;
+        mv gui $newdir
+
+      # Clean up your mess and leave.
+        /bin/rm -rf /tmp/gui-unpack-$$
+        exit;
+    };;
+
+    (setup) {
+        shift;           # "setup /tmp/stewie 8080" => "/tmp/stewie 8080"
+        stewie_setup $*;
+        exit;
+    };;
+    
+    (list) {
+        ps aux | egrep 'perl .*[/]stewie.pl';
+        echo
+        procs=`ps ax | egrep 'perl .*[/]stewie.pl' | awk '{print $1}'`;
+        for p in ${procs[*]}; do echo kill $p; done;
+        exit;
+    };;
+
+    (kill) {
+        echo "Before:"
+        ps aux | egrep 'perl .*[/]stewie.pl';
+        procs=`ps ax | egrep 'perl .*[/]stewie.pl' | awk '{print $1}'`;
+
+        echo
+        for p in ${procs[*]}; do
+            echo -n kill $p;
+            echo -n ": Really do it (y or n)? "; read answer
+
+            answer=${answer:0:1} # First char only
+            if `test "$answer" = 'y' -o "$answer" = 'Y'`; then
+                kill $p;
+            fi
+        done;
+        echo
+
+        echo "After:"
+        ps aux | egrep 'perl .*[/]stewie.pl';
+        exit
+    };;
+
+    (start) {
+        mydir=${0%/*}/
+
+        # Call to get_stewie_args returns e.g.
+        # "ARGS /home/steveri/smart_memories/Smart_design/ChipGen/gui 8080"
+
+        shift;
+        ${mydir}get_stewie_args.pl $* > /tmp/tmp.$$ || exit
+        stewie_args=(`cat /tmp/tmp.$$ | grep ARGS | sed 's/ARGS //'`)
+        # cat /tmp/tmp.$$
+        /bin/rm /tmp/tmp.$$
+
+        gui=${stewie_args[0]}; port=${stewie_args[1]}
+
+#        echo "ho ho gui=$gui port=$port"
+
+        stewie_setup $gui $port
+
+        echo "${mydir}stewie.pl gui=\"$gui\" port=$port"
+        ${mydir}stewie.pl gui=\"$gui\" port=$port
+
+        exit
+    };;
+
+    (restart) {
+        $0 kill
+        shift;
+        $0 start $*
+        exit;
+    };;
+esac
+
+stewie_help;
+
+
+
+#exit;
+#
+#HELP:
+#echo "i got your help right HERE"
+#

@@ -1,0 +1,63 @@
+/*************************************************************************
+ ** From Perforce:
+ **
+ ** $Id: //Smart_design/ChipGen/rtl/Processor/procClkGen.vp#2 $
+ ** $DateTime: 2010/05/15 00:33:56 $
+ ** $Change: 8708 $
+ ** $Author: shacham $
+ *************************************************************************/
+
+/* *****************************************************************************
+ * File: procClkGen.vp
+ * 
+ * Description:
+ * This module is in charge of generating the gated, inverted, processor clock
+ * 
+ * REQUIRED GENESIS PARAMETERS:
+ * ----------------------------
+ * 
+ * 
+ * Inputs:
+ * -------
+ * Clk		- system clock
+ * TMode	- Test mode. If set, disables clock gating
+ * procStall	- Stall the processor. if set, stalls processor clock
+ * procReset	- The processor Reset signal (post soft reset logic)
+ * 
+ * 
+ * Outputs:
+ * --------
+ * procClk	- The gated,inverted clock to be supplied to the processor
+ * 
+ * 
+ * Change bar:
+ * -----------
+ * Date          Author   Description
+ * May  13, 2010 shacham  init version
+ * 
+ * 
+ * 
+ * ****************************************************************************/
+
+module `$self->get_module_name()`
+  (
+    input Clk,
+    input TMode,	//If set, disable clock gating
+    input procStall,	//if set stall processor's clock
+    input procReset,
+   
+    output procClk
+   );
+
+   logic   procClkEn;
+   assign procClkEn =  (!procStall | procReset);
+   
+   // Clock gating cell instantiation
+   CBUFLLVTX12 pclk_gate(.G(procClk),
+			 .CP(~Clk),
+			 .E(procClkEn),
+			 .TE(TMode));
+   
+   
+endmodule: `$self->get_module_name()`
+

@@ -1,0 +1,711 @@
+/*************************************************************************
+ ** From Perforce:
+ **
+ ** $Id: //Smart_design/ChipGen/rtl/tile.vp#19 $
+ ** $DateTime: 2010/07/06 15:30:33 $
+ ** $Change: 8881 $
+ ** $Author: danowitz $
+ *************************************************************************/
+/* *****************************************************************************
+ * File: tile.vp
+ * 
+ * Description:
+ * This is the top level of the tile generator. It instantiate 
+ * a number of processor and a number of memory blocks. It also
+ * comunicate with a protocol controller.
+ * 
+ * Required Genesis Parameters (default value):Description
+ * * QUAD_ID: Quad number (must be specified or error is thrown)
+ * * TILE_ID: Tile number (must be specified or error is thrown)
+ * * CFG_IFC_REF - An instance of the reg_file_ifc (used as reference)
+ * 
+ * * NUM_PROCESSOR (1): Number of processors
+ * * PORTS (2): Number of ports per processor
+ * * NUM_MEM_MATS (1): Number of memory mats in the tile
+ * * MAT_ADDR_SIZE (32): Physical address size for the tile
+ * * MAT_TYPE (SCRATCH): Default memory type for all memories
+ * * MAT_WORDS (16): Number of words per memory mat
+ * * MAT_DATA_SIZE (32): Word size per memory mat
+ * * MAT_ADDR (0): Starting address for each memory mat
+ * * MAT_META_SIZE (32): Meta-data size returned by mats
+ * * MAT_RET_CODE (32): Size of the return code bus from each memory mat
+ * * PROC_TARG (log2(memory mats): Target memory mat bus size
+ * * PROC_META_SIZE (meta size + return code size): Size of bus for aggregated meta data and return code
+ * * REQ_PROC (log2(Num_procs*ports)): Width of bus holding requesting processor
+ * * MAT_OPCODE_WIDTH (3): Width of opcode accepted by memory mats
+ * 
+ * 
+ * Change bar:
+ * -----------
+ * Date          Author   Description
+ * Mar 21, 2010  danowitz init version
+ * Apr 14, 2010  danowitz Generatable version
+ * ***           danowitz Various bug fixes and refactorings
+ * Jun 30, 2010  danowitz Fixed bug whereby regbanks weren't getting clock or
+ *                        reset signals
+ * Jul 03, 2010  danowitz Connected missing IOs
+ * 
+ * ****************************************************************************/
+
+/*******************************************************************************
+ * PARAMETERIZATION
+ * ****************************************************************************/
+// ID Parameters:
+//; my $qid = parameter(Name=>'QUAD_ID', Val=>0);
+//; my $tid = parameter(Name=>'TILE_ID', Val=>0);
+//; if (!defined $qid || !defined $tid){
+//;	$self->error("Missing QUAD_ID/TILE_ID");
+//; }
+//;
+
+// Number of processors and memories
+//; my $NUM_PROCESSOR = $self->define_param(NUM_PROCESSOR=>1);
+//; my $PORTS = 2;
+//; my $NUM_MEM_MATS = $self->define_param(NUM_MEM_MATS=>1);
+
+// Global
+//; my $MAT_ADDR_SIZE = $self->define_param(MAT_ADDR_SIZE=>32);
+
+// Mem CFG
+//; my $MAT_TYPE = $self->define_param(MAT_TYPE=>'SCRATCH');
+//; my $MAT_WORDS = $self->define_param(MAT_WORDS=>16);
+//; my $MAT_ADDR = $self->define_param(MAT_ADDR=>0);
+//; my $MAT_META_SIZE = $self->define_param(MAT_META_WIDTH=>32);
+//; my $MAT_RET_CODE = $self->define_param(MAT_RET_CODE=>32);
+
+// Proc2mem vars
+//; my $PROC_TARG=$self->define_param(PROC_TARG=>log($NUM_MEM_MATS)/log(2));
+//; if ($PROC_TARG == 0) {
+//;    $PROC_TARG = 1;
+//; }
+//; my $PROC_META_SIZE=$self->define_param(PROC_META_SIZE=>$MAT_META_SIZE+$MAT_RET_CODE);
+
+// Memside Vars
+//; my $REQ_PROC = $self->define_param(REQ_PROC=>log($NUM_PROCESSOR*$PORTS)/log(2));
+//; my $MAT_OPCODE_WIDTH = $self->define_param(MAT_OPCODE_WIDTH=>3);
+
+// CFG interface parameters
+//; my $cfg_ifc_ref = $self->define_param(CFG_IFC_REF => '');
+//; $self->error("Missing parameter: CFG_IFC_REF") if ($cfg_ifc_ref eq '');
+
+
+
+//;# P2MS variables
+//; my @P2MS_SIGNALS = ('data', 'op', 'en', 'addr');
+//; my $P2MS_MAP_IN = 'targ_mem_blocks';
+//; my $P2MS_MAP_OUT = 'req_proc';
+//; my $P2MS_MAP_IN_SIZE = $PROC_TARG;
+//; my $P2MS_MAP_OUT_SIZE = $REQ_PROC;
+//; my @P2MS_PORTS = ('data', 'instr');
+//; my @P2MS_IN_WIDTH = ();
+//; my @P2MS_OUT_WIDTH = ();
+//;
+//;# MS2P variables
+//; my @MS2P_IN_WIDTH = ();
+//; my @MS2P_OUT_WIDTH = ();
+//;
+//;
+//; my @DATA_REG_SIGNALS = ('address', 'op', 'en', 'data', 'm1_stall');
+//; my @DATA_REG_WIDTHS = ();
+//;
+//; my @INSTR_REG_SIGNALS = ('address', 'op', 'en', 'instr', 'm1_stall');
+//; my @INSTR_REG_WIDTHS = ();
+//;
+//; my @MEM_REG_SIGNALS = ('req_proc');
+//; my @MEM_REG_WIDTHS = ();
+//;
+//;
+//;# ********************** Set up specific variables **************************
+//;# Store processor and mat variables as an array of hashes
+//; my $COUNT = 0;
+//; my @PROCESSORS = ();
+//; my @MEMBLOCKS = ();
+//; for ($COUNT = 0; $COUNT < $NUM_PROCESSOR; $COUNT++) {
+//;	my $PROC_STUFF = {};
+
+//;    #  Generate processors
+//;	    $PROC_STUFF->{'INST'}=$self->unique_inst('processor','p'.$COUNT, 
+//;		    	      QUAD_ID => $qid, TILE_ID => $tid, PROC_ID => $COUNT, 
+//;			          CFG_IFC_REF => $cfg_ifc_ref);
+//;	    $PROC_STUFF->{'OBJ_NAME'}=$PROC_STUFF->{'INST'}->get_module_name();
+//;	    $PROC_STUFF->{'INST_NAME'}=$PROC_STUFF->{'INST'}->get_instance_name();
+//;	    $PROC_STUFF->{'DATA_OP_LIST'}= $PROC_STUFF->{'INST'}->get_param('DATA_OP_LIST');
+//;	    $PROC_STUFF->{'DATA_OP_SIZE'}= $PROC_STUFF->{'INST'}->get_param('DATA_OP_WIDTH');
+//;	    $PROC_STUFF->{'DATA_SIZE'}= $PROC_STUFF->{'INST'}->get_param('DATA_BUS_WIDTH');
+//;	    $PROC_STUFF->{'INSTR_SIZE'}= $PROC_STUFF->{'INST'}->get_param('INSTRUCTION_BUS_WIDTH');
+//;     $PROC_STUFF->{'INSTR_OP_SIZE'}=$PROC_STUFF->{'INST'}->get_param('INST_OP_WIDTH');
+//;     #	$PROC_STUFF->{'INSTR_ADDR_SIZE'}= $PROC_STUFF->{'INST'}->get_param('INSTR_ADDR_SIZE');
+//;     #	$PROC_STUFF->{'DATA_ADDR_SIZE'}= $PROC_STUFF->{'INST'}->get_param('DATA_ADDR_SIZE');
+//;	    $PROC_STUFF->{'INSTR_ADDR_SIZE'}= 32;
+//;	    $PROC_STUFF->{'DATA_ADDR_SIZE'}= 32;
+//;	    $PROC_STUFF->{'PROC_META_SIZE'} = $self->define_param($PROC_STUFF->{'INST_NAME'}.'_META_SIZE' => $PROC_META_SIZE);
+//;	    push(@PROCESSORS, $PROC_STUFF);
+//;
+//; 	push(@P2MS_IN_WIDTH, $PROCESSORS[$COUNT]{'DATA_SIZE'});
+//; 	push(@P2MS_IN_WIDTH, $PROCESSORS[$COUNT]{'DATA_OP_SIZE'});
+//; 	push(@P2MS_IN_WIDTH, $PROCESSORS[$COUNT]{'DATA_SIZE'}/8);
+//; 	push(@P2MS_IN_WIDTH, $MAT_ADDR_SIZE);
+//; 	push(@P2MS_IN_WIDTH, $PROCESSORS[$COUNT]{'INSTR_SIZE'});
+//; 	push(@P2MS_IN_WIDTH, $PROCESSORS[$COUNT]{'INSTR_OP_SIZE'});
+//; 	push(@P2MS_IN_WIDTH, $PROCESSORS[$COUNT]{'INSTR_SIZE'}/32);
+//; 	push(@P2MS_IN_WIDTH, $MAT_ADDR_SIZE);
+//; 	push(@MS2P_OUT_WIDTH, $PROCESSORS[$COUNT]{'DATA_SIZE'});
+//; 	push(@MS2P_OUT_WIDTH, $PROCESSORS[$COUNT]{'PROC_META_SIZE'});
+//; 	push(@MS2P_OUT_WIDTH, $PROCESSORS[$COUNT]{'INSTR_SIZE'});
+//; 	push(@MS2P_OUT_WIDTH, $PROCESSORS[$COUNT]{'PROC_META_SIZE'});
+//; 	push(@MS2P_OUT_WIDTH, $PROCESSORS[$COUNT]{'DATA_OP_SIZE'});
+//;
+//; 	push(@DATA_REG_WIDTHS, $MAT_ADDR_SIZE);
+//; 	push(@DATA_REG_WIDTHS, $PROCESSORS[$COUNT]{'DATA_OP_SIZE'});
+//; 	push(@DATA_REG_WIDTHS, $PROCESSORS[$COUNT]{'DATA_SIZE'}/8);
+//; 	push(@DATA_REG_WIDTHS, $PROCESSORS[$COUNT]{'DATA_SIZE'});
+//; 	push(@DATA_REG_WIDTHS, 1);
+//;
+//; 	push(@INSTR_REG_WIDTHS, $MAT_ADDR_SIZE);
+//; 	push(@INSTR_REG_WIDTHS, $PROCESSORS[$COUNT]{'INSTR_OP_SIZE'});
+//; 	push(@INSTR_REG_WIDTHS, $PROCESSORS[$COUNT]{'INSTR_SIZE'}/32);
+//; 	push(@INSTR_REG_WIDTHS, $PROCESSORS[$COUNT]{'INSTR_SIZE'});
+//; 	push(@INSTR_REG_WIDTHS, 1);
+//; }
+//;
+//; my $MS2P2PC = $PROC_META_SIZE+$PROCESSORS[0]->{'DATA_SIZE'};
+//; my $msg_size;
+//; if ($PROCESSORS[0]->{'DATA_SIZE'} > $PROCESSORS[0]->{'INSTR_SIZE'}) {
+//;    $msg_size = $PROCESSORS[0]->{'DATA_SIZE'};
+//; }
+//; else {
+//;    $msg_size = $PROCESSORS[0]->{'INSTR_SIZE'};
+//; }
+//;
+//; my $MAT_DATA_SIZE = $self->define_param('MAT_DATA_SIZE' => $msg_size);
+//; my $MAT_EN_WIDTH = $self->define_param('MAT_EN_WIDTH' => $msg_size/8);
+
+//; for ($COUNT = 0; $COUNT < $NUM_MEM_MATS; $COUNT++) {
+//;	my $MEM_STUFF = {};
+//;	$MEM_STUFF->{'MAT_TYPE'}=$self->define_param('MAT_'.$COUNT.'_MAT_TYPE' =>$MAT_TYPE);
+//;	$MEM_STUFF->{'MAT_WORDS'}=$self->define_param('MAT_'.$COUNT.'_WORDS' =>$MAT_WORDS);
+//;	$MEM_STUFF->{'MAT_DATA_SIZE'}=$self->define_param('MAT_'.$COUNT.'_DATA_SIZE' =>$MAT_DATA_SIZE);
+//;	$MEM_STUFF->{'MAT_META_SIZE'}=$self->define_param('MAT_'.$COUNT.'_META_SIZE'=>$MAT_META_SIZE);
+//;	push(@MEMBLOCKS, $MEM_STUFF);
+//;
+//;
+//; 	push(@P2MS_OUT_WIDTH, $MEMBLOCKS[$COUNT]{'MAT_DATA_SIZE'});
+//; 	push(@P2MS_OUT_WIDTH, $MAT_OPCODE_WIDTH);
+//; 	push(@P2MS_OUT_WIDTH, $MAT_EN_WIDTH);
+//; 	push(@P2MS_OUT_WIDTH, $MAT_ADDR_SIZE);
+//;
+//;	push(@MS2P_IN_WIDTH, $REQ_PROC);
+//;	push(@MS2P_IN_WIDTH, $MAT_RET_CODE);
+//;	push(@MS2P_IN_WIDTH, $MEMBLOCKS[$COUNT]{'MAT_DATA_SIZE'});
+//;	push(@MS2P_IN_WIDTH, $MEMBLOCKS[$COUNT]{'MAT_META_SIZE'});
+//;
+//;	push(@MEM_REG_WIDTHS, $REQ_PROC);
+//;
+//; } # End of "for ($COUNT = 0; ..."
+
+
+/*******************************************************************************
+ * START OF TILE MODULE
+ * ****************************************************************************/
+
+//; #print "`default_nettype wire\n";
+
+module `$self->get_module_name()` 
+  (//inputs
+    input                           Clk,
+    input                           Reset,
+   //; if (($qid == 0) && ($tid == 0)){
+    // PreventReset is a chip input signal that prevents processor zero of 
+    // tile zero of quad zero from being in a soft reset state. That means that if
+    // PreventReset == 0: When Reset is de-asserted the processor is still in 
+    //			  SoftReset mode
+    // PreventReset == 1: When Reset is de-asserted the processor active
+    input PreventReset,
+   //; }
+
+   // Config bus signals
+   //; my $cfgIn_ifc_obj = $self->clone_inst($cfg_ifc_ref, 'cfgIn');
+   //; my $cfgOut_ifc_obj = $self->clone_inst($cfg_ifc_ref, 'cfgOut');
+   `$cfgIn_ifc_obj->get_module_name()`.cfgIn cfgIn, // incoming requests
+   `$cfgOut_ifc_obj->get_module_name()`.cfgOut cfgOut, // outgoing responds
+    input [`$PROCESSORS[0]{'DATA_OP_SIZE'}+$MAT_ADDR_SIZE+$PROCESSORS[0]{'DATA_SIZE'}+$MAT_EN_WIDTH-1`:0]             pc2p2msxbar,
+   //; for ($COUNT = 0; $COUNT < $NUM_PROCESSOR; $COUNT++) {
+    input [`$MS2P2PC-1`:0]          pc2data_tie_`$COUNT`,
+    input [`$PROC_META_SIZE+$PROCESSORS[0]->{'INSTR_SIZE'}-1`:0] pc2instr_tie_`$COUNT`,
+    output logic [`$PROCESSORS[0]{'DATA_OP_SIZE'}+$PROCESSORS[0]{'DATA_SIZE'}/8+$MAT_ADDR_SIZE+$PROCESSORS[0]{'DATA_SIZE'}-1`:0]                 data_tie2pc_`$COUNT`,
+    output logic [`$PROCESSORS[0]{'INSTR_OP_SIZE'}+$PROCESSORS[0]{'INSTR_SIZE'}/32+$MAT_ADDR_SIZE+$PROCESSORS[0]{'INSTR_SIZE'}-1`:0]                   instr_tie2pc_`$COUNT`,
+   //; }
+    input                           external_stall,
+    output [`$MS2P2PC-1`:0] 	    ms2pxbar2pc,
+
+   // Test mode
+   input TMode,
+   
+   // JTAG Interface
+   input JTDI,
+   input JTMS,
+   input JTCK,
+   input JTRST,
+   output JTDO
+   );
+
+   //; my $damCfgIn_ifc_obj = $self->clone_inst($cfg_ifc_ref, 'damCfgIn');
+   //; my $damCfgOut_ifc_obj = $self->clone_inst($cfg_ifc_ref, 'damCfgOut');
+   `$damCfgIn_ifc_obj->get_module_name()` damCfgIn(); // incoming requests
+   `$damCfgOut_ifc_obj->get_module_name()` damCfgOut();
+
+   //; my $iamCfgIn_ifc_obj = $self->clone_inst($cfg_ifc_ref, 'iamCfgIn');
+   //; my $iamCfgOut_ifc_obj = $self->clone_inst($cfg_ifc_ref, 'iamCfgOut');
+   `$iamCfgIn_ifc_obj->get_module_name()` iamCfgIn();
+   `$iamCfgOut_ifc_obj->get_module_name()` iamCfgOut();
+
+   // Set up proc to mem nets for each proc.
+   //; $COUNT = 0;
+   //; foreach my $proc (@PROCESSORS) {
+   logic [`$proc->{DATA_OP_SIZE}-1`:0] p`$COUNT`_dam`$COUNT`_opCode;
+   logic [`$proc->{DATA_ADDR_SIZE}-1`:0] p`$COUNT`_dam`$COUNT`_VAddress;
+   logic [`$proc->{DATA_SIZE}-1`:0] p`$COUNT`_ds`$COUNT`_data;
+   logic [`$proc->{DATA_SIZE}/8-1`:0] p`$COUNT`_ds`$COUNT`_bEn;
+   logic [`$proc->{DATA_OP_SIZE}-1`:0] dam`$COUNT`_ds`$COUNT`_opCode;
+   logic [`$MAT_ADDR_SIZE-1`:0] dam`$COUNT`_ds`$COUNT`_PAddress;
+   logic [`$PROC_TARG-1`:0] dam`$COUNT`_ds`$COUNT`_ta;
+   
+   //Instr Remap IO
+   logic [`$proc->{INSTR_OP_SIZE}-1`:0] p`$COUNT`_iam`$COUNT`_opCode;
+   logic [`$proc->{INSTR_ADDR_SIZE}-1`:0] p`$COUNT`_iam`$COUNT`_VAddress;
+   logic [`$proc->{INSTR_SIZE}-1`:0] p`$COUNT`_ds`$COUNT`_instr;
+   logic [`$proc->{INSTR_SIZE}/32-1`:0] p`$COUNT`_ds`$COUNT`_wEn;
+   logic [`$proc->{INSTR_OP_SIZE}-1`:0] iam`$COUNT`_ds`$COUNT`_opCode;
+   logic [`$MAT_ADDR_SIZE-1`:0] iam`$COUNT`_ds`$COUNT`_PAddress;
+   logic [`$PROC_TARG-1`:0] iam`$COUNT`_ds`$COUNT`_ta;
+   
+   //Dep Stall out
+   logic ds`$COUNT`_m1or`$COUNT`_stall;
+   logic ds`$COUNT`_im1or`$COUNT`_stall;
+   
+   logic [`$proc->{DATA_SIZE}-1`:0] ds`$COUNT`_p2ms_data;
+   logic [`$proc->{DATA_OP_SIZE}-1`:0] ds`$COUNT`_p2ms_opCode;
+   logic [`$MAT_ADDR_SIZE-1`:0] ds`$COUNT`_p2ms_PAddress;
+   logic [`$PROC_TARG-1`:0] ds`$COUNT`_p2ms_ta;
+   logic [`$proc->{DATA_SIZE}/8-1`:0] ds`$COUNT`_p2ms_bEn;
+      
+   logic [`$proc->{INSTR_SIZE}-1`:0] ds`$COUNT`_p2ms_idata;
+   logic [`$proc->{INSTR_OP_SIZE}-1`:0] ds`$COUNT`_p2ms_iopCode;
+   logic [`$MAT_ADDR_SIZE-1`:0] ds`$COUNT`_p2ms_iPAddress;
+   logic [`$PROC_TARG-1`:0] ds`$COUNT`_p2ms_ita;
+   logic [`$proc->{INSTR_SIZE}/32-1`:0] ds`$COUNT`_p2ms_iwEn;
+	    
+   //Mem Reg out
+   logic [`$proc->{DATA_SIZE}-1`:0] dr`$COUNT`_drh`$COUNT`_data;
+   logic [`$proc->{DATA_OP_SIZE}-1`:0] dr`$COUNT`_drh`$COUNT`_opCode;
+   logic [`$MAT_ADDR_SIZE-1`:0] dr`$COUNT`_drh`$COUNT`_PAddress;
+   logic [`$proc->{DATA_SIZE}/8-1`:0] dr`$COUNT`_drh`$COUNT`_bEn;
+   
+   logic [`$proc->{INSTR_SIZE}-1`:0] ir`$COUNT`_irh`$COUNT`_instr;
+   logic [`$proc->{INSTR_OP_SIZE}-1`:0] ir`$COUNT`_irh`$COUNT`_opCode;
+   logic [`$MAT_ADDR_SIZE-1`:0] ir`$COUNT`_irh`$COUNT`_PAddress;
+   logic [`$proc->{INSTR_SIZE}/32-1`:0] ir`$COUNT`_irh`$COUNT`_wEn;
+   
+   logic dr`$COUNT`_dvn`$COUNT`_stall;
+   logic ir`$COUNT`_ivn`$COUNT`_stall;
+
+   //ms2p crossbar
+   logic [`$proc->{DATA_SIZE}-1`:0] ms2p_drh`$COUNT`_retdata;
+   logic [`$proc->{PROC_META_SIZE}-1` :0] ms2p_drh`$COUNT`_meta;
+
+   logic [`$proc->{INSTR_SIZE}-1`:0] ms2p_irh`$COUNT`_retdata;
+   logic [`$proc->{PROC_META_SIZE}-1` :0] ms2p_irh`$COUNT`_meta;
+
+   logic [`$proc->{DATA_SIZE}-1`:0] drh`$COUNT`_drs`$COUNT`_data;
+   logic [`$proc->{INSTR_SIZE}-1`:0] irh`$COUNT`_irs`$COUNT`_instr;
+   
+   logic [`$proc->{DATA_SIZE}-1`:0] drs`$COUNT`_p`$COUNT`_data;
+   logic [`$proc->{INSTR_SIZE}-1`:0] irs`$COUNT`_p`$COUNT`_instr;
+   
+   logic p2ms_m1or`$COUNT`_stall;
+   logic p2ms_im1or`$COUNT`_stall;
+   
+   logic drh`$COUNT`_dvn`$COUNT`_stall;
+   logic irh`$COUNT`_ivn`$COUNT`_stall;
+   logic dvn`$COUNT`_drs`$COUNT`_valid;
+   logic ivn`$COUNT`_irs`$COUNT`_valid;
+
+   logic m1or`$COUNT`_dr`$COUNT`_stall;
+   logic im1or`$COUNT`_ir`$COUNT`_stall;
+
+   logic ps`$COUNT`_rs`$COUNT`_stall;
+   
+   //;	   $COUNT++;
+   //; } # End of "foreach my $proc (@PROC..."
+
+   // Set up proc to mem nets for each proc.
+   //; $COUNT = 0;
+   //; foreach my $mb (@MEMBLOCKS) {
+   logic [`$REQ_PROC-1`:0] p2ms_mb`$COUNT`_rp;
+   logic [`$MAT_ADDR_SIZE-1`:0] p2ms_mb`$COUNT`_addr;
+   logic [`$MAT_OPCODE_WIDTH-1`:0] p2ms_mb`$COUNT`_op;
+   logic [`$MAT_EN_WIDTH-1`:0] p2ms_mb`$COUNT`_en;
+   logic [`$mb->{MAT_DATA_SIZE}-1`:0] p2ms_mb`$COUNT`_data;
+   logic [`$mb->{MAT_DATA_SIZE}-1`:0] mb`$COUNT`_ms2p_data;
+   logic [`$MAT_RET_CODE-1`:0] mb`$COUNT`_ms2p_code;
+   logic [`$mb->{MAT_META_SIZE}-1`:0] mb`$COUNT`_ms2p_meta;
+   logic [`$REQ_PROC-1`:0] mr`$COUNT`_ms2p_rp;
+   //; $COUNT ++
+   //; }
+
+   // build processors and per processor collateral
+   //; $COUNT = 0;
+   //; foreach my $proc (@PROCESSORS) {
+   // Handle ors for stall logic
+   assign m1or`$COUNT`_dr`$COUNT`_stall = (ds`$COUNT`_m1or`$COUNT`_stall | 
+					    p2ms_m1or`$COUNT`_stall);
+   assign im1or`$COUNT`_ir`$COUNT`_stall = (ds`$COUNT`_im1or`$COUNT`_stall | 
+					    p2ms_im1or`$COUNT`_stall);
+
+   assign ps`$COUNT`_rs`$COUNT`_stall = (m1or`$COUNT`_dr`$COUNT`_stall |
+					 im1or`$COUNT`_ir`$COUNT`_stall |
+					 drh`$COUNT`_dvn`$COUNT`_stall |
+					 irh`$COUNT`_ivn`$COUNT`_stall |
+					 external_stall);
+   assign dvn`$COUNT`_drs`$COUNT`_valid = ~(drh`$COUNT`_dvn`$COUNT`_stall |
+					    dr`$COUNT`_dvn`$COUNT`_stall);
+								   
+   `$proc->{'OBJ_NAME'}` `$proc->{'INST_NAME'}` 
+     (.Clk(Clk),
+	  .Stall(/* FIXME p`$COUNT`_stall*/ 0),
+      .Reset(Reset),
+      //; if (($qid == 0) && ($tid == 0) && ($COUNT == 0)){
+      .PreventReset(PreventReset),
+      //; }
+      //; if ($COUNT == 0){
+      .cfgIn(cfgIn),
+      //; }else{
+      .cfgIn(/* FIXME - need to concatenate cfg interfaces across units and processors */),
+      //; }
+      //; if ($COUNT == scalar(@PROCESSORS)-1){
+      .cfgOut(cfgOut/* FIXME - What if the processor is not the last unit on the cfg chain?*/),
+      //; }else{
+      .cfgOut(/* FIXME - need to concatenate cfg interfaces across units and processors */),
+      //; }
+	  .IRamBusy(/*FIXME*/ 0),
+	  .IRamData(irs`$COUNT`_p`$COUNT`_instr),
+	  .IRamWordEn(p`$COUNT`_ds`$COUNT`_wEn),
+	  .IRamWrData(p`$COUNT`_ds`$COUNT`_instr),
+	  .IRamAddr(p`$COUNT`_iam`$COUNT`_VAddress),
+	  .IRamOp(p`$COUNT`_iam`$COUNT`_opCode),
+	  .DRamData(drs`$COUNT`_p`$COUNT`_data),
+	  .DRamByteEn(p`$COUNT`_ds`$COUNT`_bEn),
+	  .DRamWrData(p`$COUNT`_ds`$COUNT`_data),
+	  .DRamAddr(p`$COUNT`_dam`$COUNT`_VAddress),
+	  .DRamOp(p`$COUNT`_dam`$COUNT`_opCode),
+      .BInterrupt(0/* FIXME: What is the meaning of this signal?*/),
+      .XOCDModePulse(0/* FIXME: What is the meaning of this signal?*/),
+      .TDebugInterrupt(0/* FIXME: What is the meaning of this signal?*/),
+      .TMode(TMode),
+      .JTDI(0/*FIXME: Need to concatenate jtags */),
+      .JTMS(JTMS),
+      .JTCK(JTCK),
+      .JTRST(JTRST),
+      .JTDO(0/*FIXME: Need to concatenate jtags */)      
+      );
+   
+   //; my $unique_inst = $self->unique_inst('addrMap', 'dam'.$COUNT, 
+   //;					'ADDR_SIZE' => $proc->{DATA_ADDR_SIZE}, 
+   //;					'ADDR_OUT_SIZE'=>$MAT_ADDR_SIZE,
+   //;					'OP_SIZE' => $proc->{DATA_OP_SIZE}, 
+   //;					'TARG_SIZE' => $PROC_TARG,
+   //;                  'IFC_REF' => $cfg_ifc_ref);
+   //; my $datamap = $unique_inst->get_module_name();
+   //; my $mapname = $unique_inst->get_instance_name();
+   `$datamap` `$mapname` 
+     (.Clk(Clk),
+	  .Reset(Reset),
+	  .op_in(p`$COUNT`_dam`$COUNT`_opCode),
+      .address_in(p`$COUNT`_dam`$COUNT`_VAddress), 
+      .op_out(dam`$COUNT`_ds`$COUNT`_opCode),
+      .address_out(dam`$COUNT`_ds`$COUNT`_PAddress), 
+      .targ_block(dam`$COUNT`_ds`$COUNT`_ta),
+	  .cfgIn(damCfgIn.cfgIn),
+	  .cfgOut(damCfgOut.cfgOut),
+	  .TMode(TMode));
+   
+   //; $unique_inst = $self->unique_inst('addrMap', 'iam'.$COUNT, 
+   //;					 ADDR_SIZE => $proc->{INSTR_ADDR_SIZE}, 
+   //;					 OP_SIZE => $proc->{INSTR_OP_SIZE}, 
+   //;					 ADDR_OUT_SIZE=>$MAT_ADDR_SIZE, 
+   //;					 TARG_SIZE => $PROC_TARG,
+   //;                   'IFC_REF' => $cfg_ifc_ref);
+   //; my $instrmap = $unique_inst->get_module_name();
+   //; my $imapname = $unique_inst->get_instance_name();
+   `$instrmap` `$imapname` 
+     (.Clk(Clk),
+	  .Reset(Reset),
+	  .op_in(p`$COUNT`_iam`$COUNT`_opCode),
+      .address_in(p`$COUNT`_iam`$COUNT`_VAddress), 
+      .op_out(iam`$COUNT`_ds`$COUNT`_opCode),
+      .address_out(iam`$COUNT`_ds`$COUNT`_PAddress), 
+      .targ_block(iam`$COUNT`_ds`$COUNT`_ta),
+	  .cfgIn(iamCfgIn.cfgIn),
+	  .cfgOut(iamCfgOut.cfgOut),
+	  .TMode(TMode));
+
+   //; $unique_inst = $self->unique_inst('depStall', 'ds_'.$COUNT, 
+   //;					 ADDR_SIZE => $MAT_ADDR_SIZE, 
+   //;					 DATA_OP_SIZE => $proc->{DATA_OP_SIZE},
+   //;                   INSTR_OP_SIZE => $proc->{INSTR_OP_SIZE},  
+   //;					 DATA_SIZE => $proc->{DATA_SIZE}, 
+   //;					 INSTR_SIZE => $proc->{INSTR_SIZE}, 
+   //;					 TARG_SIZE => $PROC_TARG);
+   //; my $depstall = $unique_inst->get_module_name();
+   //; my $dstallname = $unique_inst->get_instance_name();
+   `$depstall` `$dstallname` 
+     (.data_in(p`$COUNT`_ds`$COUNT`_data), 
+      .data_op_in(dam`$COUNT`_ds`$COUNT`_opCode),
+	  .data_en_in(p`$COUNT`_ds`$COUNT`_bEn),
+      .data_addr_in(dam`$COUNT`_ds`$COUNT`_PAddress), 
+      .data_targ_in(dam`$COUNT`_ds`$COUNT`_ta), 
+      .instr_in(p`$COUNT`_ds`$COUNT`_instr), 
+      .instr_op_in(iam`$COUNT`_ds`$COUNT`_opCode),
+	  .instr_en_in(p`$COUNT`_ds`$COUNT`_wEn),
+      .instr_addr_in(iam`$COUNT`_ds`$COUNT`_PAddress),
+      .instr_targ_in(iam`$COUNT`_ds`$COUNT`_ta),
+      .data_out(ds`$COUNT`_p2ms_data),
+      .data_op_out(ds`$COUNT`_p2ms_opCode),
+	  .data_en_out(ds`$COUNT`_p2ms_bEn),
+      .data_addr_out(ds`$COUNT`_p2ms_PAddress),
+      .data_targ_out(ds`$COUNT`_p2ms_ta),
+      .instr_out(ds`$COUNT`_p2ms_idata),
+      .instr_op_out(ds`$COUNT`_p2ms_iopCode),
+	  .instr_en_out(ds`$COUNT`_p2ms_iwEn),
+      .instr_addr_out(ds`$COUNT`_p2ms_iPAddress),
+      .instr_targ_out(ds`$COUNT`_p2ms_ita),
+      .data_stall_out(ds`$COUNT`_m1or`$COUNT`_stall),
+      .instr_stall_out(ds`$COUNT`_im1or`$COUNT`_stall));
+   
+   //; $unique_inst = $self->unique_inst('replyHandler', 'drh'.$COUNT, 
+   //;					 ADDR_SIZE => $MAT_ADDR_SIZE, 
+   //;					 OP_SIZE => $proc->{DATA_OP_SIZE},
+   //;                   EN_SIZE => $proc->{DATA_SIZE}/8,
+   //;					 DATA_SIZE => $proc->{DATA_SIZE}, 
+   //;					 META_SIZE => $proc->{PROC_META_SIZE});
+   //; my $datareplyhandler = $unique_inst->get_module_name();
+   //; my $drh = $unique_inst->get_instance_name();
+   `$datareplyhandler` `$drh` 
+     (.data_in(dr`$COUNT`_drh`$COUNT`_data), 
+      .op_in(dr`$COUNT`_drh`$COUNT`_opCode),
+	  .en_in(dr`$COUNT`_drh`$COUNT`_bEn),
+      .addr_in(dr`$COUNT`_drh`$COUNT`_PAddress), 
+      .return_data_in(ms2p_drh`$COUNT`_retdata), 
+      .meta_in(ms2p_drh`$COUNT`_meta), 
+      .pc2tie_rep(pc2data_tie_`$COUNT`),
+      .return_data_out(drh`$COUNT`_drs`$COUNT`_data),
+      .stall_out(drh`$COUNT`_dvn`$COUNT`_stall),
+      .tie2pc_req(data_tie2pc_`$COUNT`));
+   
+   //; $unique_inst = $self->unique_inst('replyHandler', 'irh'.$COUNT, 
+   //;					  ADDR_SIZE => $MAT_ADDR_SIZE, 
+   //;					  OP_SIZE => $proc->{INSTR_OP_SIZE},
+   //;                    EN_SIZE => $proc->{INSTR_SIZE}/32,
+   //;					  DATA_SIZE => $proc->{INSTR_SIZE}, 
+   //;					  META_SIZE => $proc->{PROC_META_SIZE});
+   //; my $instrreplyhandler = $unique_inst->get_module_name();
+   //; my $irh = $unique_inst->get_instance_name();
+   `$instrreplyhandler` `$irh` 
+     (.data_in(ir`$COUNT`_irh`$COUNT`_instr), 
+      .op_in(ir`$COUNT`_irh`$COUNT`_opCode),
+	  .en_in(ir`$COUNT`_irh`$COUNT`_wEn),
+      .addr_in(ir`$COUNT`_irh`$COUNT`_PAddress), 
+      .return_data_in(ms2p_irh`$COUNT`_retdata), 
+      .meta_in(ms2p_irh`$COUNT`_meta), 
+      .pc2tie_rep(pc2instr_tie_`$COUNT`),
+      .return_data_out(irh`$COUNT`_irs`$COUNT`_instr),
+      .stall_out(irh`$COUNT`_ivn`$COUNT`_stall),
+      .tie2pc_req(instr_tie2pc_`$COUNT`));
+   
+   //; $unique_inst = $self->unique_inst('replyStall', 'drs'.$COUNT, 
+   //;					  DATA_SIZE => $proc->{DATA_SIZE});
+   //; my $replystall = $unique_inst->get_module_name();
+   //; my $rs = $unique_inst->get_instance_name();
+   `$replystall` `$rs` 
+     (.data_in(drh`$COUNT`_drs`$COUNT`_data), 
+      .valid_in(dvn`$COUNT`_drs`$COUNT`_valid), 
+      .stall_in(ps`$COUNT`_rs`$COUNT`_stall), 
+      .data_out(drs`$COUNT`_p`$COUNT`_data));
+   
+   //; $unique_inst = $self->unique_inst('replyStall', 'irs'.$COUNT, 
+   //;					  DATA_SIZE => $proc->{INSTR_SIZE});
+   //; my $instrreplystall = $unique_inst->get_module_name();
+   //; my $is = $unique_inst->get_instance_name();
+   `$instrreplystall` is`$COUNT` 
+     (.data_in(irh`$COUNT`_irs`$COUNT`_instr), 
+      .valid_in(ivn`$COUNT`_irs`$COUNT`_valid), 
+      .stall_in(ps`$COUNT`_rs`$COUNT`_stall), 
+      .data_out(irs`$COUNT`_p`$COUNT`_instr));
+
+
+   
+   //; $COUNT++;
+   //; } # End of "foreach my $proc (@PR..."
+
+
+
+   
+   // build memory blocks
+   //; $COUNT = 0;
+   //; foreach my $mb (@MEMBLOCKS) {
+   //; my $unique_inst = $self->unique_inst('memory', 'mb'.$COUNT, 
+   //;					  TYPE => $mb->{MAT_TYPE}, 
+   //;					  WORDS => $mb->{MAT_WORDS}, 
+   //;					  DATA_SIZE => $mb->{MAT_DATA_SIZE}, 
+   //;					  META_SIZE => $mb->{MAT_META_SIZE}, 
+   //;					  REQ_SIZE => $REQ_PROC, 
+   //;					  ADDR_SIZE => $MAT_ADDR_SIZE, 
+   //;					  ADDR => $mb->{MEM_ADDR}, 
+   //;					  OP_SIZE => $MAT_OPCODE_WIDTH,
+   //;                    EN_SIZE => $MAT_EN_WIDTH,
+   //;					  RET_CODE_SIZE => $MAT_RET_CODE);
+   //; my $memmat = $unique_inst->get_module_name();
+   //; my $mm = $unique_inst->get_instance_name();
+   `$memmat` `$mm` 
+     (.requesting_proc_in(p2ms_mb`$COUNT`_rp),
+      .address_in(p2ms_mb`$COUNT`_addr),
+      .opcode_in(p2ms_mb`$COUNT`_op),
+	  .en_in(p2ms_mb`$COUNT`_en),
+      .data_in(p2ms_mb`$COUNT`_data),
+      .retcode_out(mb`$COUNT`_ms2p_code),
+      .data_out(mb`$COUNT`_ms2p_data),
+      .meta_out(mb`$COUNT`_ms2p_meta));
+   //; $COUNT++;
+   //; }
+
+   //; my $unique_inst = $self->unique_inst('p2ms_xbar', 'p2ms'.$COUNT, 
+   //;					INPUT_GROUPS => $NUM_PROCESSOR, 
+   //;					PORTS => \@P2MS_PORTS, 
+   //;					SIGNALS => \@P2MS_SIGNALS, 
+   //;					INPUT_WIDTHS => \@P2MS_IN_WIDTH, 
+   //;					OUTPUT_GROUPS => $NUM_MEM_MATS, 
+   //;					OUTPUT_WIDTHS => \@P2MS_OUT_WIDTH, 
+   //;					MAP_IN => $P2MS_MAP_IN, 
+   //;					MAP_IN_SIZE => $P2MS_MAP_IN_SIZE, 
+   //;					MAP_OUT => $P2MS_MAP_OUT, 
+   //;					MAP_OUT_SIZE => $P2MS_MAP_OUT_SIZE, 
+   //;					PC_WIDTH => $PROCESSORS[0]{'DATA_OP_SIZE'}+$MAT_ADDR_SIZE+$PROCESSORS[0]{'DATA_SIZE'}+$MAT_EN_WIDTH);
+   //; my $p2msxbar = $unique_inst->get_module_name();
+   //; my $p2m = $unique_inst->get_instance_name();
+   `$p2msxbar` `$p2m` 
+     (
+      //;for ($COUNT = 0; $COUNT < $NUM_PROCESSOR; $COUNT++) {
+      .`$P2MS_SIGNALS[0] . '_' . $P2MS_PORTS[0] . '_in_' . $COUNT`(ds`$COUNT`_p2ms_data),
+	  .`$P2MS_SIGNALS[1] . '_' . $P2MS_PORTS[0] . '_in_' . $COUNT`(ds`$COUNT`_p2ms_opCode),
+	  .`$P2MS_SIGNALS[2] . '_' . $P2MS_PORTS[0] . '_in_' . $COUNT`(ds`$COUNT`_p2ms_bEn),
+      .`$P2MS_SIGNALS[3] . '_' . $P2MS_PORTS[0] . '_in_' . $COUNT`(ds`$COUNT`_p2ms_PAddress),
+      .`$P2MS_MAP_IN . '_' . $P2MS_PORTS[0] . '_in_' . $COUNT`(ds`$COUNT`_p2ms_ta),
+      .`$P2MS_SIGNALS[0] . '_' . $P2MS_PORTS[1] . '_in_' . $COUNT`(ds`$COUNT`_p2ms_idata),
+      .`$P2MS_SIGNALS[1] . '_' . $P2MS_PORTS[1] . '_in_' . $COUNT`(ds`$COUNT`_p2ms_iopCode),
+	  .`$P2MS_SIGNALS[2] . '_' . $P2MS_PORTS[1] . '_in_' . $COUNT`(ds`$COUNT`_p2ms_iwEn),
+      .`$P2MS_SIGNALS[3] . '_' . $P2MS_PORTS[1] . '_in_' . $COUNT`(ds`$COUNT`_p2ms_iPAddress),
+      .`$P2MS_MAP_IN . '_' . $P2MS_PORTS[1] . '_in_' . $COUNT`(ds`$COUNT`_p2ms_ta),
+      .`$P2MS_PORTS[0]`_stall_out_`$COUNT`(p2ms_m1or`$COUNT`_stall),
+      .`$P2MS_PORTS[1]`_stall_out_`$COUNT`(p2ms_im1or`$COUNT`_stall),
+      //; }
+      //;foreach ($COUNT = 0; $COUNT < $NUM_MEM_MATS; $COUNT ++){
+      .`$P2MS_SIGNALS[0] . '_out_' . $COUNT`(p2ms_mb`$COUNT`_data),
+      .`$P2MS_SIGNALS[1] . '_out_' . $COUNT`(p2ms_mb`$COUNT`_op),
+      .`$P2MS_SIGNALS[2] . '_out_' . $COUNT`(p2ms_mb`$COUNT`_en),
+      .`$P2MS_SIGNALS[3] . '_out_' . $COUNT`(p2ms_mb`$COUNT`_addr),
+      .`$P2MS_MAP_OUT . '_out_' . $COUNT`(p2ms_mb`$COUNT`_rp),
+      //;}			
+      .pc_in(pc2p2msxbar)
+      );
+   
+   
+   //; my $unique_inst = $self->unique_inst('ms2p_xbar', 'ms2'.$COUNT, 
+   //;					INPUT_GROUPS => $NUM_MEM_MATS, 
+   //;					INPUT_WIDTHS => \@MS2P_IN_WIDTH, 
+   //;					OUTPUT_GROUPS => $NUM_PROCESSOR, 
+   //;					OUTPUT_WIDTHS => \@MS2P_OUT_WIDTH, 
+   //;					PC_SIZE => $MS2P2PC);
+   //; my $ms2pxbar = $unique_inst->get_module_name();
+   //; my $m2p = $unique_inst->get_instance_name();
+   `$ms2pxbar` `$m2p` 
+     (
+      //;for ($COUNT = 0; $COUNT < $NUM_MEM_MATS; $COUNT++) {
+      .req_proc_`$COUNT`(mr`$COUNT`_ms2p_rp),
+      .return_code_in_`$COUNT`(mb`$COUNT`_ms2p_code),
+      .return_data_in_`$COUNT`(mb`$COUNT`_ms2p_data),
+      .return_meta_in_`$COUNT`(mb`$COUNT`_ms2p_meta),
+      //; }
+      //;foreach ($COUNT = 0; $COUNT < $NUM_PROCESSOR; $COUNT ++){
+     .ret_data_out_`$COUNT`(ms2p_drh`$COUNT`_retdata),
+     .ret_meta_out_`$COUNT`(ms2p_drh`$COUNT`_meta),
+     .ret_instr_out_`$COUNT`(ms2p_irh`$COUNT`_retdata),
+     .ret_instrmeta_out_`$COUNT`(ms2p_irh`$COUNT`_meta),
+     .op_code_in_`$COUNT`(dr`$COUNT`_drh`$COUNT`_opCode),				   
+     //; }
+      .to_pc(ms2pxbar2pc)
+      );
+   
+   //; $unique_inst = $self->unique_inst('regbank', 'dr', 
+   //;					 INPUT_GROUPS => $NUM_PROCESSOR, 
+   //;					 SIGNALS => \@DATA_REG_SIGNALS, 
+   //;					 INPUT_WIDTHS => \@DATA_REG_WIDTHS);
+   //; my $datareg = $unique_inst->get_module_name();
+   //; my $dr = $unique_inst->get_instance_name();
+   `$datareg` `$dr` 
+     (
+      //; for ($COUNT = 0; $COUNT < $NUM_PROCESSOR; $COUNT++){
+      .address_in_`$COUNT`(ds`$COUNT`_p2ms_PAddress),
+      .op_in_`$COUNT`(ds`$COUNT`_p2ms_opCode),
+	  .en_in_`$COUNT`(ds`$COUNT`_p2ms_bEn),
+      .data_in_`$COUNT`(ds`$COUNT`_p2ms_data),
+      .m1_stall_in_`$COUNT`(m1or`$COUNT`_dr`$COUNT`_stall),
+      .address_out_`$COUNT`(dr`$COUNT`_drh`$COUNT`_PAddress),
+      .op_out_`$COUNT`(dr`$COUNT`_drh`$COUNT`_opCode),
+	  .en_out_`$COUNT`(dr`$COUNT`_drh`$COUNT`_bEn),
+      .data_out_`$COUNT`(dr`$COUNT`_drh`$COUNT`_data),
+      .m1_stall_out_`$COUNT`(dr`$COUNT`_dvn`$COUNT`_stall),
+     //;}
+	  .Clk(Clk),
+	  .Reset(Reset)
+      );
+   
+   //; $unique_inst = $self->unique_inst('regbank', 'ir', 
+   //;					 INPUT_GROUPS => $NUM_PROCESSOR, 
+   //;					 SIGNALS => \@INSTR_REG_SIGNALS, 
+   //;					 INPUT_WIDTHS => \@INSTR_REG_WIDTHS);
+   //; my $instrreg = $unique_inst->get_module_name();
+   //; my $ir = $unique_inst->get_instance_name();
+   `$instrreg` `$ir` 
+     (
+      //; for ($COUNT = 0; $COUNT < $NUM_PROCESSOR; $COUNT++){
+      .address_in_`$COUNT`(ds`$COUNT`_p2ms_iPAddress),
+      .op_in_`$COUNT`(ds`$COUNT`_p2ms_iopCode),
+	  .en_in_`$COUNT`(ds`$COUNT`_p2ms_iwEn),
+      .instr_in_`$COUNT`(ds`$COUNT`_p2ms_idata),
+      .m1_stall_in_`$COUNT`(im1or`$COUNT`_ir`$COUNT`_stall),
+      .address_out_`$COUNT`(ir`$COUNT`_irh`$COUNT`_PAddress),
+      .op_out_`$COUNT`(ir`$COUNT`_irh`$COUNT`_opCode),
+	  .en_out_`$COUNT`(ir`$COUNT`_irh`$COUNT`_wEn),
+      .instr_out_`$COUNT`(ir`$COUNT`_irh`$COUNT`_instr),
+      .m1_stall_out_`$COUNT`(ir`$COUNT`_ivn`$COUNT`_stall),
+     //;}
+	  .Clk(Clk),
+	  .Reset(Reset)
+      );
+   
+   //; $unique_inst = $self->unique_inst('regbank', 'mr', 
+   //;					 INPUT_GROUPS => $NUM_PROCESSOR, 
+   //;					 SIGNALS => \@MEM_REG_SIGNALS, 
+   //;					 INPUT_WIDTHS => \@MEM_REG_WIDTHS);
+   //; my $memreg = $unique_inst->get_module_name();
+   //; my $mr = $unique_inst->get_instance_name();
+   `$memreg` `$mr` 
+     (
+      //; for ($COUNT = 0; $COUNT < $NUM_MEM_MATS; $COUNT++){
+     .req_proc_in_`$COUNT`(p2ms_mb`$COUNT`_rp),
+     .req_proc_out_`$COUNT`(mr`$COUNT`_ms2p_rp),
+     //;}
+	 .Clk(Clk),
+	 .Reset(Reset)
+      );
+endmodule // tile

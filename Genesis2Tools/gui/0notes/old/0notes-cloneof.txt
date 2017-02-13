@@ -1,0 +1,11 @@
+From the wiki:
+
+------------------------------------------------------------------------------
+https://www-vlsi.stanford.edu/mediawiki/index.php/CG/GUI_To-Do_List#Clickable_Clone-of
+
+Clickable Clone-of
+
+    [mw 1/2012] Can we make it click-able if an item is "clone-of", so
+    that you can immediately see that item?
+
+DONE! 5/2012

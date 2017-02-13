@@ -1,0 +1,174 @@
+TODO ASAP (today is 12/18/2014)
+
+- clean up below
+- add relevant new files to the official release esp. setup_stanford.cshrc etc.
+
+-   restore opendesign.pl, updatedesign.csh etc.
+
+
+Next:
+  get the installation instructions up to date:
+- http://genesis2.stanford.edu/mediawiki/index.php/Original_GUI_Installation_Details#New_install
+- scrub through 0notes-12*, think about a new install process maybe
+- uninstall tcllib?
+
+==============================================================================
+Things to update in the release I guess:
+(note MUST UPDATE setup_stanford)
+  
+% diff -r /var/www/homepage/genesis/configs ~/gui/configs | grep diff
+diff -r /var/www/homepage/genesis/configs/index_stanford.htm /home/steveri/gui/configs/index_stanford.htm
+diff -r /var/www/homepage/genesis/configs/index_stewie.htm /home/steveri/gui/configs/index_stewie.htm
+diff -r /var/www/homepage/genesis/configs/install/INSTALL.pl /home/steveri/gui/configs/install/INSTALL.pl
+diff -r /var/www/homepage/genesis/configs/install/README_gui.txt /home/steveri/gui/configs/install/README_gui.txt
+diff -r /var/www/homepage/genesis/configs/setup.cshrc /home/steveri/gui/configs/setup.cshrc
+diff -r /var/www/homepage/genesis/configs/setup_stanford.cshrc /home/steveri/gui/configs/setup_stanford.cshrc
+
+what else?  maybe these:
+cgi/opendesign.pl
+
+what else?
+
+
+==============================================================================
+
+
+
+
+
+==============================================================================
+
+(For FPGen demo) missing file designs/FloatingPointGen/FPGen.js
+Solution:
+1. Added file-exists check to fpdemo.php.
+2. cd designs/FloatingPointGen; cp empty.js FPGen.js
+
+
+-----
+
+(For FFT) "do_anything.pl" missing from cgi directory
+Solution:
+sudo cp /home/steveri/gui/cgi/do_anything.pl /var/www/homepage/genesis/cgi
+ls !$
+sudo chown www-data /var/www/homepage/genesis/cgi/*
+sudo chgrp www-data /var/www/homepage/genesis/cgi/*
+
+
+-----
+
+Missing perl package:
+
+% perl -f /var/www/homepage/genesis/cgi/updatedesign.dir/build_xml_change_file.pl
+
+Can't locate XML/Simple.pm in @INC (you may need to install the
+XML::Simple module) (@INC contains: ...) at
+/var/www/homepage/genesis/cgi/updatedesign.dir/build_xml_change_file.pl
+line 5.
+
+BEGIN failed--compilation aborted at
+/var/www/homepage/genesis/cgi/updatedesign.dir/build_xml_change_file.pl
+line 5.
+
+Solution:
+  su
+  cpan App::cpanminus
+  cpanm XML::Simple
+
+
+-----
+
+
+
+cgi must be owned by root:
+  % ls -ld /var/www/homepage/genesis/cgi
+  drwxr-xr-x 3 root root 4096 Dec 17 14:23 /var/www/homepage/genesis/cgi/
+
+
+(had to do this:
+  mkdir /var/www/homepage
+  mkdir /usr/lib/cgi_bin
+  ln -s /cad /hd/cad
+  ln -s /var/www/homepage /var/www/html
+
+
+diff -r /var/www/homepage/genesis ~/smart_memories/Smart_design/ChipGen/bin/Genesis2Tools/gui
+
+Missing from release:
+  demo/fpdemo.php
+  designs/FloatingPointGen/
+
+
+Do this:
+  cd /var/www/homepage/genesis
+  sudo cp -r ~steveri/gui/demo/ .
+  sudo cp -r ~steveri/gui/designs/FloatingPointGen/ .
+
+
+New cgi is maybe /usr/lib/cgi-bin instead of prev /usr/lib/cgi_bin/genesis:
+  cd /usr/lib/cgi-bin
+  sudo ln -s /var/www/homepage/genesis/cgi genesis
+
+
+  sudo a2enmod cgi
+  sudo service apache2 restart
+
+
+  sudo chown root /var/www/homepage/
+  sudo chown root /var/www/homepage/genesis/
+  sudo chown root /var/www/homepage/genesis/cgi
+
+
+Restore all the designs:
+  cd /var/www/homepage/genesis
+  sudo cp -r ~/gui/designs/* designs
+
+Make them writable:
+  cd /var/www/homepage/genesis
+  sudo chown -R www-data designs
+  sudo chgrp -R www-data designs
+
+==============================================================================
+TCL problems
+  "init.c(478):ERROR:161: Cannot initialize TCL"
+  https://stuff.mit.edu/afs/athena/course/13/13.715/build/modules-3.2.6/INSTALL
+
+  > You should get the usage instructions. If you get an error message of
+  > the form:
+  > 
+  > init.c(425):ERROR:159: Cannot initialize TCL
+  > 
+  > Then your TCL installation is probably corrupted. This usually means
+  > the internally compiled path to the "init.tcl" script does not match
+  > with reality. You can try getting around this by setting the
+  > TCLLIBPATH environment variable to point to the right directory
+  > (/usr/local/tcl* or /usr/share/tcl* in some cases), but you are
+  > probably better off reinstalling TCL correctly.
+
+
+cat /cad/modules/tcl/init/csh
+(maybe tcl used for "modulecmd")
+
+
+http://www.howtogeek.com/howto/linux/show-the-list-of-installed-packages-on-ubuntu-or-debian/
+  The command we need to use is dpkg get-selections, which will give us
+  a list of all the currently installed packages.
+
+  For extra credit, you can find the locations of the files within a
+  package from the list by using the dpkg -L command, such as:
+
+    dpkg -L php5-gd
+
+% dpkg --get-selections | grep tcl
+[ no tcllib]
+
+% apt-cache search tcllib
+tcllib - Standard Tcl Library
+
+% sudo apt-get install tcllib
+
+% dpkg --get-selections | grep tcl
+libtcl8.6:amd64                                 install
+tcl                                             install
+tcl8.6                                          install
+tcllib                                          install
+

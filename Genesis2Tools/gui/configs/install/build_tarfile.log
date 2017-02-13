@@ -1,0 +1,24 @@
+
+Built tarfile '/tmp/gui.tar.bz2'; should be about 200 KB:
+192850 /tmp/gui.tar.bz2
+
+Remember to move it to its final home:
+    cd $CHIPGEN/gui/configs/install/latest-release
+    p4 edit gui.tar.bz2
+    mv /tmp/gui.tar.bz2 .
+    p4 submit
+    set cnum=(Change number 'ddddd' of submit)
+    echo $cnum > ~/gui/configs/install/version_number.txt
+    cp gui.tar.bz2 gui--r$cnum.tar.bz2
+    edit and update ~/gui/configs/install/release-notes.txt
+
+Then:
+    ssh neva
+    $CHIPGEN/gui/configs/install/build_release.sh |& tee /tmp/$$
+
+To check the tarfile:
+    tar tjf gui.tar.bz2
+
+Tarfile should be about 300 KB:
+    192850 /tmp/gui.tar.bz2
+

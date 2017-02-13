@@ -1,0 +1,133 @@
+== How do I install the GUI at my site? ==
+
+<small><i>
+(Maintenance notes: This information should be maintained in two places:
+1) On the wiki at http://genesis2.stanford.edu/mediawiki/index.php?InteractiveGenesis2GUI#How_do_I_install_the_GUI_at_my_site.3F<br>
+2) On the disk at $CHIPGENESIS/gui/configs/install/README.txt
+</i></small>
+
+=== 0. Where to install ===
+
+Installation should take place on the same machine that is running
+your web server.  It might work better if you have root access and/or
+at least be running as the same user and group as the web server.
+Example:
+
+  % ssh webserver -l root
+
+OR
+
+  % ssh webserver -l apache
+
+If you don't have access to the webserver account, and/or if it
+doesn't even have an account, you can try to do the install as
+yourself.  It's still a good idea to be on the webserver machine,
+however.  And you'll probably need root access (e.g. <tt>sudo</tt>) to
+install the files in the right place and give the correct final
+permissions.
+
+=== 1. Save the tarball ===
+
+Someone should have given you a compressed release tarball
+<b><tt>gui.tar.bz2.</tt></b> Make a directory and put the tarball in
+it.
+
+NOTE: Running from "/tmp" might help avoid permission problems.  This
+is what I have to do to install at Stanford.
+
+Example:
+
+  % mkdir /tmp/unpackgui
+  % mv gui.tar.bz2 /tmp/unpackgui
+
+=== 2. Unpack ===
+Unpack the gui.  Example:
+
+  % cd /tmp/unpackgui
+  % tar xvjf gui.tar.bz2
+
+You should see one file (<tt>README.txt</tt>) and one directory (<tt>gui</tt>).
+
+  % ls -1F
+  README.txt
+  gui/
+
+=== 3. Upgrade existing install OR ===
+If you are updating an existing installation, simply copy the new
+files in place of the old.  For paranoia's sake, it's probably good
+to preserve a copy of the existing installation before overwriting
+it with the new update.  For instance, at Stanford we would do:
+
+  % mkdir ~/genesis.save
+  % cp -r /var/www/homepage/genesis ~/genesis.save
+  % cd /tmp/unpackgui
+  % sudo cp -r gui/* /var/www/homepage/genesis
+
+If updating, YOU ARE DONE, DO NOT PROCEED.
+
+Otherwise, if this is a new install, move on to the next step, below.
+
+=== 4. New install ===
+For a new install, cd to the install directory
+<tt>gui/configs/install</tt>.  Run the install script
+<tt>INSTALL.sh</tt> and follow the directions.
+Note that you'll probably need to have full root privilege 
+(e.g. <tt>sudo</tt>) for everything to work properly.
+
+  % cd /tmp/unpackgui
+  % cd gui/configs/install
+  % sudo ./INSTALL.sh
+
+of course, if you don't have access to <tt>sudo</tt>, you'll instead be doing something like
+
+  % su root
+  # ./INSTALL.sh
+
+INSTALL.sh will want to know and/or will try to guess the following
+information (examples are from Stanford's installation at
+http://www-vlsi.stanford.edu/genesis - feel free to visit there for
+reference purposes):
+
+* what is your web-server URL (e.g. "http://www-vlsi.stanford.edu")
+* where do cgi files live on your server (e.g. "<tt>/usr/lib/cgi_bin</tt>")
+* what pathname does your server use to access cgi files (e.g. "<tt>/cgi-bin</tt>")
+* where do "/" level html files live on your server (e.g. "<tt>/var/www/homepage</tt>")
+* what is the username of the web server (e.g. "<tt>www-data</tt>")
+* what group name (for <tt>chgrp</tt>) can the web server access(e.g. "<tt>www-data</tt>")
+
+
+
+NOTE: By default
+the installation will create a website called "genesis," e.g. its
+URL will be "http://your-site.com/genesis" and the cgi files will live
+in e.g. "http://your-site.com/cgi/genesis".  If for some reason you
+cannot use the default install name "genesis", and/or if you want to
+make a separate test installation with a different name, you should
+use the "-test" option for INSTALL.sh, e.g.
+
+  % cd /tmp/unpackgui
+  % cd gui/configs/install
+  % sudo ./INSTALL.sh -test genesis_test_install
+
+This (above) would create a web site
+    http://your-site.com/genesis_test_install
+
+...instead of the default
+    http://your-site.com/genesis
+
+=== 5. Set permissions ===
+Note the instructions at the end of the INSTALL script, which will 
+tell you how to set correct permissions such that the web server 
+can use the new installation.  You'll be doing something like this:
+
+  % chown -R www-data /var/www/homepage/genesis
+  % chgrp -R www-data /var/www/homepage/genesis
+
+  % chown -R www-data /usr/lib/cgi-bin/genesis
+  % chgrp -R www-data /usr/lib/cgi-bin/genesis
+
+=== 6. Optional cleanup ===
+Once installation is complete, you no longer need the contents of
+the unpacking directory, which can safely be deleted.
+
+  % rm /tmp/unpackgui

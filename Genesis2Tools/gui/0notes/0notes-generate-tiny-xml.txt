@@ -1,0 +1,113 @@
+(was: ~/gui-bug.txt)
+
+The current plan for implementing this in the GUI looks something like
+the following:
+
+  - default will be to still to use and produce fully-elaborated xml
+    on each iteration (this can change if the new path below works
+    well and becomes preferred)
+
+  - there will be a new annoying button, just below the existing "turn
+    debugging ON" annoying button, that will say something like "Turn
+    on 'generate-tiny-xml'" ; this will activate GTX mode
+
+  - if GTX mode is active when you push "Submit Changes", the GUI will
+    give you the option of 1) automatically use the
+    most-recently-generated tiny-xml file produced by the GUI or 2)
+    user can input the name of a tiny-xml file to start from
+
+
+Add a button, below the debugging button:
+  "Generate-tiny-xml" is OFF.  Click here to change it.
+
+---
+
+Working on it now.  Notes, mostly to self:
+
+In the existing flow, the GUI combines its small user-produced changes
+"change.xml" with its fully-elaborated input file "mydesign-t(n).xml"
+to produce a new fully-elaborated change file
+"SysCfgs/mydesign-t(n+1)-changes.xml".
+
+In the proposed flow, the GUI will combine its small user-produced
+changes "change.xml" with a previous small-changes file
+"SysCfgs/mydesign-t(n)-changes.xml" to produce a new small-changes
+file "SysCfgs/mydesign-t(n+1)-changes.xml".
+
+========================================================================
+A promise I made:
+
+GUI probably complained to the vlsiweb console; the problem is in
+getting the complaint to show up in your browser, esp. if you have
+debugging turned OFF.
+
+I'll work on improving the mechanism that detects and displays
+errors...meanwhile, you can try turning on debugging when you detect a
+problem.  If you leave debugging OFF until just before you click the
+final "Submit Changes" then it's slightly less painful (i.e. somewhat
+fewer popups to wade through.)
+
+--- On Tue, 2/7/12, Megan Wachs <megan.wachs@gmail.com> wrote:
+
+    Ok, I think the problem is that was I was using <Value> tag inside
+    of hashes instead of <Val>. I guess neither genesis nor GUI
+    xml-to-whatever tools complain about bad XML (just later things
+    show up as empty hashes... sound right?
+==============================================================================
+The good news: Tiny-xml mode is up and running on
+the GUI, at least enough to run my very small set
+of tests.
+
+How it works:
+
+  - GUI always operates off a fully-elaborated
+    (big) xml file "foo.xml"
+
+  - when changes are submitted, GUI searches for a
+    tiny version of the current design, which must
+    have a "tiny_" prefix, i.e. must be named
+    "tiny_foo.xml"
+
+  - if GUI finds a tiny version, the change file it
+    produces, "SysCfg/foo-<date>-<time>-changes.xml",
+    will be a tiny xml file
+
+  - (as usual,) GUI will direct Genesis to use
+    "SysCfg/foo-<date>-<time>-changes.xml"
+    to produce new xml files
+    "foo-<date>-<time>.xml" and "tiny_foo-<date>-<time>.xml"
+
+Thus! To get started with a tiny-xml file
+"myTileGen.xml" you would do this:
+
+  - rename "myTileGen.xml" as "tiny_myTileGen.xml"
+
+  - run "tiny_myTileGen.xml" through Genesis to
+    produce a new fully-elaborated xml file, which
+    you then rename as "myTileGen.xml"
+
+  - when starting the GUI, point it at
+    "myTileGen.xml" as the starting design; the
+    naming convention will allow the GUI to find
+    and use "tiny_myTileGen.xml" as a reference to
+    produce its tiny-changes file as described above.
+
+To try out tiny mode:
+  "choose your design"
+  => "tgt0-tinybaseline.xml"
+  => "Submit Changes"
+  => see what happens
+
+========================================================================
+
+The bad news:
+
+There's an annoying popup when you press "Submit Changes"
+notifying the user that we're using "perforce" Genesis
+instead of "/cad" Genesis.  (Because "/cad" Genesis doesn't
+support tiny-xml...right?)
+
+Also, there's not good support (yet) for downloading the
+tiny xml files; you have to go hunt for them in the design
+and directory and its "SysCfg/" subdirectory.
+

@@ -1,0 +1,41 @@
+maybe a...perl script thing or...what if they don't have perl
+installed where i think...maybe an sh script that says do this:
+/usr/bin/perl <filename>
+
+...or maybe that searches for perl and, if it finds it, executes
+perl -f install-script.pl and otherwise says "hey where's perl"
+something like that
+
+distribution package would look something like...
+
+Installation instructions
+1. make a directory and put the tarball in it
+Example:
+  % mkdir /home/mydir/unpackgui
+  % cp chipgengui.tar.gz /home/mydir/gui-unpack
+
+2. Unpack the gui
+Example:
+  % cd /home/mydir/unpackgui
+  % tar xvf chipgengui.tar.gz | gunzip
+
+3. You should see two files and two directories
+Example:
+  % cd /home/mydir/unpackgui
+  % ls -1F
+  INSTALLME.sh
+  README.txt
+  installdir/
+  gui/
+  
+4. Run installme.sh and follow the directions.
+Note that you'll probably need to have full root 
+privilege for everything to work properly.
+
+
+
+
+
+========================================================================
+Installation script:
+1. look for /usr/bin/perl; crash and burn if it doesn't exist

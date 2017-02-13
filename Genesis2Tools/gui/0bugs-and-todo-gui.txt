@@ -1,0 +1,156 @@
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+7/2012
+
+add a counter to see if anyone ever use "tarfiles" feature...
+
+add an email notice to see if anyone ever uses the gui at all!!!
+  - include: version number
+
+Something that needs fixed: gui layout
+  - in chrome, parmbox doesn't go all the way to the bottom (should
+    it?); need a "height:100%" for .parms?
+  - see top.DUT.p0.rf for really ugly layout that needs fixin.
+
+Multiline comments
+  Add a multiline comment to "CMP" example
+  double-check samples/{regression,multiline...} in xml-decoder/
+  (see ~/gui/0notes-multiline-comments.txt)
+  see xml2js.csh
+  compare samples/regression,multiline etc.
+
+See gui/0notes/0notes-range-info.txt
+
+see misc/cleanup-after-gui.csh; incorporate into gui design dir(s) somehow??
+
+Maybe put a copy of latest CG doc in the dropbox??
+
+
+
+
+
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+Remember to verify for IE, Chrome
+
+Where bug reports live:
+  - http://genesis2.stanford.edu/mediawiki/index.php/GUI_To-Do_List
+  - bugzilla, e.g. http://aegir.stanford.edu/bugzilla/show_bug.cgi?id=725
+  - bugzilla, e.g. http://aegir.stanford.edu/bugzilla/buglist.cgi?quicksearch=GUI
+  - ~/gui/
+        0bugs-and-todo-gui.txt
+        todo.htm
+        todo-offload*
+        0notes/*
+
+Also see
+  - ~/gui/todo-done.txt (DONE items)
+  - ~/gui/0notes/0notes.txt (notes)
+
+
+(5/2012) Someday: make new-array-edit mode permanent and get rid of "NEW_ARR_MODE" option
+  - Can replace Sublists.SubparmForm with Sublists.SubparmForm2, right?
+  - Can replace ParmBoxForm.Build with ParmBoxForm.Build2, right?
+  - grep for and ?undo? NEW_ARR in gui/*.js and gui/configs/index_dev_sr.htm
+
+(5/2012) long delay on first generation of "designs" dir, e.g. first click of
+"click here to do real work"...
+
+(5/2012) DESIGN LIST SHOULD NOT BE NAMED DESIGN_LIST_STANFORD.TXT
+...use symlink like in setup.cshrc, maybe; at least it's consistent...
+
+(6/2012) Re-evaluate guisada.
+  - Clean up ~/0-notes-guisada.txt
+  - Clean up ~/0-notes-guisada2.txt
+
+(2011) Add "use strict" to all perl files
+
+
+
+Documentation:
+  http://genesis2.stanford.edu/mediawiki/index.php/GUI_Links
+
+  Links to add to wiki/gui todo
+    http://genesis2.stanford.edu/mediawiki/index.php/InteractiveGenesis2GUI
+      - maybe connect to this with a "?" on the splash page?!
+
+Unrelated/interesting CG documents:
+  vlsiweb/mediawiki/index.php/CG/TileGenerator
+  vlsiweb/mediawiki/index.php/CG/Generation
+  genesis2.stanford.edu/mediawiki/index.php/Main_Page
+    - has pointer to InteractiveGenesis2GUI
+
+stewie_check for valid designs, see 0notes-misc.txt
+==============================================================================
+Older todo items, from before April 2012:
+
+stewie: see ~/0-notes-stewie.txt
+
+Add support for "SynonymFor": see 0notes-misc.txt
+
+Add tiny-xml doc to wiki; see ~/gui/0notes/0notes-generate-tiny-xml.txt
+
+========================================================================
+Fix shell script in designs.aux vs. installation package
+
+(120423) document "editdesigns.pl" design database editor
+(120423) performance problems, see ~/tmp.genesis/*/0-speedtest.csh
+(120423) Must update designs.aux/README.txt?
+(120423) see e-mail notes re: "round buttons" (in HTML5)
+(120423) fill-in box for new designs
+(120423) document procedures for testing, adding new designs, other?
+(120423) move "choosedesign.pl's debug checkbox to extreme bottom left corner of screen: "debug[]"
+(120423) use browser buttons to navigate design, instead of (or along with) gui-nav buttons
+
+(110413) grep cgi files for INPUT, see if can replace w/get_input_parms in utils
+(110413) what good are gui/design-samp* files???
+(110413) "make publish" => can be done as a cgi script from inside the gui...??!
+(110413) Search relevant dirs for TODO/BUG
+(110413) see ~/genify/genify.pl
+(110413) see ~/gui/0notes/0notes-cmu-110413.txt
+
+========================================================================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+BEGIN 120423
+
+Links to add to wiki/gui todo
+  https://vlsiweb/mediawiki/index.php/CG/TileGenerator
+  https://vlsiweb/mediawiki/index.php/CG/Generation
+  http://genesis2.stanford.edu/mediawiki/index.php/InteractiveGenesis2GUI
+
+
+see ~/todo-offload-cg.txt
+see ~/todo-offload.txt
+see ~/todo-offload-gui.txt
+
+Performance?
+  - try submitting single-module change instead of complete file...?
+
+END 120423
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+========================================================================
+
+========================================================================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+BEGIN 110413
+
+see ~/gui/todo-offload-110413.txt GONE!
+
+see qiuling mail "re: genesis2 for cmu generators"
+see mail "changes to genesis2's xml schema"
+see mail "re: chip generator gui" from qiuling
+
+------------------------------------------------------------------------
+GUI to-do list:
+  - "opendesign.pl" should start by running Genesis on the chosen xml config
+  - do we really need a "SysConfigs" folder?  and/or shouldn't the
+    config files be all together rather than spread across . and
+    ./SysConfigs? (ofer prefers use SysCfgs folder)
+  - should delete javascript config.js file from design dir after use
+  - instead of "110212-1333" use "v00" etc.
+  - simplify the stupid timestamps...!
+
+END 110413
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+========================================================================
+
+DONE: see ~/gui/todo-done.txt

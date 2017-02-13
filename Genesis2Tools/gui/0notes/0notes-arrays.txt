@@ -1,0 +1,31 @@
+cgtop.SubInstances.DUT.SubInstances.p0.ImmutableParameters.INST_OP_LIST = new Object();
+cgtop.SubInstances.DUT.SubInstances.p0.ImmutableParameters.INST_OP_LIST[0] = "NOP";
+cgtop.SubInstances.DUT.SubInstances.p0.ImmutableParameters.INST_OP_LIST[1] = "LOAD";
+cgtop.SubInstances.DUT.SubInstances.p0.ImmutableParameters.INST_OP_LIST[2] = "STORE";
+cgtop.SubInstances.DUT.SubInstances.p0.ImmutableParameters.INST_OP_LIST[3] = "FETCH";
+
+want:
+  INST_OP_LIST (click to modify) =>
+    0: "NOP"
+    1: "LOAD"
+    2: "STORE"
+    3: "FETCH"
+    4: (click to add array item)
+
+------------------------------------------------------------------------
+
+cgtop.SubInstances.DUT.SubInstances.p0.Parameters.SPECIAL_DATA_MEM_OPS = new Object();
+
+cgtop.SubInstances.DUT.SubInstances.p0.Parameters.SPECIAL_DATA_MEM_OPS[0] = new Object();
+cgtop.SubInstances.DUT.SubInstances.p0.Parameters.SPECIAL_DATA_MEM_OPS[0].name = "METALOAD";
+cgtop.SubInstances.DUT.SubInstances.p0.Parameters.SPECIAL_DATA_MEM_OPS[0].tiecode = "4";
+
+cgtop.SubInstances.DUT.SubInstances.p0.Parameters.SPECIAL_DATA_MEM_OPS[1] = new Object();
+cgtop.SubInstances.DUT.SubInstances.p0.Parameters.SPECIAL_DATA_MEM_OPS[1].name = "METASTORE";
+cgtop.SubInstances.DUT.SubInstances.p0.Parameters.SPECIAL_DATA_MEM_OPS[1].tiecode = "36";
+
+
+want:
+  SPECIAL_DATA_MEM_OPS (click to modify) =>
+    0: (click to modify) =>
+    1: (click to modify) =>

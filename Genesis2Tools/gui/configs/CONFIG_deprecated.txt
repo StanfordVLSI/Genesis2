@@ -1,0 +1,11 @@
+# one two three testing the comments
+
+SERVER_URL      http://www-vlsi.stanford.edu
+
+CGI_DIR         /usr/lib/cgi_bin/ig     # Where the cgi files live on the server
+CGI_URL         /cgi-bin/ig             # How to access cgi files from the web
+
+GUI_HOME_DIR    ~steveri/gui
+GUI_HOME_URL    /ig
+
+#END#

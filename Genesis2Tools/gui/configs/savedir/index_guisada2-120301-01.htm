@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<!-- DO NOT MODIFY INDEX.HTM! -->
+<!-- It is a symbolic link. Instead modify e.g. configs/index_stanford.htm -->
+
+<html>
+  <head>
+    <title>Genesis Home - Guisada2</title>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    <link rel="shortcut icon" href="favicon.ico">
+    <base href="http://neva-2:8080/cgi/">
+    <script type="text/javascript" src="secret_buttons.js"></script>
+    <style type="text/css">
+      .module { border: 8px solid #990000; width: 324; height: 460;
+                border-spacing: 4; background-color: #e7d19a; }
+      .secret_button { font-size:0.5em; display:inline }
+    </style>
+
+  </head>
+  <!--==================================================================-->
+  <body>
+    <table class=module>
+	<tr>
+	  <td style='vertical-align:top; text-align:center'>
+	    <h2>
+               Welcome to the<br>Interactive Chip Generator<br>
+	       <small><i>powered by Genesis</i></small>
+            </h2>
+
+	    <hr>
+	    <h3>
+	      <a href = 'opendesign.pl?newdesign=cmpdemo&amp;file=../designs/tgt0/tgt0-baseline.xml'>
+		  Demo: (Real-ish) CMP generator
+              </a>
+	    </h3>
+
+	    <hr>
+	    <h3>
+	      <a href = 'opendesign.pl?newdesign=socdemo&amp;file=../designs/demo/top.xml'>
+		  Demo: (Toy-ish) SoC generator
+              </a>
+	    </h3>
+
+	    <hr>
+	    <h3>
+	      <a id=choosedesign href="choosedesign.pl">Click here to do real work</a>
+	    </h3>
+	    <hr>
+
+	    <!-- h3>(Snazzy logo goes here)</h3 -->
+            <center><img src="../images/stanford_seal.gif" alt="tree"></center>
+
+            <!-- Secret buttons.  Shhhh!!! -->
+            <div style="text-align:right">
+              <div class=secret_button style="color:gray"
+                   id=toggle_cookie_OFER_MODE onclick='toggle_cookie("OFER_MODE","o")'>o
+              </div>
+              <div class=secret_button style="color:black"
+                   id=toggle_cookie_COMMENTS  onclick='toggle_cookie("COMMENTS", "c")'>c
+              </div>
+              <div class=secret_button style="color:gray"
+                   id=toggle_cookie_DEBUG     onclick='toggle_cookie("DEBUG",    "d")'>d
+              </div>
+            </div>
+
+	  </td>
+	</tr>
+    </table>
+  </body>
+  <!--==================================================================-->
+</html>

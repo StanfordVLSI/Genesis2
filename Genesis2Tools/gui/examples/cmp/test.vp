@@ -1,0 +1,392 @@
+/*************************************************************************
+ ** From Perforce:
+ **
+ ** $Id: //Smart_design/ChipGen/TileTest/TileGenTest/test.vp#16 $
+ ** $DateTime: 2010/07/13 15:52:31 $
+ ** $Change: 8902 $
+ ** $Author: danowitz $
+ *************************************************************************/
+/* *****************************************************************************
+ * File: test.svp
+ *
+ * Description:
+ * Top level testing program (system verilog).
+ *
+ * Required Genesis Parameters (default value):Description
+ * * QUAD_ID: Quad number (must be specified or error is thrown)
+ * * TILE_ID: Tile number (must be specified or error is thrown)
+ * * CFG_IFC_REF - An instance of the reg_file_ifc (used as reference)
+ * 
+ * * MAX_CYCLES (100000): Max number of cycles after which the simulation
+ *   would be killed and an error message sent.
+ * * FIXME: What are the other params?
+ *
+ * 
+ *
+ * Change bar:
+ * -----------
+ * Date          Author   Description
+ * Apr 25 2010   danowitz Init version
+ * Apr 30 2010   shacham  Some cleanup
+ * May 7  2010   shacham  added cfg interfaces and Tile/Quad id parameters
+ * May 26 2010   shacham  Added PreventReset logic ---
+ * 			  PreventReset is a chip input signal that prevents 
+ *			  processor zero of tile zero of quad zero from being 
+ *			  in a soft reset state. That means that if
+ * 			  PreventReset == 0: When Reset is de-asserted the 
+ *			  processor is still in SoftReset mode
+ * 			  PreventReset == 1: When Reset is de-asserted the 
+ *			  processor active
+ * Jun 21 2010   danowitz Decoupled instr and data op widths
+ * Jun 23 2010   danowitz Added enable widths
+ * Jun 30 2010   danowitz Finished necessary fixes for ini version
+ * Jul 2  2010   danowitz Various bug fixes and signal changes
+ * Jul 6  2010   danowitz Now passes data op list to mem manager
+ * Jul 13 2010   danowitz Fixed a bug would prevent mailboxes from being 
+ *                        serviced if they contained more than one message
+ *
+ * ****************************************************************************/
+
+
+/*******************************************************************************
+ * PARAMETERIZATION
+ * ****************************************************************************/
+// ID Parameters:
+//; my $qid = parameter(Name=>'QUAD_ID', Val=>0);
+//; my $tid = parameter(Name=>'TILE_ID', Val=>0);
+//; if (!defined $qid || !defined $tid){
+//;	$self->error("Missing QUAD_ID/TILE_ID");
+//; }
+//;
+
+//; my $max_cyc = $self->define_param('MAX_CYCLES' => 100000);
+//; my $NUM_PROCESSOR = $self->define_param('NUM_PROCESSOR'=>1);
+
+//; my $DATA_OP_SIZE = $self->define_param('DATA_OP_SIZE'=>3);
+//; my $DATA_OP_LIST = $self->define_param('DATA_OP_LIST'=> []);
+//; my $DATA_SIZE = $self->define_param('DATA_SIZE'=>3);
+//; my $DATA_EN_SIZE = $self->define_param('DATA_EN_SIZE'=>6);
+//; my $INSTR_OP_SIZE = $self->define_param('INSTR_OP_SIZE'=>3);
+//; my $INSTR_OP_LIST = $self->define_param('INSTR_OP_LIST'=> []);
+//; my $INSTR_SIZE = $self->define_param('INSTR_SIZE'=>3);
+//; my $INSTR_EN_SIZE = $self->define_param('INSTR_EN_SIZE'=>3);
+
+//; my $MAT_ADDR_SIZE = $self->define_param('MAT_ADDR_SIZE'=>32);
+//; my $META_SIZE = $self->define_param('META_SIZE'=>32);
+//; my $MAT_RET_CODE = $self->define_param('MAT_RET_CODE'=>5);
+//; my $MAT_EN_SIZE = $self->define_param('MAT_EN_SIZE'=> 3);
+
+// CFG interface parameters
+//; my $cfg_ifc_ref = $self->define_param(CFG_IFC_REF => '');
+//; $self->error("Missing parameter: CFG_IFC_REF") if ($cfg_ifc_ref eq '');
+
+//; my $COUNT;
+
+program automatic `$self->get_module_name()` 
+  (
+    input 			 Clk,
+    input 			 Reset,
+   //; if (($qid == 0) && ($tid == 0)){
+    // PreventReset is a chip input signal that prevents processor zero of 
+    // tile zero of quad zero from being in a soft reset state. That means that if
+    // PreventReset == 0: When Reset is de-asserted the processor is still in 
+    //			  SoftReset mode
+    // PreventReset == 1: When Reset is de-asserted the processor active
+    output logic 		 PreventReset,
+   //; }
+   
+   // Config bus interfaces
+   //; my $cfgIn_ifc_obj = $self->clone_inst($cfg_ifc_ref, 'cfgIn');
+   //; my $cfgOut_ifc_obj = $self->clone_inst($cfg_ifc_ref, 'cfgOut');
+   `$cfgIn_ifc_obj->get_module_name()`.cfgIn cfgIn, // incoming responds
+   `$cfgOut_ifc_obj->get_module_name()`.cfgOut cfgOut, // outgoing requests
+
+    output logic [`$MAT_EN_SIZE+$DATA_OP_SIZE+$MAT_ADDR_SIZE+$DATA_SIZE-1`:0] pc2p2msxbar,
+   //; for ($COUNT = 0; $COUNT < $NUM_PROCESSOR; $COUNT++) {
+    input   [`$DATA_EN_SIZE+$DATA_OP_SIZE+$MAT_ADDR_SIZE+$DATA_SIZE-1`:0] data_tie2pc_`$COUNT`,
+    input   [`$INSTR_EN_SIZE+$INSTR_OP_SIZE+$MAT_ADDR_SIZE+$INSTR_SIZE-1`:0] instr_tie2pc_`$COUNT`,
+    output logic [`$META_SIZE+$DATA_SIZE-1`:0] pc2data_tie_`$COUNT`,
+    output logic [`$META_SIZE+$INSTR_SIZE-1`:0] pc2instr_tie_`$COUNT`,
+   //; }
+    output  logic 					    external_stall,
+    input [`$META_SIZE+$DATA_SIZE-1`:0] 		    ms2pxbar2pc
+   );
+
+   
+   // some variables to control the test
+   int 							    seed;
+   int 							    rnd0;
+   int 							    fd;
+
+
+   /***************************************************************************
+    *Instantiate PC and memory collateral
+    **************************************************************************/
+   mailbox data_pc_in = new();
+   mailbox instr_pc_in = new();
+   mailbox data_pc_out = new();
+   mailbox instr_pc_out = new();
+   mailbox memory_in = new();
+   mailbox memory_out = new();
+
+   event pc_in;
+   event pc_out;
+   event p2m;
+   event m2p;
+
+   //; my $pc_obj = $self->unique_inst('pc','pc',
+   //;                  NUM_PROCESSOR => $NUM_PROCESSOR,
+   //;                  DATA_OP_SIZE => $DATA_OP_SIZE,
+   //;                  MAT_EN_SIZE => $MAT_EN_SIZE,
+   //;                  INSTR_OP_SIZE => $INSTR_OP_SIZE,
+   //;                  DATA_SIZE => $DATA_SIZE,
+   //;                  DATA_EN_SIZE => $DATA_EN_SIZE,
+   //;                  INSTR_SIZE => $INSTR_SIZE,
+   //;                  INSTR_EN_SIZE => $INSTR_EN_SIZE,
+   //;                  ADDR_SIZE => $MAT_ADDR_SIZE,
+   //;                  META_SIZE => $META_SIZE,
+   //;                  RET_SIZE => $MAT_RET_CODE);
+   //; my $pc_mod = $pc_obj->get_module_name();
+   //; my $pc = $pc_obj->get_instance_name();
+
+   `$pc_mod` `$pc` = new(data_pc_in, instr_pc_in, data_pc_out, 
+                         instr_pc_out, memory_in, memory_out, pc_in, pc_out, p2m, m2p);
+
+   //; my $dtrans_obj = $self->clone_inst($pc_obj->get_subinst('dtrans'),
+   //;                             'dtrans');
+   //; my $dtrans_mod = $dtrans_obj->get_module_name();
+   //; my $dtrans = $dtrans_obj->get_instance_name();
+
+   //; my $dtrans_out_obj = $self->clone_inst($pc_obj->get_subinst('dtrans_out'),
+   //;                             'dtrans_out');
+   //; my $dtrans_out_mod = $dtrans_out_obj->get_module_name();
+   //; my $dtrans_out = $dtrans_out_obj->get_instance_name();
+
+   //; my $itrans_obj = $self->clone_inst($pc_obj->get_subinst('itrans'), 
+   //;                             'itrans');
+   //; my $itrans_mod = $itrans_obj->get_module_name();
+   //; my $itrans = $itrans_obj->get_instance_name();
+
+   //; my $itrans_out_obj = $self->clone_inst($pc_obj->get_subinst('itrans_out'), 
+   //;                             'itrans_out');
+   //; my $itrans_out_mod = $itrans_out_obj->get_module_name();
+   //; my $itrans_out = $itrans_out_obj->get_instance_name();
+
+   //; my $mem_mgr_obj = $self->unique_inst('mem_mgr', 'mem_mgr',
+   //;                       ADDR_SIZE => $MAT_ADDR_SIZE,
+   //;                       DATA_SIZE => $DATA_SIZE,
+   //;                       INSTR_SIZE => $INSTR_SIZE,
+   //;                       META_SIZE => $META_SIZE,
+   //;                       OP_SIZE => $DATA_OP_SIZE,
+   //;                       DATA_OP_LIST => $DATA_OP_LIST,
+   //;                       INSTR_OP_LIST => $INSTR_OP_LIST,
+   //;                       EN_SIZE => $MAT_EN_SIZE,
+   //;                       NUM_PROCESSOR => $NUM_PROCESSOR);
+   //; my $mem_mgr_mod = $mem_mgr_obj->get_module_name();
+   //; my $mem_mgr = $mem_mgr_obj->get_instance_name();
+
+   `$mem_mgr_mod` `$mem_mgr` = new(memory_in, memory_out, p2m, m2p);
+
+
+
+
+   
+   /****************************************************************************
+    * Control the simulation
+    * *************************************************************************/
+   initial begin
+      $display("%t:\t********************Loading Arguments***********************",$time);
+      /**************************
+       * Between 'Loading Arguments' and 'START' there must NOT be any time consuming
+       * tasks. Any signal driven or sampled must do that asynchronously. This is the
+       * portion of the code that initialize classes and test generators.
+       * ************************/
+      ProcessArgs();
+      fd = $fopen("test.log","w");
+      init_test(); // FIXME: Implement this function/task
+      
+      $display("%t:\t*************************START*****************************",$time);
+      @(negedge Reset);
+	  
+      repeat (10) @(posedge Clk);
+       run_test(); //FIXME: Implement this function/task
+      
+      // At the end of test we wait for 1000 cycles for all transactions to finish
+      repeat (1000) @(posedge Clk);
+      $display("%t:\t********************** TEST FINISHED ************************",$time);
+      $fclose(fd);
+      $finish(2);
+   end
+   
+   /****************************************************************************
+    * Initial signals
+    * *************************************************************************/
+   task init_test();
+      begin
+	 cfgOut.op = '0;
+	 cfgOut.addr = '0;
+	 cfgOut.data = '0;
+		 external_stall = 0;
+		 
+	 //; if (($qid == 0) && ($tid == 0)){
+	 PreventReset = 1'b1; /* change to 1'b1 if you want to bypass q0.t0.p0.Reset
+			       * keep as 1'b0 if you want to control q0.t0.p0.Reset
+			       * from the cfg interface (using the soft reset reg)
+			       * */
+	 //; }
+		 `$mem_mgr`.mem_ini();
+		 
+		 fork
+   			`$pc`.mem_access();
+		
+			`$mem_mgr`.mem_access();
+
+			ExtMem();
+			
+		 join_none
+		 
+
+      end
+   endtask // init_test
+
+   task ExtMem();
+	  //; for ($COUNT = 0; $COUNT < $NUM_PROCESSOR; $COUNT++) {
+	  `$dtrans_mod` `$dtrans.'_'.$COUNT`;
+	  `$itrans_mod` `$itrans.'_'.$COUNT`;
+	  //;}
+	  `$dtrans_out_mod` `$dtrans_out`;
+	  `$itrans_out_mod` `$itrans_out`;
+
+	  
+	  integer sendID;
+	  string srcType;
+	  bit [`$DATA_SIZE-1`:0] data;
+	  bit [`$META_SIZE-1`:0] meta;
+	  
+	  integer isendID;
+	  string isrcType;
+	  bit [`$INSTR_SIZE-1`:0] idata;
+	  bit [`$META_SIZE-1`:0] imeta;
+
+	  fork
+		 
+		 //; for ($COUNT = 0; $COUNT < $NUM_PROCESSOR; $COUNT++) {
+		 forever begin
+			@(data_tie2pc_`$COUNT`);
+			
+			`$dtrans.'_'.$COUNT` = new (`$COUNT`, "data", data_tie2pc_`$COUNT`);
+			
+			data_pc_in.put(`$dtrans.'_'.$COUNT`);
+			->pc_in;
+			//->p2m;
+			
+		 end // forever begin
+		 
+		 forever begin
+			@(instr_tie2pc_`$COUNT`);
+			`$itrans.'_'.$COUNT` = new (`$COUNT`, "instr", instr_tie2pc_`$COUNT`);
+			$display("instr_tie %h", instr_tie2pc_`$COUNT`);
+			
+			instr_pc_in.put(`$itrans.'_'.$COUNT`);
+			->pc_in;
+			
+		 end
+		 //; }
+			
+		 forever begin
+			@(pc_out);
+			fork 
+			   begin
+				  if (data_pc_out.try_get(`$dtrans_out`)>=1) begin
+					 `$dtrans_out`.payload(sendID, srcType, {data, meta});
+					 case (sendID)
+					   //; for ($COUNT = 0; $COUNT < $NUM_PROCESSOR; $COUNT++) {
+					   `$COUNT`: begin
+						  pc2data_tie_`$COUNT` = {data, meta};
+					   end
+					   //; }
+					   default: pc2data_tie_0 = {data, meta};
+					   
+					 endcase // case(sendID)
+				  end // if (data_pc_out.try_get(`$dtrans_out`))
+			   end // fork begin
+		   join_none
+		 end // forever
+		 forever begin
+			@(pc_out);
+			fork
+			   begin
+				  if(instr_pc_out.try_get(`$itrans_out`)>=1) begin
+					 `$itrans_out`.payload(isendID, isrcType, {idata, imeta});
+					 case (isendID)
+					   //; for ($COUNT = 0; $COUNT < $NUM_PROCESSOR; $COUNT++) {
+					   `$COUNT`: begin
+						  pc2instr_tie_`$COUNT` = {idata, imeta};
+						  $display("what pc got %h", pc2instr_tie_`$COUNT`);
+						  
+					   end
+					   //; }
+					   default: pc2instr_tie_0 = {idata, imeta};
+					   
+					 endcase // case(sendID)
+				  end // if (instr_pc_out.try_get(`$itrans_out`))
+			   end // fork begin
+			   join_none
+		    end // forever begin
+		 join_none
+   endtask // ExtMem
+   
+   task run_test();
+	  ExtMem();
+	  external_stall = 0;
+	  
+   endtask // run_test
+   
+  
+   /****************************************************************************
+    * Other Tasks:
+    * *************************************************************************/
+   task ProcessArgs;
+      begin
+         // if this is a "+wave" run, it must record all signals
+         if ( $test$plusargs("wave") ) begin
+            //         levels  instance
+	    $display("%t:\tStarting Wave Capture",$time);
+            $vcdpluson(0,        top);
+         end
+         // if this is a "+memwave" run, it must record all memories
+         if ( $test$plusargs("memwave") ) begin
+            //         levels  instance
+            $display("%t:\tStarting Memories Capture", $time);
+            CaptureMemoriesOn();
+         end
+         // find the seed for this run
+         if ( $test$plusargs("seed") ) begin
+            $value$plusargs("seed=%d", seed);
+         end else begin
+            seed = 12345;
+         end
+         $display("%t:\tUsing seed %d",$time, seed);
+      end
+   endtask // ProcessArgs
+
+   task CaptureMemoriesOn;
+      begin
+         $vcdplusmemon(0,        top);
+      end
+   endtask // CaptureMemoriesOn
+
+   task CaptureMemoriesOff;
+      begin
+         $vcdplusmemoff(0,        top);
+      end
+   endtask // CaptureMemoriesOff
+
+   // timer:
+   initial begin
+      repeat(`$max_cyc`) @(posedge Clk);
+      $display("\n%t\tERROR: The `$max_cyc` cycles marker has passed!\n",$time);
+      $finish(2);
+   end
+
+endprogram : `$self->get_module_name()`

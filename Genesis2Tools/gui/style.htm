@@ -1,0 +1,135 @@
+<!--==============================================================
+  Each module contains one or more evenly-spaced submods.
+
+  Each module is 200w by 150h, white w/thin black border.
+
+  ================================================================
+  // My colors: #cccccc = gray
+  //            #990000 = cardinal red       (153,  0,  0)
+  //            #E7D19A = Stanford sandstone (231,209,154)
+  //            #88ffff = light blue
+  //            #ffe9b2 = light sandstone? (e7.d1.9a + 18.18.18)
+  //            #ff6666 = light cardinal?  (99.00.00 + 66.66.66)
+  ================================================================-->
+
+<style type="text/css">
+  .layout { border-spacing: 0; padding:16px 0px; }
+
+  .module { border: 1px solid black; margin:0px 20px;
+            border-spacing: 4px; background-color: #cccccc;
+	    width: 324px; height: 460px;
+          }
+
+  /* Box for parameters */
+  .parms { border: 2px solid #990000; text-align: left;
+           border-spacing: 0px 0px;  /* 0px right/left, 0x top/bottom */
+	   background-color: #990000; min-width:300px;
+          }
+
+  /* Shortcut button for clones, should fit inside parmbox (.parms) above */
+  /* (also see "parmboxparms") */
+  #scb_container   { padding-top:18px; padding-left:20px; text-align:left; }
+
+  .submod { border: 1px solid black; text-align: left; vertical-align: top;
+            background-color: white;
+            height: 66px; max-width: 66px; min-width:66;
+            word-wrap:break-word;
+            padding-left:4px;
+            font-size:small;
+ }
+
+  /* word-wrap and padding not necessary here because "nosubmod" has no label */
+  .nosubmod { height: 66px; max-width: 66px; min-width: 66px}
+
+  .submodname {height: 100px; }
+
+  .button { background-color: #eeeeee; border: 1px inset black; border-spacing:0; border-radius:4px; }
+
+  /* There's probably a better way to do these minor style variations...hmmm? */
+
+  .parmlist_table     { border-collapse:collapse;border-spacing:0;font-size:12px;
+                        padding:0; width:100% }
+
+  .parmlist_table_imm { border-collapse:collapse;border-spacing:0;font-size:12px;
+                        padding:0; width:100%; font-style:italic; }
+
+  /*
+  ** Note: "inputcol" is used for both "input" and "select" tags;
+  ** also note "select" also needs "width:100%" (added by javascript);
+  ** could solve this by e.g. separate "parmlist_selectcol" class...
+  */
+  .parmlist_parmname { text-align:right; font-size:small; vertical-align:top; padding-top:4px; }
+  .parmlist_inputcol { text-align:right; font-size:small; vertical-align:top; padding-top:4px; height:100%; }
+  .parmlist_parmcomm { text-align:left;  font-size:small; vertical-align:top; padding-top:4px;
+                       font-style:italic; width:300px }
+
+  .subparmlist_parmname { text-align:left; font-size:small; vertical-align:top; padding-top:4px; }
+
+  /* "expandlist" should match "parmlist_inputcol" */
+  .expandlist { vertical-align:top; padding-right:11px; padding-top:4px; }
+
+  /* "width" and "margin-left" are only there to match "expandlistbox" */
+  .parmlist_input_imm  { width:120px; margin-left:auto; font-size:12px; border: 0px solid black; font-style:italic; background-color:darkgray }
+  .parmlist_input      { width:120px; margin-left:auto; font-size:12px; border: 0px solid black;
+                         height:100%; padding:0px 0px 1px 0px; }
+
+  /* "expandlistbox" (div) needs to match "parmlist_input" and "parmlist_input_imm" (input's) */
+  .expandlistbox {
+      height:16px; width:117px; border:2px outset #e7d19a;
+      margin-left:auto;
+      background-color:white;
+  }
+
+/*  .parmlist_radix { width:8px; padding:0px; } */
+/*  .parmlist_radix { font-size:0.4em; padding:0px; height:100%; } */
+/*  .parmlist_radix { width:8px; font-size:0.5em; vertical-align:top; text-align:center; } */
+/*  #change_radix { width:8px; font-size:0.5em; vertical-align:top; text-align:center; }   */
+
+.parmlist_radix {
+    background-color: #e7d19a;
+    border: 0 none;
+    font-size: 0.5em;
+    /*margin-top: 6px;*/
+    padding: 0;
+    text-align: center;
+    text-indent: -2px;
+    vertical-align: top;
+    width: 8px;
+    position: relative; left: -8px;
+}
+
+  #parmbox     { /*white-space:nowrap;*/ }
+  #immparmbox  { /*white-space:nowrap;*/ font-style:italic; }
+
+  .parmboxtitle   { background-color:#990000;  color: white; padding-left:4px;
+                    height:30px; vertical-align:top; text-align:left; }
+
+  .parmboxcaption { background-color:#e7d19a; font-size:small; border: 0px;  padding-left:4px;}
+
+  .parmboxparms   { font-size:12px; background-color:#e7d19a; text-align:right;
+                    vertical-align: top; padding-left:4px; }
+
+  /* "#" for id, "." for class */
+  /*  #immparmbox { font-style: italic; } */
+
+  /* They say "button" but they're actually tables...! */
+
+  .top_stack_button { border:1px solid black;width:612px;
+                      background-color:#e7d19a; }
+
+  .mid_stack_button { border:1px solid black;border-top:hidden; width:612px;
+                      background-color:#e7d19a; }
+
+
+  /* ArrayEdit buttons */
+
+  .ae_button_cell { padding:0px; }
+
+  .ae_button {  border-width: 2px; border-style:solid; border-color:transparent;
+                padding:2px; height:12px; }
+
+  .ae_button:hover { border-style: outset;
+                     border-color:#e7d19a;
+                   }
+
+</style>

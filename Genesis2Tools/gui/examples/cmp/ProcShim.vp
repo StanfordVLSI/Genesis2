@@ -1,0 +1,159 @@
+/******************************************************************************
+ * File: tile.vp
+ * Author: Smart Memory team, adapted by Andrew Danowitz
+ * 
+ * Description:
+ * Processor wrapper for use in chip-gen tile test.  Note, parameters here 
+ * assumed to be trickle up to inform tile.
+ * 
+ * Required Genesis Parameters (default value):Description
+ * * OP_SIZE
+ * * DATA_SIZE
+ * * INSTR_SIZE
+ * * DATA_ADDR_SIZE
+ * * INSTR_ADDR_SIZE
+ * 
+ * Change bar:
+ * -----------
+ * Date          Author   Description
+ * Apr 14, 2010    danowitz Generatable version
+ *  
+ * 
+ *****************************************************************************/
+
+//; my $OP_SIZE = $self->define_param(OP_SIZE=>13);
+//; my $DATA_SIZE = $self->define_param(DATA_SIZE=>32);
+//; my $INSTR_SIZE = $self->define_param(INSTR_SIZE=>64);
+//; my $DATA_ADDR_SIZE = $self->define_param(DATA_ADDR_SIZE=>29);
+//; my $INSTR_ADDR_SIZE = $self->define_param(INSTR_ADDR_SIZE=>30);
+
+module `$self->get_module_name()`(input                     Clk,
+								  input                     Reset,
+								  output logic [`$OP_SIZE-1`:0]    data_op,
+								  output logic [`$DATA_ADDR_SIZE-1`:0] data_address,
+								  output logic [`$DATA_SIZE-1`:0]  data_out,
+								  output logic [`$OP_SIZE-1`:0]    instr_op,
+								  output logic [`$INSTR_ADDR_SIZE-1`:0] instr_address,
+								  output logic [`$INSTR_SIZE-1`:0] instr_out,
+								  input [`$DATA_SIZE-1`:0] ret_data,
+								  input [`$INSTR_SIZE-1`:0] ret_instr
+								  );
+   logic 												   CLK;
+   logic 												   BReset;
+   logic 												   IRam0Busy;
+   logic 												   RunStall;
+   logic [15:0] 										   PRID;
+   logic [15:0] 										   BInterrupt;
+   
+   logic 												   JTDI;
+   logic 												   TResetB;
+   logic 												   TShiftDR;
+   logic 												   TClockDR;
+   logic 												   TUpdateDR;
+   logic 												   TUpdateIR;
+   logic [4:0] 											   TInst;
+   logic 												   TMode;
+   
+   // The following are TILE inputs, that are checked by the shim
+   logic 												   cc2proc_int_hard_soft_sel_pulse; 
+   logic [3:0] 											   cc2proc_int_pin_sel_pulse; 
+   logic 												   cc2proc_raise_int_pulse; 
+   logic 												   sys_Clk;
+   
+   logic 												   XTDO;
+   logic 												   XTDV;
+   logic 												   XOCDMode;
+   logic 												   XOCDModePulse;
+   logic [7:0] 										   PDebugStatus;
+   logic [31:0] 										   PDebugData;
+   logic 												   PWaitMode;
+   logic [31:0] 										   PDebugPC;
+   logic [3:0] 										   PDebugLS0Stat;
+   logic [31:0] 										   PDebugLS0Addr;
+   logic [31:0] 										   PDebugLS0Data;   
+   
+   logic 												   IRam0En;
+   logic 												   IRam0Wr;
+   logic 												   IRam0LoadStore;
+   logic [1:0] 										   IRam0WordEn;
+   logic [29:3] 										   IRam0Addr;
+   logic [63:0] 										   IRam0WrData;
+   logic [63:0] 										   IRam0Data;
+   
+   
+   logic 												   DRam0En0;
+   logic 												   DRam0Wr0;
+   logic [3:0] 										   DRam0ByteEn0;
+   logic [30:2] 										   DRam0Addr0;
+   logic [31:0] 										   DRam0WrData0;
+   logic [31:0] 										   DRam0Data0;
+   
+   logic [69:0] 										   TIE_MemOp_Out;
+   logic 												   TIE_MemOp_Out_Req;
+   logic [31:0] 										   TIE_MemOp_In;
+ 
+   logic 												   TDebugInterrupt;
+   logic 												   OCDHaltOnReset;
+   
+   ProcessorShim ProcessorShim(XTDO, 
+							   XTDV, 
+							   XOCDMode, 
+							   XOCDModePulse, 
+							   PDebugStatus,
+							   PDebugPC,
+							   PDebugLS0Stat,
+							   PDebugLS0Addr,
+							   PDebugLS0Data,
+							   PDebugData,
+							   PWaitMode, 
+							   IRam0En, 
+							   IRam0Wr, 
+							   IRam0LoadStore, 
+							   IRam0WordEn, 
+							   IRam0Addr, 
+							   IRam0WrData, 
+							   DRam0En0, 
+							   DRam0Wr0, 
+							   DRam0ByteEn0, 
+							   DRam0Addr0, 
+							   DRam0WrData0, 
+							   TIE_MemOp_Out,
+							   TIE_MemOp_Out_Req,
+							   // Inputs
+							   CLK, 
+							   BReset,
+							   IRam0Busy,
+							   RunStall, 
+							   PRID, 
+							   BInterrupt, 
+							   JTDI, 
+							   TResetB, 
+							   TShiftDR, 
+							   TClockDR, 
+							   TUpdateDR, 
+							   TUpdateIR, 
+							   TInst, 
+							   TMode, 
+							   IRam0Data, 
+							   DRam0Data0, 
+							   TIE_MemOp_In, 
+							   TDebugInterrupt,
+							   OCDHaltOnReset,
+							   cc2proc_int_hard_soft_sel_pulse,
+							   cc2proc_int_pin_sel_pulse,
+							   cc2proc_raise_int_pulse,
+							   sys_Clk
+							   );
+
+   assign 												   CLK = Clk;
+   assign 												   BReset = Reset;
+   assign 												   data_address = TIE_MemOp_Out_Req? TIE_MemOp_Out[31:0]: DRam0Addr0;
+   assign 												   instr_address = {IRam0Addr,3'b0};
+   assign 												   data_out = TIE_MemOp_Out_Req? TIE_MemOp_Out[63:32]: DRam0WrData0;
+   assign 												   instr_out = IRam0WrData;
+   assign 												   data_op = {TIE_MemOp_Out_Req, TIE_MemOp_Out[69:64], DRam0En0,DRam0Wr0, DRam0ByteEn0};
+   assign 												   instr_op = {7'b0,IRam0En, IRam0WordEn, IRam0Wr, IRam0LoadStore};
+   assign                                                  DRam0Data0 = ret_data;
+   assign 												   IRam0Data = ret_instr;
+
+endmodule //

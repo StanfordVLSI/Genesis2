@@ -1,0 +1,89 @@
+<script type="text/javascript"><!--
+
+SubparmBox = new function () {
+
+  ///////////////////////////////////////////////////////////////////////
+  // EXPORTED functions and data:                                      //
+  ///////////////////////////////////////////////////////////////////////
+
+  // This will go to new module "SubparmBox.js"
+  this.BuildPopUp = BuildPopUp;
+
+  ////////////////////////////////////////////////////////////////////////
+  // PRIVATE functions and data:                                        //
+  ////////////////////////////////////////////////////////////////////////
+    
+  function BuildPopUp(i) {
+    SublistMgmt.PopUp(i);
+
+    // build submenu e.g. <div id="submenu13" ...
+    // then:  PopUp.Appear(e, "submenu13");
+
+    var smid    = "submenu" + i;                   // E.g. "submenu15"
+    var smstyle = "' style='position:absolute; display:none; top:0px; left:0px; z-index:10000;'";
+    var smbox   = BuildSubparmBox(i); if (DBG) { alert(smbox); }
+    var submenu = "<div class=popup id='" + smid + smstyle + ">\n" + smbox + "</div>";
+alert(submenu);
+    if (DBG) alert(submenu);
+
+    return submenu;
+  }
+
+  this.hackfoo = function (i) {
+    var smid    = "submenu" + i;                   // E.g. "submenu15"
+    var smstyle = "' style='position:absolute; display:none; top:0px; left:0px; z-index:10000;'";
+    var smbox   = BuildSubparmBox(i); if (DBG) { alert(smbox); }
+    var submenu = "<div class=popup id='" + smid + smstyle + ">\n" + smbox + "</div>";
+    if (DBG) alert(submenu);
+
+    return submenu;
+  }
+
+  this.Build = BuildSubparmBox;
+
+  function BuildSubparmBox(i) {
+
+    // Called when someone pushes a "click to expand" subparm button.
+    // Builds a table containing the subparm fill-in form.
+
+    var boxtitle    = SubparmTitlebar(i);
+    var subparmform = Sublists.SubparmForm(i);
+
+    var rval =
+      "<table class=parms style='height:100%'>\n" +
+      "  <tr><td class=parmboxtitle>\n\n" + boxtitle    + "</td></tr>\n" +
+      "  <tr><td class=parmboxparms>" + subparmform + "</td></tr>" + 
+      "</table>";
+
+    // Box over a box. TODO: Could try using dropshadow instead of white border.
+    rval = "<table bgcolor=white><tr><td>" + rval + "</td></tr></table>";
+
+    if (DBG) { alert("RVAL = " + rval); }
+
+    return rval;
+  }
+
+  function SubparmTitlebar(i) { // Including "submit" and "cancel" buttons.
+
+    // When someone pushes "Cancel" or "Submit", this remembers which subparm list to close.
+    Button_CancelSubmit.Remember(i); 
+
+    var rval =
+      "\n\n<table width=100%><tr>\n" +
+      "  <td align=left style='color:white'><b><small>" + Sublists.SublistName(i) + "</b></small></td>\n" +
+      "  <td align=right>\n" + 
+      "    <table class=button id=submitsubparm" + i +
+      "><tr><td><small>&nbsp;Submit&nbsp;</small></tr></td></table>\n" +
+      "  </td></small>\n" +
+      "  <td align=right>\n" + 
+      "    <table class=button id=cancelsubparm" + i +
+      "><tr><td><small>&nbsp;Cancel&nbsp;</small></tr></td></table>\n" +
+      "  </td>\n" +
+      "</tr></table>\n\n";
+
+    if (DBG) alert(rval);
+    return rval;
+  }
+}
+
+//--></script>

@@ -1,0 +1,83 @@
+/******************************************************************************
+ * File: p2ms_xbar.vp
+ * Author: Andrew Danowitz
+ * 
+ * Description:
+ * p2ms_xbar.  Wrapper module for the processor-side to memory-module crossbar
+ * in the Chip Generator tile.
+ * 
+ * Required Genesis Parameters (default value):Description
+ * * INPUT_GROUPS (1): Number of times each set of signals/ports are replicated
+ *                    (i.e. 2 indicates xbar being fed by 2 processors)
+ * * SIGNALS (['data','opcode','address']): The per group/per port in/out 
+ *                                          signals
+ * * INPUT_WIDTHS ([32,3,32,63,3,63]): Per signal/per port/per group input 
+ *                                     widths
+ * * OUTPUT_GROUPS (1): Number of times each set of output signals are 
+ *                      replicated
+ * * OUTPUT_WIDTHS ([32,3,32]): Per signal/per group output widths
+ * * MAP_IN (targ_mem): Name of input signal that dictates crossbar mapping
+ * * MAP_IN_SIZE (1): Width of MAP_IN signal
+ * * MAP_OUT (req_proc): Name of output signal that dictates crossbar mapping
+ * * MAP_OUT_SIZE (1): Width of MAP_OUT signal
+ * * PORTS (['data', 'instr']): Data ports for input groups.
+ * * PC_WIDTH (67): Width of signal to PC
+ * 
+ * Change bar:
+ * -----------
+ * Date          Author   Description
+ * Apr 14, 2010    danowitz Generatable wrapper version
+ *  
+ * 
+ *****************************************************************************/
+
+
+//; my $INPUT_GROUPS = $self->define_param('INPUT_GROUPS' => 1);
+//; my $SIGNALS_REF = $self->define_param('SIGNALS'=>['data', 'opcode', 'address']);
+//; my $INPUT_WIDTHS_REF = $self->define_param('INPUT_WIDTHS'=>[32,3,32,63,3,63]);
+//; my $OUTPUT_GROUPS = $self->define_param('OUTPUT_GROUPS', 1);
+//; my $OUTPUT_WIDTHS_REF = $self->define_param('OUTPUT_WIDTHS'=>[32,3,32]);
+//; my $MAP_IN = $self->define_param('MAP_IN'=>"targ_mem");
+//; my $MAP_IN_SIZE = $self->define_param('MAP_IN_SIZE'=>1);
+//; my $MAP_OUT = $self->define_param('MAP_OUT'=>"req_proc");
+//; my $MAP_OUT_SIZE = $self->define_param('MAP_OUT_SIZE'=>1);
+//; my $PORTS_REF = $self->define_param('PORTS'=>['data','instr']);
+//; my $PC_WIDTH = $self->define_param('PC_WIDTH'=>67);
+
+//; my $SIGNAL;
+//; my $PORT;
+//; my $GROUPCOUNT = 0;
+//; my $PORTCOUNT = 0;
+  
+//; my @SIGNALS = @$SIGNALS_REF;
+//; my @INPUT_WIDTHS = @$INPUT_WIDTHS_REF;
+//; my @OUTPUT_WIDTHS = @$OUTPUT_WIDTHS_REF;
+//; my @PORTS = @$PORTS_REF;
+  
+module `$self->get_module_name()` (
+								   //; for ($GROUPCOUNT = 0; $GROUPCOUNT < $INPUT_GROUPS; $GROUPCOUNT ++) {
+								   //; foreach $PORT (@PORTS) {
+								   //; foreach $SIGNAL (@SIGNALS) {
+								   input [`$INPUT_WIDTHS[$PORTCOUNT]-1`:0] `$SIGNAL . '_' . $PORT . '_in_' . $GROUPCOUNT`,
+								   //; $PORTCOUNT++;
+								   //; }
+								   input [`$MAP_IN_SIZE-1`:0] `$MAP_IN . '_' . $PORT . '_in_' . $GROUPCOUNT`,
+								   output logic `$PORT`_stall_out_`$GROUPCOUNT`,
+								   //; }
+						           //; }
+								   //; $PORTCOUNT = 0;
+								   //; for ($GROUPCOUNT = 0; $GROUPCOUNT < $OUTPUT_GROUPS; $GROUPCOUNT ++) {
+								   //; foreach $SIGNAL (@ SIGNALS) {
+								   output logic [`$OUTPUT_WIDTHS[$PORTCOUNT]-1`:0] `$SIGNAL . '_out_' . $GROUPCOUNT`,
+								   //; $PORTCOUNT++;
+								   //; }
+								   
+																											       output logic [`$MAP_OUT_SIZE-1`:0] `$MAP_OUT . '_out_' . $GROUPCOUNT`,
+								   //; }
+								   
+								   input [`$PC_WIDTH-1`:0] pc_in
+								   );
+
+   //insert module here
+
+endmodule //

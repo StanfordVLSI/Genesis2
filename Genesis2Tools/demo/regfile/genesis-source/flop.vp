@@ -1,0 +1,72 @@
+/* *****************************************************************************
+ * File: flop.vp
+ * 
+ * Description:
+ * My first attempt in using Genesis2 to make a flip-flop generator.
+ * 
+ * Required Genesis2 Controlable Parameters:
+ * * FLOP_TYPE		- constant, flop, rflop, eflop, or reflop
+ * * FLOP_WIDTH		- integer value specifying register width
+ * * FLOP_DEFAULT	- default value for the flop 
+ *			 (only applies when flop_type=constant|rflop|reflop)
+ *
+ * ****************************************************************************/
+
+
+/*******************************************************************************
+ * REQUIRED PARAMETERIZATION
+ ******************************************************************************/
+//; my $flop_type = parameter(name=>'FLOP_TYPE', val=>"REFLOP", 
+//;                           list=>['constant', 'flop', 'rflop', 'eflop', 'reflop']);
+//; my $flop_default;
+//; if($flop_type =~ m/(constant|rflop|reflop)/i){
+//;   $flop_default = parameter(name=>'FLOP_DEFAULT', val=>"0");
+//; }
+//; my $flop_width = parameter(name=>'FLOP_WIDTH', val=>1);
+//;
+//; # Check for error assignments
+//; $self->error("Flop_type parameter = -->$flop_type<-- is not allowed! ".
+//;		 "Allowed values: constant, flop, rflop, eflop, or reflop.")
+//;	   unless($flop_type =~ m/constant/i || $flop_type =~ m/flop/i ||
+//;	          $flop_type =~ m/rflop/i || $flop_type =~ m/eflop/i || 
+//;		  $flop_type =~ m/reflop/i);
+
+module `mname`(
+    //inputs
+  //; if ($flop_type !~ m/constant/i) {
+    input logic                 Clk,
+    input logic [`$flop_width-1`:0] data_in,
+  //; }
+  //; if ($flop_type =~ m/rflop/i || $flop_type =~ m/reflop/i) {
+    input logic 		Reset,
+  //; }
+  //; if ($flop_type =~ m/eflop/i || $flop_type =~ m/reflop/i) {
+    input logic 		Enable,
+  //; }
+								
+    //outputs
+    output logic [`$flop_width-1`:0] data_out
+             );
+   
+    //; if ($flop_type =~  m/^constant$/i) {
+      assign data_out = `$flop_width`'d`$flop_default`;
+    //; } else {
+      always @ (posedge Clk) begin
+      //;if ($flop_type =~ m/rflop/i || $flop_type =~ m/reflop/i) {
+      if (Reset) begin
+	 data_out <= `$flop_width`'d`$flop_default`;
+      end
+      else begin
+      //; }
+      //; if ($flop_type =~ m/eflop/i || $flop_type =~ m/reflop/i) {
+	 if (Enable)
+      //; }
+	    data_out <= data_in;   
+      //; if ($flop_type =~ m/rflop/i || $flop_type =~ m/reflop/i) {
+      end // else: !if(Reset)
+      //; }
+   end // always @ (posedge Clk)
+   //; }
+
+endmodule // `mname`
+

@@ -1,0 +1,128 @@
+<!--
+THIS FILE IS SEVERELY DEPRECATED.
+ITS CONTENTS SHOULD BE MOVED TO
+~/gui/0bugs-and-todo.txt
+AND/OR THE WIKI AT
+https://www-vlsi.stanford.edu/mediawiki/index.php/CG/GUI_To-Do_List
+-->
+
+<p><b>Todo:</b>
+
+<br /> = <a href="http://aegir.stanford.edu/bugzilla/buglist.cgi?query_format=advanced&short_desc_type=allwordssubstr&short_desc=&product=ChipGenerator&component=GUI&long_desc_type=substring&long_desc=&bug_file_loc_type=allwordssubstr&bug_file_loc=&status_whiteboard_type=allwordssubstr&status_whiteboard=&bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&emailassigned_to1=1&emailtype1=substring&email1=&emailassigned_to2=1&emailreporter2=1&emailcc2=1&emailtype2=substring&email2=&bugidtype=include&bug_id=&votes=&chfieldfrom=&chfieldto=Now&chfieldvalue=&cmdtype=doit&order=Reuse+same+sort+as+last+time&field0-0-0=noop&type0-0-0=noop&value0-0-0=">
+Bugzilla bug list
+</a>
+
+<br /> = clean up todo file
+<br /> = OOPS submit buttons in sublists DON'T WORK YET!!!
+<br /> = grep through source code for SUBTODO, TODO, BUG
+<br /> = grep for EGREGIOUS and defaultHACK in decode.pl
+
+
+<p>Then:
+
+<br /> = Read-only parameters
+<br /> = Need to identify and handle lists differently; need an "add list item" button
+<br /> = install a pointer from icg to ig and back
+
+
+<p>Later:
+
+<br /> = nav buttons should check to make sure no parms have changed
+<br /> = and issue a warning "parms have changed; do you want to submit changes?"
+<br />
+
+<br /> = test on IE
+
+<br /> = put names/icons of subsubmods in submod boxes
+<br /> = PopUp really should be ParmBoxListPopup => at least the subparm-dependent parts
+<br /> = maybe clean up ModuleBox.js, style.htm
+<br /> = Need instructions: 'click (double-click?) a submodule to go down a level, click "UP" button to go up a level'
+<br /> = shadow box for IO_LIST submenus?
+<br /> = maybe need a "show hist" button
+<p>
+<br /> = Right-click on a module brings up module properties, and a list of submods (see below)
+<br /> = Create new function "ShowModuleProperties(e)"
+<br /> == Right-click on a box should give that module's properties, e.g.
+<br /> ===Base_Module_Name
+<br /> ===Instance_Name
+<br /> ===Clone_Of
+<br /> ===Unique_Module_Name
+<p>
+<br /> = other todo: search source for "TODO" and "BUG"
+<br />
+
+<hr><!-- ---------------------------------------- -->
+
+<p><b>Obviated/went away on their own/changed my mind/already fixed:</b>
+<br /> = Clicking "UP" clears sublists, pushing into a module should also clear.
+<br /> = is "module dut" spanning both columns???
+<br /> = module box should have a minimum width of two submodules...
+         maybe this means that HowManyColumns or whatever it's called should
+         always return "2" or greater.
+<br /> = Entire first row of mod table (including "UP" button) should
+         function like UP button
+<br /> = Instead of "undefined," should just be absence-of-box.
+<br /> = double-click of e.g. "ifc" should call NewModule(top.dut.ifc).
+<br /> = clicking on "comp" results in "e is null" error
+<br /> = add appropriate todo items from icg
+<br /> = boxes should fit ipad window better---ipad and iphone 
+have different aspect ratios!?  Current box fits both pretty well.
+
+<hr><!-- ---------------------------------------- -->
+
+<p><b>Testing:</b>
+
+Testing subparm lists: begin at "top.DUT.p0"
+<br /> = one-level test: "INST_OP_LIST" => "Cancel"
+<br /> = two-level test: "SPECIAL_DATA_MEM_OPS" => "0" => "Cancel"
+<br /> = out-of-scope tests: "INST_OP_LIST" => "DATA_OP_LIST"
+<br /> = out-of-scope tests: "SPECIAL_DATA_MEM_OPS" => "0" => "INST_OP_LIST"
+
+
+<hr><!-- ---------------------------------------- -->
+
+<p><b>Done:</b>
+
+<br /> == init() should call NewModule(top.dut)
+<br /> = click on ifc should say "my name is top.dut.ifc"
+<br /> = need "UP" button in top level module.
+<br /> = Right-click on a module says "hey you rightclicked"
+<br /> = Add parameters to param box.
+<br /> = "module" box should be sized such that left edge of "parm" box doesn't jump around.
+<br /> = in fact, size module box so that can fit up to 16 (12?) modules w/o changing outer boundary.
+<br /> = 6/15 each IO_LIST (e.g.) should be a button that pops up a submenu for the IO_LIST values
+<br /> = 6/15 want a new submenu for each parm list
+<br /> = 6/15 need a "DONE" button to make the submenu go away. (Implemented Cancel, Submit)
+<br /> = 6/16 Clean up Activate.js etc.
+<br /> = 6/17 once there are two submenus on screen, the "cancel" buttons stop working
+<br /> = 6/17 Related: click on "regfile_clk2" I think subparm lists are WRONG!!!
+<br /> = Initial code clean-up (not yet).
+<br /> = 6/17 From "top", clicking on "UP" makes "UP" stop working.
+         (PRIORITY: THIS IS AN ACTUAL BUG!!)
+<br /> = 6/21 subparm popups don't work so well as browser window gets narrower
+<br /> = 6/21 mixed font sizes on parms looks dumb (subparms are too big)
+<br /> = 6/21 iphone version now == regular version; merge/delete
+<br /> = 6/22 consider: "UP" button on left, "BACK" button on right.  OR! "<", ">", "UP"
+<br /> = 6/22 titles should be "top.dut" and "top.dut.template", not "dut" and "template"; also, put them on the left i guess
+         if necessary, only show the last n letters of the string
+<br /> = 6/22 really should clean up "ModuleNavigator.js"
+
+<br /> = 8/1 "submit changes" button should do something---click on it and follow directions. (DONE)
+<li>8/1 pop up an alert box with parm change, curdesign name, etc. (DONE)
+<li>8/1 call a cgi script with parm change, curdesign name, etc. (DONE)
+
+<br />8/1 "updatedesign.pl" needs to do more stuff
+<li>8/1  build an xml-changes file
+<li>8/1  use the xml-changes to produce a new xml dbase
+<li>8/1  use the xml dbase to make a new javascript dbase
+<li>8/1  use the new xml dbase as new design base for "updatedesign.pl"
+
+<br />1/19/2011  cleaned up cgi files
+<br />1/19 Design name now accommodates hyphens, underbars.
+
+
+<br />
+
+
+
+

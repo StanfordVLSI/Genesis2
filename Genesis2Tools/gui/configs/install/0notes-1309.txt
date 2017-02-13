@@ -1,0 +1,96 @@
+==============================================================================
+GUI TESTING
+
+ask the group to check the gui like a naif
+  - see online mail draft, ~/tmp-gui-vetting.txt
+
+
+==============================================================================
+GUI DOCUMENTATION
+
+document stuff
+
+WORKS (sorta):
+su root
+cpan
+install HTTP::Server::Simple::CGI 
+
+DOES NOT WORK:
+sudo cpan -i HTTP::Server::Simple::CGI 
+
+
+
+
+WRONG Might be a problem with TCL_LIBRARY?
+WRONG   setenv TCL_LIBRARY /usr/share/tcl8.4 or maybe
+WRONG   setenv TCL_LIBRARY /usr/share/tcltk/tcl8.4
+
+
+
+
+
+
+==============================================================================
+GUI IS GOING TO BREAK when vlsiweb reboots because there's no
+automount for /cad => FIXED added /cad to /etc/fstab 9/2013
+
+
+VLSIWEB REBOOT PROBLEMS that cropped up after vlsiweb died and had to
+be restored from three years back.
+
+1. GUI could not find synopsys tools because /cad not mounted.  Fixed by:
+  - mounted /cad on vlsiweb (with Charlie's help):
+    sudo mount whirlpool.stanford.edu:/vol/vgates/cad /cad
+    - Note this is not permanent and WILL REVERT when/if vlsiweb reboots
+  - made a symbolic link for the missing /hd/cad:
+    sudo mkdir /hd; cd /hd; sudo ln -s /cad
+
+mtab looks like this:
+  whirlpool.stanford.edu:/vol/vgates/cad /cad nfs rw,addr=172.24.74.33 0 0
+
+added to /etc/fstab:
+  whirlpool.stanford.edu:/vol/vgates/cad /cad nfs rw 0 0
+
+
+2. GUI could not find path to TCL libraries.  Fixed by:
+  - added to $SMASH/bin/setup.cshrc:
+        source /cad/modules/tcl/init/csh
+        module load base
+  - added to ~/gui/configs/setup_stanford.cshrc:
+        source /cad/modules/tcl/init/csh
+        module load base
+        module load genesis2
+
+3. /hd/cad/modules/modulefiles/modules (at least) had a dependence on
+/hd/horowitz_users/zasgar, which did not exist on vlsiweb, so I made
+the following adjustment that, in later hindsight, may not have been
+strictly necessary:
+
+    cd /hd; sudo ln -s /home horowitz_users
+    ls /hd/horowitz_users/zasgar
+
+
+  - see how much "what i did" can be undone and still work,
+
+
+What I did and then later undid:
+  - install tcl on vlsiweb
+    sudo apt-get install tcl
+  - undid it as follows maybe
+    apt-get uninstall tcl
+
+
+
+documentation
+  - add pre-test to the wiki documentation somewhere/somehow
+    - see gui/README.txt "DESIGN PRE-TEST" for the pre-test info
+
+
+==============================================================================
+
+
+Later:
+  clean up remaining perforce-open files.
+  - fix configs/index_* ; in the end there can be only one.
+
+

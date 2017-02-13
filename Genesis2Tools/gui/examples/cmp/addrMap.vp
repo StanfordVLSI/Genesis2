@@ -1,0 +1,209 @@
+/*************************************************************************
+ ** From Perforce:
+ **
+ ** $Id: //Smart_design/ChipGen/rtl/addrMap.vp#6 $
+ ** $DateTime: 2010/05/17 04:05:59 $
+ ** $Change: 8710 $
+ ** $Author: danowitz $
+ *************************************************************************/
+
+/* *****************************************************************************
+ * File: addrMap.vp
+ * Author: Andrew Danowitz
+ * 
+ * Description:
+ * Genesis-based address translator
+ * 
+ * Required Genesis Controlable Parameters:
+ * * ADDR_SIZE  - Determines how many bits the address is
+ * * ADDR_MAP - Array of hashes defining each remap table, segments
+ * * and corresponding op codes.  Defaults to identity remap table (empty 
+ * * structure): [{ops => (op1,op2,...,opn), remap_bits => number of bits to 
+ * * be remapped, segments => ({lookup_val => lookup value to compare against
+ * * virtual address, remap_val => remap value to be compared 
+ * * against, addr_interrupts => interrupt code (if any), targ => one-hot 
+ * * value of blocks to be targetted})}]
+ * * OP_SIZE - width of opcode bus
+ * * TARG_SIZE - Size of target mem blocks bus
+ * * INT_SIZE - Size of interrupt bus
+ * 
+ * Change bar:
+ * -----------
+ * Date          Author   Description
+ * Jan 20, 2010  danowitz init version
+ * 
+ *  
+ * 
+ * ****************************************************************************/
+
+/*******************************************************************************
+ * Simulation Control Definitions
+ ******************************************************************************/
+
+// Temp compile param
+
+// Set default variable values for module
+//; my $ADDR_SIZE = $self->define_param(ADDR_SIZE => 32);
+//; my $OP_SIZE = $self->define_param(OP_SIZE => 3);
+//; my $ADDR_MAP_REF = $self->define_param(ADDR_MAP => [{ops=>[0],remap_bits=>1,segments=>[{lookup_val=>0, remap_val=>0, addr_interrupts=>0, targ=> 1111}]}]);
+//; my $TARG_SIZE = $self->define_param(TARG_SIZE => 4);
+//; my $INT_SIZE = $self->define_param(INT_SIZE => 3);
+//; my $ADDR_OUT_SIZE = $self->define_param(ADDR_OUT_SIZE => 32);
+
+// Set config bus options
+//; my $cfg_ops = $self->define_param('CFG_OPCODES' => {nop => 0, read => 1, write => 2, bypass => 3});
+//; my $ifc_ref = $self->define_param(IFC_REF => '');
+
+//; $self->error("Missing parameter: IFC_REF") if ($ifc_ref eq '');
+//; my $addrCfgInObj = $self->clone_inst($ifc_ref, 'AddrCFG_in');
+//; my $addrCfgOutObj = $self->clone_inst($ifc_ref, 'AddrCFG_out');
+
+//Pull array from reference
+//; my @ADDR_MAP = @$ADDR_MAP_REF;
+
+//Get Genesis assigned module name
+//; my $instance_name = $self->get_module_name();
+
+//Address map module
+module `$instance_name`(
+						//inputs,
+						input                         Clk,
+						input                         Reset,
+						input [`$ADDR_SIZE-1`:0]      address_in,
+						input [`$OP_SIZE-1`:0]        op_in,
+						output logic [`$OP_SIZE-1`:0] op_out,
+						output logic [`$ADDR_OUT_SIZE-1`:0] address_out,
+						output logic [`$TARG_SIZE-1`:0] targ_block,
+						output logic [`$INT_SIZE-1`:0] interrupts,
+						`$addrCfgInObj->get_module_name()`.cfgIn cfgIn,
+						`$addrCfgOutObj->get_module_name()`.cfgOut cfgOut,
+						input TMode
+						);
+   //; my $addr = 0;
+   //; my $TABLE = '';
+   //; my $segment = '';
+   //; my $COUNT = 0;
+   //; foreach $TABLE (@ADDR_MAP) {
+   //;     my $RF_OUT_SIZE = $TABLE->{remap_bits} + $INT_SIZE + $TARG_SIZE;
+   //;     foreach $segment (@{$TABLE->{segments}}){
+   logic [`$RF_OUT_SIZE-1`:0] `"r".$segment->{'lookup_val'}."_".$COUNT`;
+   //;     }
+   logic [`$TABLE->{remap_bits}+$INT_SIZE+$TARG_SIZE-1`:0] rf_out_`$COUNT`;
+   logic [`$INT_SIZE-1`:0] intermed_int_`$COUNT`;
+   logic [`$ADDR_SIZE-1`:0] intermed_addr_`$COUNT`;
+   logic [`$TARG_SIZE-1`:0] intermed_targ_`$COUNT`;
+   //; $COUNT++;
+   //; }
+
+   //; $COUNT = 0;
+   //; my @REG = ();
+   //; my @cfg_out = ();
+					  
+   //; foreach $TABLE (@ADDR_MAP) {
+   //;     my $RF_OUT_SIZE = $TABLE->{remap_bits} + $INT_SIZE + $TARG_SIZE;
+   //;     foreach (@{$TABLE->{segments}}){
+   //;     my $RF_OUT_SIZE = $TABLE->{remap_bits} + $INT_SIZE + $TARG_SIZE;   
+   //;     my $REG_HASH = {};
+   //;     $REG_HASH->{'name'} = "r".$_->{'lookup_val'};
+   //;     $REG_HASH->{'default'} = oct("0b".$_->{'remap_val'} . $_->{'addr_interrupts'} . $_->{targ});
+   //;     $REG_HASH->{'width'} = $RF_OUT_SIZE;
+   //;     $REG_HASH->{'IEO'} = 'O';
+   //;     push(@REG, $REG_HASH);
+   //;     }
+								   
+   //; my $cfgIn_obj = $self->clone_inst($ifc_ref,'cfgIn_'.$COUNT);
+   //; my $cfgIn_MOD = $cfgIn_obj->get_module_name();
+   //; my $cfgIn_name = $cfgIn_obj->get_instance_name();
+
+   //; my $cfgOut_obj = $self->clone_inst($ifc_ref,'cfgOut_'.$COUNT);
+   //; my $cfgOut_MOD = $cfgOut_obj->get_module_name();
+   //; my $cfgOut_name = $cfgOut_obj->get_instance_name();
+   //; push (@cfg_out, $cfgOut_name);
+								   
+   `$cfgIn_MOD` `$cfgIn_name`();
+   `$cfgOut_MOD` `$cfgOut_name`();
+								   
+   //; if ($COUNT==0) {
+   always_comb begin
+					   `$cfgIn_name`.addr <= cfgIn.addr;
+					   `$cfgIn_name`.data <= cfgIn.data;
+					   `$cfgIn_name`.op <= cfgIn.op;
+			   end // UNMATCHED !!
+   //;} #endif	
+   //; else {
+   always_comb begin
+			 `$cfgIn_name`.addr <= `$cfg_out[{$COUNT-1}]`.addr;
+			 `$cfgIn_name`.data <= `$cfg_out[{$COUNT-1}]`.data;
+			 `$cfgIn_name`.op <= `$cfg_out[{$COUNT-1}]`.op;
+			 end
+   //; } #endelse
+							   
+
+   //; my $unique_inst = $self->unique_inst('reg_file','rf_'.$COUNT, 'REG_LIST'=> \@REG, 'IFC_REF'=>$ifc_ref);
+   //; my $RF_MOD = $unique_inst-> get_module_name();
+   //; my $RF = $unique_inst->get_instance_name();
+   `$RF_MOD` `$RF` (Clk,
+					  Reset,
+					  `$cfgIn_name`.cfgIn,
+					  `$cfgOut_name`.cfgOut,
+		              //; foreach $segment (@{$TABLE->{segments}}){
+					  `"r".$segment->{'lookup_val'}."_".$COUNT`,
+					  //;} #end foreach
+					  TMode
+					  );
+
+
+   always_comb begin
+	  case (address_in[`$ADDR_SIZE-1`:`$ADDR_SIZE-$TABLE->{remap_bits}`]) 
+		 //; foreach $segment (@{$TABLE->{segments}}){
+					  `$segment->{'lookup_val'}`: begin
+						 rf_out_`$COUNT` <= `"r".$segment->{'lookup_val'}."_".$COUNT`;
+					  end
+					  //;} #end foreach
+		default: rf_out_`$COUNT` <= 'b0;
+	  endcase // case(address_in[`$ADDR_SIZE-1`:`$ADDR_SIZE-$TABLE->{remap_bits}`])
+   end // UNMATCHED !!
+	  
+   //; $COUNT++;
+   //; } #end foreach
+
+   always_comb begin
+	  cfgOut.addr <= `$cfg_out[$COUNT-1]`.addr;
+	  cfgOut.data <= `$cfg_out[$COUNT-1]`.data;
+	  cfgOut.op <= `$cfg_out[$COUNT-1]`.op;
+   end
+   
+   //; $COUNT = 0;
+   //; foreach $TABLE (@ADDR_MAP){
+   //; my $RF_OUT_SIZE = $TABLE->{remap_bits} + $INT_SIZE + $TARG_SIZE;
+   assign    intermed_addr_`$COUNT` = {rf_out_`$COUNT`[`$RF_OUT_SIZE-1`:`$INT_SIZE + $TARG_SIZE`], address_in[`$ADDR_SIZE-1-$TABLE->{remap_bits}`:0]};
+   assign 	 intermed_int_`$COUNT` = rf_out_`$COUNT`[`$INT_SIZE+$TARG_SIZE-1`:`$TARG_SIZE`];
+   assign    intermed_targ_`$COUNT` = rf_out_`$COUNT`[`$TARG_SIZE-1`:0];
+   //; $COUNT++;
+   //; }
+   assign 	 op_out = op_in;
+   
+   
+   //; $COUNT = 0;
+   always_comb begin
+	  case (op_in)
+		//; my $OP;
+		//; foreach $TABLE (@ADDR_MAP) {
+		//; foreach $OP (@{$TABLE->{ops}}) {
+		`$OP_SIZE`'d`$OP`: begin
+		   address_out <= intermed_addr_`$COUNT`;
+		   interrupts <= intermed_int_`$COUNT`;
+		   targ_block <= intermed_targ_`$COUNT`;
+		end
+		//; }
+		//; $COUNT++;
+		//; }
+		default: begin 
+		   address_out <= address_in;
+		   interrupts <= '0;
+		   targ_block <= '0;
+		end
+	  endcase // case(remapBits)
+   end // UNMATCHED !!
+
+endmodule // addr_map

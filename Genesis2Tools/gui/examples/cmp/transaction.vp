@@ -1,0 +1,71 @@
+/*************************************************************************
+ ** From Perforce:
+ **
+ ** $Id: //Smart_design/ChipGen/TileTest/TileGenTest/transaction.vp#2 $
+ ** $DateTime: 2010/06/30 21:12:15 $
+ ** $Change: 8875 $
+ ** $Author: danowitz $
+ *************************************************************************/
+
+/* *****************************************************************************
+ * File: transaction.vp
+ * Author: Andrew Danowitz
+ * 
+ * Description:
+ * Genesis-based transaction class for tb to pc 
+ * and pc to mem communications
+ * 
+ * Required Genesis Controlable Parameters:
+ * * ADDR_SIZE  - Determines how many bits the address is
+ * * OP_SIZE - width of opcode bus
+ * * DATA_SIZE - Size of target mem blocks bus
+ * * ADDR_SIZE - SIZE of meta_data
+ * * EN_SIZE - Number of processors
+ * 
+ * Change bar:
+ * -----------
+ * Date          Author   Description
+ * Jun 23, 2010  Danowitz Init version
+ * Jun 30, 2010  Danowitz Fixed various bugs and removed debug print
+ *                        statements 
+ * 
+ * ****************************************************************************/
+
+//; my $PAYLOAD = $self->define_param('PAYLOAD'=>32);
+
+class `$self->get_module_name()`;
+
+ protected integer sendID;
+ protected string srcType;
+ protected bit [`$PAYLOAD-1`:0] message;
+ protected time trans_time;
+
+
+function new( integer sendID,
+			  string srcType,
+			  bit [`$PAYLOAD-1`:0] message);
+
+	  this.sendID = sendID;
+	  this.srcType = srcType;
+	  this.message = message;
+	  this.trans_time = $time;
+
+endfunction // new
+
+task payload(output integer sendID,
+			  output string srcType,
+			  output bit [`$PAYLOAD-1`:0] message);
+	  
+	  sendID = this.sendID;
+	  srcType = this.srcType;
+	  message = this.message;
+
+endtask // payload
+
+task transTime(output time trans_time);
+
+	  trans_time = this.trans_time;
+endtask // transTime
+
+endclass
+  

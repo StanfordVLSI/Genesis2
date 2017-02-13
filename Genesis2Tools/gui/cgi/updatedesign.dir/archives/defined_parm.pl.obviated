@@ -1,0 +1,55 @@
+# To test, try something like: perl -f <thisfile>
+use strict;
+
+sub test_defined_parm {
+    my $PARMLISTref = shift @_; # \%PARMLIST
+    print "PARMLIST{SPECIAL_DATA_MEM_OPS}{0}{tiecode} = "
+	.%{$PARMLISTref}->{SPECIAL_DATA_MEM_OPS}{0}{tiecode}."\n";
+
+    print "PARMLIST{SPECIAL_DATA_MEM_OPS}{2}{tiecode} = "
+	.%{$PARMLISTref}->{SPECIAL_DATA_MEM_OPS}{2}{tiecode}."\n\n";
+
+    my $tmp = "SPECIAL_DATA_MEM_OPS";
+    print "defined(PARMLIST{$tmp}) = "
+	.(defined(%{$PARMLISTref}->{$tmp}) ? "TRUE" : "FALSE")
+	."\n";
+
+    print "defined(PARMLIST{SPECIAL_DATA_MEM_OPS}{2}{tiecode} = "
+	.(defined(%{$PARMLISTref}->{SPECIAL_DATA_MEM_OPS}{2}{tiecode}) ? "TRUE" : "FALSE")
+	."\n\n";
+
+    my ($defined,$val) = defined_parm($PARMLISTref, "SPECIAL_DATA_MEM_OPS", "2", "tiecode");
+
+    print "defined_parm(PARMLIST{SPECIAL_DATA_MEM_OPS}{2}{tiecode} = ".
+        $defined.
+	"\n";
+
+    print "defined(PARMLIST{a}{b}{c}) = "
+	.(defined(%{$PARMLISTref}->{a}{b}{c}) ? "TRUE" : "FALSE")
+	."\n\n";
+
+    my ($defined,$val) = defined_parm($PARMLISTref, "a", "b", "c");
+
+    print "defined_parm(PARMLIST{a}{b}{c} = $defined\n\n";
+}
+
+sub defined_parm {
+    # E.g. defined_parm($PARMLISTref, "SPECIAL_DATA_MEM_OPS", "2", "tiecode") = (TRUE, [val])
+    # and  defined_parm($PARMLISTref, "bar", "baz", "bogus") = (FALSE, "")
+
+    my $hashptr  = shift @_;           # Pointer to PARMLIST
+    my @testparm = @_;                 # E.g. ("SPECIAL_DATA_MEM_OPS", "2", "tiecode");
+
+    my ($DEFINED,$UNDEFINED) = (1,0);
+
+    while ($#testparm >= 0) {
+	if (defined %{$hashptr}->{$testparm[0]}) {
+	    $hashptr = %{$hashptr}->{$testparm[0]};
+	}
+	else { return ($UNDEFINED, ""); }
+	shift @testparm;
+    }
+    return ($DEFINED, $hashptr);
+}    
+
+1;

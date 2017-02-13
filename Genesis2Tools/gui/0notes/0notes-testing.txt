@@ -1,0 +1,22 @@
+next:
+  - testing:
+    - prototype procedure for starting from clone
+    - prototype procedure for starting from tarball
+    - prototype procedure for starting from perforce
+
+  - testing ("*" means test passed):
+    - *stewie from perforce, neva-2: choose design, change nprocs
+    - *stewie from clone,    neva-2: choose design, change nprocs
+
+    -  stewie from perforce, vlsiweb: choose design, change nprocs
+    -  stewie from clone,    vlsiweb: choose design, change nprocs
+
+    - (make sure sr-dev still works)
+
+Bugs to fix:
+  - try miniserver with chrome, firefox from paint; for ofer, chrome don't work?
+
+testing:
+  - see ~/gui/test/gui-tests.txt
+  - figure out a better way to test
+

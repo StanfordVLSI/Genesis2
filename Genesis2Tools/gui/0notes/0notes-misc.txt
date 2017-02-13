@@ -1,0 +1,92 @@
+GUI BUG LIST
+  title of new installation (index.htm) is always "Stanford edition"---oops!
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+THIS IS STILL A LEGITIMATE BUG as of 1/9/2012
+
+Comments in hashes: to see the problem, look at immutable parm
+"PC2XBAR_REQ_SIGNALS" in TileGen-OS "top.DUT"; next to "click to expand";
+it should say "List of interface signals between protocol controller 
+and the Xbar"
+
+% cd ChipGen/TileTest/TileGenTest
+% cat hier*xml
+...
+
+  <Doc>List of interface signals between protocol controller and the Xbar</Doc>
+  <Name>PC2XBAR_REQ_SIGNALS</Name>
+...
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+Soon:
+  - build a stewie_check
+    - setup, design files should have list of valid hostnames e.g.
+      "#Valid for hosts: neva.stanford.edu neva-2.stanford.edu ...
+      stewie_check will say: "Found setup file valid for hosts:  neva.stanford.edu neva-2.stanford.edu..."
+      "And you appear to be on host ..."
+      "You need to edit the setup file (path), following the instructions found in the file..."
+      (and then maybe cat the file header)
+      (...same for design_list file...)
+  - maybe the Stewie design list would be called "design_list_stewie.txt"
+  - how do we verify perl pkgs in advance (HTTP::Server::Simple, HTTP::Server::Simple::CGI, e.g.)?
+  - "download button"---last item in every design dir list should be "Import",
+    allowing user to type the full pathname of a desired design (maybe starting from
+    "__SOURCE_DIR__"
+
+Todo's related to Ofer mail:
+  - Subject: some xml related changes
+  - Date: Saturday, February 11, 2012 9:00 PM
+  - Add support for "SynonymFor"
+
+"Choose design" shouldn't show "small_" or "tiny_" files, right?
+  - But then how do we delete them?
+  - Maybe have an option 'delete orphaned "small_" and "tiny_" files' or something?
+
+'Calling build_xml_change_file() to create  ../foobar/SysCfgs/mydesign-120202-093046-changes.xml'
+  => should show parameters being sent to build_xml_change_file...right!??
+
+Need better way to determine hash vs. array
+  - Add "h" or "a" at the beginning of each key name in javascript e.g. instead of
+    "top.DUT.p0.SPECIAL. 0. name = foo" should be
+    "top.DUT.p0.SPECIAL.a0.hname = foo"
+     kind of hacky but I kinda like it...
+
+Ofer's "top" bug fix will probably break if:
+  - any module other than top has the name "top"
+  - any module other than top has the same name as the top module
+    (e.g. two modules in the hierarchy named (top_FMA))
+
+misc
+  - LINT for cg xml?  Same as first five passes?
+  -- "<Name>" not first item in "<...>" block beginning at line 327" etc.
+
+misc
+  - to README , somewhere, add the phrase "the design directory should magically 
+    appear in foo/bar/designs next time the gui starts..."
+
+Later:
+
+  - increase robustness of when multiple users access GUI at the same time
+
+clean up updatedir tests---they probably don't work right now.
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Make a record of this somewheres? (below)
+0notes-documentation.txt?
+==============================================================================
+Change 10002:
+
+Description:
+	Packing, unpacking and installation scripts and instructions.
+Files:
+      .../gui/configs/index_template.htm	# add
+      .../gui/configs/install/INSTALL.pl	# add
+      .../gui/configs/install/INSTALL.sh	# add
+      .../gui/configs/install/README-packing.txt	# add
+      .../gui/configs/install/README-unpacking.txt	# add
+      .../gui/configs/install/README.txt	# add
+      .../gui/configs/install/build_tarfile.sh	# add
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+Check out jquery.
+

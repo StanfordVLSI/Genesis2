@@ -1,0 +1,26 @@
+// function deepCopy(p,c) {
+// var c = c||{};
+// for (var i in p) {
+//   if (typeof p[i] === 'object') {
+//     c[i] = (p[i].constructor === Array)?[]:{};
+//     deepCopy(p[i],c[i]);
+//   } else c[i] = p[i];}
+// return c;
+// }
+// 
+// to call:
+// var child = deepcopy(parent);
+
+// I think what he means is this:
+
+// To use: var new = deepcopy(old);
+
+// function deepCopy(old) {
+// var new = new || {};
+// for (var i in old) {
+//   if (typeof(old[i]) === 'object') {
+//     new[i] = (old[i].constructor === Array) ? [] : {};
+//     new[i] = deepCopy(old[i]);
+//   } else new[i] = old[i];}
+// return new;
+// }

@@ -1,0 +1,67 @@
+/******************************************************************************
+ * File: regbank.vp
+ * Author: Andrew Danowitz
+ * 
+ * Description:
+ * Produces banks of flip-flops to handle any signals of any widths
+ * 
+ * Required Genesis Parameters (default value):Description
+ * * INPUT_GROUPS (1): Number of times each signal repeats
+ * * SIGNALS (['data']): Array of signals per group
+ * * INPUT_WIDTHS ([1]): Size of input signals (one per signal per group)
+ * * FLOP_TYPE ('RFLOP'): Base flip-flop for reg bank
+ * 
+ * Change bar:
+ * -----------
+ * Date          Author   Description
+ * Apr 14, 2010  danowitz Generatable version
+ * Jun 30, 2010  danowitz Fixed minor bug 
+ * 
+ * ****************************************************************************/
+
+//; my $INPUT_GROUPS = $self->define_param('INPUT_GROUPS'=>5);
+//; my $SIGNALS_REF = $self->define_param('SIGNALS'=>['data']);
+//; my $INPUT_WIDTHS_REF = $self->define_param('INPUT_WIDTHS'=>[1, 2, 3, 4, 5]);
+//; my $FLOP_TYPE = $self->define_param('FLOP_TYPE'=>'RFLOP');
+
+//; my @SIGNALS = @$SIGNALS_REF;
+//; my @INPUT_WIDTHS = @$INPUT_WIDTHS_REF;
+//; my $GROUPCOUNT = 0;
+//; my $IOCOUNT = 0;
+
+module `$self->get_module_name()` (
+								   //; for ($GROUPCOUNT = 0; $GROUPCOUNT < $INPUT_GROUPS; $GROUPCOUNT++) {
+						           //; foreach (@SIGNALS) {
+								   input [`$INPUT_WIDTHS[$IOCOUNT]-1`:0]   `$_ . "_in_" . $GROUPCOUNT`,
+								   //; $IOCOUNT++;
+						           //; }
+								   //; }
+
+								   //; $IOCOUNT = 0;
+								   //; for ($GROUPCOUNT = 0; $GROUPCOUNT < $INPUT_GROUPS; $GROUPCOUNT++) {
+						           //; foreach (@SIGNALS) {
+								   output logic [`$INPUT_WIDTHS[$IOCOUNT]-1`:0]   `$_ . "_out_" . $GROUPCOUNT`,
+								   //; $IOCOUNT++;
+						           //; }
+								   //; }
+								   input Clk,
+								   input Reset
+								   );
+
+   //; my $IOCOUNT = 0;
+   //; for ($GROUPCOUNT = 0; $GROUPCOUNT < $INPUT_GROUPS; $GROUPCOUNT++) {
+   //; foreach (@SIGNALS) {
+   //; my $unique_inst = $self->unique_inst('flop', 'flop_' .$_ . '_' .$IOCOUNT, 'FLOP_TYPE'=>$FLOP_TYPE, 'FLOP_WIDTH'=>$INPUT_WIDTHS[$IOCOUNT]);
+   //; my $FLOP = $unique_inst->get_module_name();
+   //; my $FF = $unique_inst->get_instance_name();
+   `$FLOP` `$FF` (.Clk(Clk), 
+					.Reset(Reset), 
+					.data_in(`$_ . "_in_" . $GROUPCOUNT`),
+					.data_out(`$_ . "_out_" . $GROUPCOUNT`)
+					);
+   
+   //; $IOCOUNT++;
+   //; }
+   //; }
+
+endmodule //

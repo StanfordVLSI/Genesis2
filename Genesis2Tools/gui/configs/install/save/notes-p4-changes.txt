@@ -1,0 +1,1159 @@
+10598 06/12: Added instant range-checking for inputs with defined "min" or "max".
+10595 06/11: Slight improvement to build_release.sh
+10594 06/11: Fixed a bug in TOP_HASH.
+10593 06/11: Forgot to remove a debug popup...
+10592 06/11: NOW maybe stewie finds missing HTTP library when needed.
+10591 06/11: Maybe stewie.pl automatically finds missing HTTP library if needed.
+10589 06/07: Better support for hex numbers i parms.
+10588 06/07: Slight change to build_tarfile.sh
+10587 06/07: Working array-edit buttons for new regime etc.
+10585 06/05: Decided to use upper case for hex.
+10584 06/05: Deleting socdemo files.
+10583 06/05: Removed socdemo from remaining files.
+10582 06/05: Removed socdemo from splash pages.
+10581 06/05: Default for NEW_ARR_EDIT_MODE is now "ON".
+10580 06/05: No more OFER_MODE.
+10579 06/05: Prettier format for array display and editing.
+10578 06/04: Cleaning up the code...
+10577 06/04: Wow array-edit buttons seem to work in new regime!
+10576 06/04: Added helpful comment to command-line error msg.
+10575 06/04: Latest gooey tarball release.
+10574 06/04: Added hidden-button support for new array-edit mode NEW_ARRAY_MODE.
+10571 05/31: New-regime-sublists now work!  (If ofer-mode is on.)
+10570 05/31: Added style to improve new-regime-sublist format, for now at least.
+10569 05/31: Implemented OFER_MODE_HACK that will need to be undone later.
+10567 05/31: Code to support new array-edit layout.
+10566 05/31: Latest release of gooey tarball.
+10563 05/30: Added bin-to-hex test parms.
+10559 05/29: Big big changes to stewie script; yet more error checks and user friendliness.
+10550 05/18: Fixed a stupid little bug related to <select> tag.
+10549 05/18: Cleaned up the code, added default-hex for values g.t. 256.
+10548 05/18: Check in working change-radix button; still need cleanup.
+10547 05/18: Added a couple of top-level test examples to cmp-baseline.
+10543 05/17: Much prettier, for firefox at least; ready now to finish change-radix.
+10541 05/17: Tweaking the look of the "change-radix" button.
+10539 05/17: Cleaned up style a bit, added support for change-radix button.
+10538 05/17: Added support for download of *.sv as well as *.v files.
+10537 05/17: Slight improvement to code readability.
+10536 05/17: Added comments to help find prev regexp work in javascript.
+10528 05/15: Oops had a bad reg_file.vp for the demo.
+10527 05/15: Added shortcut button to get from clone to original module.
+10525 05/14: No longer need javascript design samples, right?
+10521 05/14: Added "smaples" to exclusion directories.
+10520 05/14: Ongoing slight improvements to the release process.
+10519 05/14: Redo of previous release; significantly smaller because exclude savedir.
+10518 05/14: Now excluding "savedir" for significant savings.
+10517 05/14: Latest release fixed a lotta bugs...
+10514 05/13: Added top-level array of hashes to cmp design example.
+10513 05/13: Fixed some problems with designdir management.
+10508 05/10: Slight change to name by which we exclude deleted designs.
+10507 05/10: Streamlined the debug messages.
+10506 05/10: Fixed problem with hashes/arrays at top level.
+10505 05/09: find-updates enhancements that I may regret...
+10504 05/09: Problems w/deleting files from SysCfgs src dirs.
+10501 05/08: Fixed a problem with missing setup.cshrc.
+10500 05/08: Changed how stewie deals with start directory.
+10499 05/08: Slight update to find-updates.
+10498 05/08: Back to earlier/better setup file.
+10497 05/07: Latest release fixes multiline-comment problem.
+10496 05/07: Don't use <br>'s in place of newline.
+10495 05/07: Added support for multiline comments.
+10489 05/04: Latest tarball.
+10488 05/04: Small problem with the xml2js driver.
+10487 05/04: Fixed multiple problems with "emptydesign.xml" type files.
+10478 05/03: Cleaned up setup file.  Didn't test it.  Naughty naughty!
+10477 05/03: Improved process for building tarballs and releases.
+10476 05/03: Added code to make stewie work better on kiwi.
+10468 05/01: Latest release.
+10467 05/01: Fixed a really stupid bug: forgot to take out nonexistent debug message.
+10464 05/01: This wasn't really working right as a perforce file.
+10463 05/01: latest tarball release
+10462 05/01: Support for parm val lists and ranges (min/max/step) (finally!).
+10461 05/01: In the end, all I did was add a comment.
+10460 05/01: Migrating information out from todo.htm to the wiki.
+10453 04/30: Added range and comments to top level of parms.
+10452 04/30: Added a test for enum with step.
+10440 04/27: Turned parm floatboxes back on.
+10438 04/24: Fixed a domain-name bug; added code to pre-populate design examples.
+10437 04/24: Fixed a major bug in the way the gui finds a design(!)
+10436 04/24: Added at least one xml design to the demo directory.
+10435 04/24: cmp/cmp => CMP/cmp
+10434 04/24:  Changed example from tgt0 to cmp.
+10433 04/24: Changed pointers to todo-list, changed example from tgt0 to cmp.
+10429 04/20: Cleaned up design list.
+10428 04/20: Fixed a couple egregious mistakes with backup, return vs. exit.
+10427 04/20: Stanford-specific domain check and errors; better "list" format.
+10426 04/20: Version control support file.
+10425 04/20: Server-related perl files.
+10424 04/20: Fixed "inperforce" test for running stewie in situ.
+10423 04/20: Took out useless "emptyfile" processing.
+10421 04/19: New cmp example in place of old "tgt0".
+10420 04/19: Ditching tgt0 in favor of cmp
+10419 04/19: Improved user interface; plus creates empty.xml where needed.
+10418 04/19: Better format for "stewie list".
+10413 04/17: Test script to see how well a design works with stewie/gui.
+10412 04/17: Suppress version check for perforce "in situ" stewie.
+10404 04/12: cmp => CMP
+10403 04/12: No more README file.
+10402 04/12: Fixed problems with setup file for kiwi.
+10401 04/12: Latest and greatest.
+10400 04/12: No more README at top level (for now at least).
+10399 04/12: Messy new "setup" file maybe works for kiwi.  Needs good cleaning tho.
+10398 04/12: "nlines" change that I'll probably soon regret...!
+10397 04/12: Fixed a small bug in "stewie setup" command.
+10396 04/12: Added cmp to the design list.
+10394 04/10: Updated README file.
+10393 04/10: Failed attempt to make setup work for kiwi.
+10392 04/10: Increased helpfulness of error message.
+10391 04/10: Cleaning up the README files.
+10390 04/10: README => README_gui; also, small build_release update.
+10389 04/10: Improved release procedure plus latest new release.
+10387 04/09: "start" will now build/update distribution where needed.
+10386 04/09: Slight improvement to "busy port" message.
+10385 04/09: Exclude *all* deleteme files; added "-q".
+10375 04/06: Fixed a bug with Stewie and tarball downloads and GUI_HOME_URL.
+10368 04/05: kiwi did not understand "localhost"(!)
+10367 04/05: Small inconsequential change to info output (I hope).
+10366 04/05: Improved "clone" function.
+10348 04/03: Improved the comments maybe.
+10346 04/02: Updated the post-processing instructions.
+10344 04/02: Potential problem with calculation of "mydir"
+10343 04/02: Fixed a tiny bug in the post-processing instructions.
+10342 04/02: new build_tarfile; plus latest gui release.
+10341 04/02: Checking in latest gui.tar.bz2
+10340 04/02: Now using my own "php.pl" in place of "/usr/bin/php".
+10334 03/30: Latest/greatest tarball.
+10333 03/30: Automatically build "empty.xml" if none exists.
+10330 03/29: Design dirs now populated with SysCfgs/*.xml in add'n to just *.xml.
+10328 03/29:  Dir no longer optional on command line for "start".
+10327 03/29: Implemented friendlier server message on startup.
+10318 03/27: Fixed problem with stewie args; hope I didn't cause any new problems.
+10317 03/27: Small problem with finding the right directory...
+10315 03/27: Updated latest release of gooey tarball.
+10312 03/25: Extensive modifications to stewie for improved UX.
+10311 03/25: Error message now goes to stderr.
+10310 03/25: Opted out of designs tmp file to make distribution tarfile smaller.
+10309 03/25: Cleaned and simplified the setup file.
+10308 03/25: I'm pretty sure I don't need this anymore.
+10288 03/18: Cleaning the code.
+10287 03/18: Intermediate checkin while cleaning the code.
+10286 03/18: Okay no longer need '.' (dot) in your path to run stewie.
+10285 03/17: Stewie now checks w/user to verify setup.cshrc is correct for the site.
+10284 03/17: Stewie now checks and cmoplains if setup.cshrc is missing.
+10283 03/17: If no scratch dir on "start", stewie will build one.
+10282 03/17: Better error reporting, including check for setup.cshrc existence.
+10281 03/17: Better error reporting for "updatedesign.csh" calls.
+10280 03/17: Problems with missing scratch directory.
+10279 03/17: Improved user friendliness.
+10278 03/17: Friendlified and clarified an error message.
+10246 03/07: Got rid of some stupid debug code.
+10239 03/06: New gui tarball, plus twek to build-tarball routine.
+10238 03/06: Better support for index and CONFIG setup.
+10237 03/06: Changed stewie config files to better support stewie setup.
+10236 03/06: Improved(?) debug messages a bit.
+10234 03/06: Hacked in a fix for Ofer's problem where cgtop.BaseModuleName != "top".
+10230 03/05: Fixed xml file descriptions on download page.
+10229 03/05: Download now includes makefiles.
+10228 03/05: Added path for $SMASH/gui/bin
+10227 03/05: Fixed problem with stewie not seeing servers from other users.
+10226 03/05: Problems with debug messages...
+10225 03/05: Oops stewie had the wrong name for CONFIG.TXT.
+10224 03/05: Lack of warning caused garbage symlinks in random places.
+10223 03/05: More user friendliness.
+10222 03/05: Slightly enhanced user-friendliness.
+10221 03/05: Just a little housecleaning.
+10216 03/04: Oops had wrong value for GUI_HOME_URL.
+10215 03/04:  Order design list so "small_"/"tiny_" designs are at the end.
+10214 03/04: Support for better information from "stewie list".
+10199 03/02: Oops forgot to add the wrapper!
+10198 03/02: Slightly improved doc/debugging.
+10197 03/02: Hello.  I am Stewie the Standalone GUI.
+10192 03/01: Who messed up the secret buttons??
+10191 03/01: Updated "file-already-exists" safety check.
+10178 02/28: Another piece of the puzzle---will need to rename it later.
+10177 02/28: Support for new miniserver-based standalone gui.
+10176 02/28: Added better warnings for "empty" files.
+10175 02/28: bye bye
+10174 02/28: foo
+10173 02/28: Notes on what to do for "empty" files.
+10166 02/27: Now it automatically launches Firefox for you.
+10163 02/26: Altered install script to include site-specific setup.cshrc
+10153 02/23: Removed an outdated comment.
+10152 02/23: Oops messed up the last checkin.
+10151 02/23: Updated the tarball.
+10150 02/23: Updated the tarball unpacking info to reflect bz2 instead of gz etc.
+10149 02/23: Updated the bundling procedure for building a gooey tarball.
+10148 02/23: Using bzip instead of gzip for tarfile, to be compatible w/Genesis.
+10146 02/22: Problems and potential problems with CONFIG.TXT and standalone mode.
+10145 02/22: Added a comment/reminder to delete this unused file.
+10138 02/21: Last file cleanup for this round.
+10137 02/21: Cleaned the next file in the list.
+10136 02/21: Code cleaning...
+10135 02/21: Cleaning up the code...slowly...
+10134 02/21: Cleaned up the code.
+10133 02/21: Cleaned up the code a bit.
+10132 02/21: Checking in a symbolic link...does this work??
+10131 02/21: Driver for standalone gui.
+10130 02/21: Scary: standalone gui.  It'll need to be cleaned up later.
+10114 02/16: Latest gui release.
+10113 02/16: HTML compliance.
+10112 02/16: Added sizes to download files.
+10111 02/16: HTML compliance; mostly escaping close-tags in javascript.
+10109 02/15: HTML compliance.
+10108 02/15: HTML compliance for choosedesign.pl
+10106 02/15: Improved HTML compliance for splash page.
+10105 02/15: It's deprecated, right?  Bye bye!
+10103 02/15: Use official Genesis instead of development version.
+10102 02/15: Added description of small, tiny etc. to download page.
+10101 02/15: I don't trust the symlink, so here's a full checkin.
+10100 02/15: Updating with a symbolic link---does this work!??
+10099 02/15: Download now includes small, tiny and change files.
+10097 02/15: Now find-updates.csh defaults to a "brief"/"quiet" output.
+10096 02/15: Tiny xml: fixed an infinite-loop bug in build-changes script.
+10095 02/13:  Run this script from vlsiweb to see what needs updating.
+10094 02/13: Support for tiny mode.
+10093 02/13: Got rid of a couple of annoying debug messages.
+10092 02/13: New tiny-xml version of tgt0, for testing and demo purposes.
+10091 02/13: Cleaned up the code a bit; new version is functionally equivalent to old.
+10090 02/13: Forgot to delete placeholder for UGTX button.
+10089 02/13: Undo explicit UGTX (tiny-xml) mode---now it's detected automatically based on filenames...
+10079 02/09: Initial support for tiny xml, not yet fully implemented.
+10077 02/08: Cleaned up the code a little.
+10076 02/08: Prep for tiny-xml mode.
+10075 02/08: Forgot to check in the new UGTX button (see prev change).
+10074 02/08: Added support for UGTX "Use-and-Generate-Tiny-XML" mode.
+10057 02/06: Prettied up the module boxes, made them smaller etc.
+10043 02/02: Changed simple copy to deep copy for cloned array elements.
+10042 02/02: Changed the comments around a bit.  Stupid change, really.
+10037 02/01: No change; just comments.
+10035 01/31: Slight update to README file.
+10034 01/31: Latest gui release
+10033 01/31: Improvements to INSTALL script.
+10028 01/30: Fixed a little "glob" bug in genesis_dev_sr
+10016 01/26: Built a new release w/latest bug fix.
+10015 01/26: Some parms had no comments, and that was causing problems.
+10011 01/25: Done with comparefiles.csh (a helper file for an old version of publish.csh).
+10010 01/25: publish.csh has been eliminated in favor of build_tarfile and INSTALL.sh
+10009 01/25: Slight update to one of the README files.
+10007 01/25: Latest gui release.
+10006 01/25: README files for gui installation scripts.
+10002 01/20: Packing, unpacking and installation scripts and instructions.
+10001 01/20: If "designs" directory is missing create a blank one.
+10000 01/20: If design file is missing, create a blank one.
+9999 01/20: If "scratch" directory is missing, build_new_php() will create it.
+9991 01/09: Maybe this fixed something, I dunno.
+
+
+
+
+
+
+
+9935 2011/12/06: Fixed problem with single-element lists in <List> tag.
+9934 2011/12/06: Created a better error message for design list access problems.
+9933 2011/12/06: Changed the label on the "download" button.
+9900 2011/12/03: My attempt at improving table placement in "Supplemental" section.
+9899 2011/12/03: Fixed some "overfull hbox" errors.
+9898 2011/12/03: Typos, rewordings; added a caption to Table S-1.
+9897 2011/12/03: Typos and a bit of rewording here and there.
+9896 2011/12/03: It's funny how "textsc" environment works...!
+9895 2011/12/03: Minor typo fix.
+9894 2011/12/03: Minor changes.
+9893 2011/12/03: "Parametrize" => "parameterize" as previously agreed...
+9857 2011/12/01: Comments for hashes and arrays etc.
+9855 2011/12/01: Better way of hiding zombie designs.
+9854 2011/12/01: Double-quotes in xml comments (<Doc>) no longer break.
+9824 2011/11/29: SR changes.
+9823 2011/11/29: Added the ref for Wallace tree.
+9821 2011/11/29: "Parameterization" consistency etc.
+9820 2011/11/29: SR mods.
+9819 2011/11/29: SR tweaks.
+9818 2011/11/29: "Parameterization"
+9817 2011/11/29: Slight slight tiny changes.
+9812 2011/11/28: Added "back to 'choose your design'" buttons.
+9810 2011/11/28: Fixed a typo.
+9809 2011/11/28: Latest snapshot of design list
+9806 2011/11/28: Fixed bug where deleted designs didn't go away.
+9805 2011/11/28: Enhanced GUI publication scripts.
+9769 2011/11/22: Entered rough draft of S-1.
+9768 2011/11/22: SR edits/tweaks.
+9767 2011/11/22: Edited existing text; added verbage for the GUI.
+9766 2011/11/22: SR edits.
+9764 2011/11/22: SR edits for section 2, plus initial checkin/add of S-1.
+9763 2011/11/22: Small editing changes, plus added draft motivation at the end.
+9740 2011/11/15: Secret "o" flag for Ofer/Genesis development.
+9739 2011/11/15: Enhanced design-delete and design-edit dialog boxes.
+9711 2011/11/10: Can now edit design list from inside the GUI.
+9674 2011/11/01: Cleaned up the new updatedesigndirs script.
+9673 2011/11/01: updatedesigndirs process is now MUCH MUCH faster.
+9672 2011/11/01: Changed table width to default (100%) (I'll probably regret this).
+9671 2011/11/01: Changed "ls" to follow symbolic links.
+9652 2011/10/27: Implemented faster and simpler xml-to-javascript translator.
+9651 2011/10/27: Bug 752; array edit buttons were present for array-of-objects but not simple arrays;
+9650 2011/10/27: Inconsequential tweak to debug info.
+9649 2011/10/27: Inconsequential tweak to debug alert-box.
+9641 2011/10/24: Added test for dots and dollars in hash key (really!??)
+9630 2011/10/20: Final fix for Megan's bug 746, editing nested arrays; seems to work in Firefox, haven't yet checked Chrome.
+9629 2011/10/20: Tiny formatting changes.
+9628 2011/10/20: Snapshot as I'm cleaning up.
+9627 2011/10/20: Removed annoying debug message.
+9626 2011/10/20: Fixed Megan's bug with nested array-edits; left a mess.
+9625 2011/10/20: Elaborated a coupla debug msgs.
+9624 2011/10/20: Cleared up some annoying debug messages.
+9622 2011/10/19: Fixed some xml parsing problems, for Andrew; still need better longterm sol'n
+9621 2011/10/19: Making the logo fit better...
+9617 2011/10/17: Crazy rounded cancel and submit buttons...!
+9615 2011/10/17: Earlier change screwed up format of pop-up boxes...
+9613 2011/10/17: (Finally) added a snazzy logo, plus a couple of buttons.
+9612 2011/10/17: GUI forgot how to build missing SysCfgs directory...
+9611 2011/10/17: Fixed problems with /tmp files.
+9610 2011/10/17: Improved use of tmp files.
+9607 2011/10/15: Yet another tweak to the "publish" process.
+9606 2011/10/15: Tiny tiny tweak.  Nothing really.  Probably broke everything.
+9598 2011/10/13: Improved conformance to html standards; changed look and feel slightly.
+9597 2011/10/13: Firefox/linux doesn't understand html comments!?
+9592 2011/10/13: Pretty-up the array-edit buttons.
+9589 2011/10/11: Fixed some syntax that IE/Chrome didn't understand; cleaned the code.
+9586 2011/10/10: Cleaned the code; added support for add_array_item (cloneme)
+9585 2011/10/10: Support for add_array_item (cloneme)
+9583 2011/10/10: delete-array-items works (that was easy...)
+9572 2011/10/09: Cleaning gup.
+9571 2011/10/09: Cleaning up, mostly.  Ready to re-implement deleteme, cloneme.
+9570 2011/10/09: Cleaning up from previous changes; first checkin of ArrayEdit
+9569 2011/10/09: Completely rewrote getparms.pl (significantly simpler now).
+9568 2011/10/09: Cleaning up code for "submit" buttons.
+9567 2011/10/08: Bit the bullet.  Used XML::Simple.  Greatly simplified updatedesign*.
+9560 2011/10/06: I think it works!! Delete-array-item function, I mean.
+9559 2011/10/06: Suppoprt for array-item-delete, plus small aesthetic improvements.
+9558 2011/10/06: Confidence is running high for delete-array-item functionality.
+9544 2011/10/04: Support for parameter array insert/delete.
+9540 2011/10/03: Adding support to add/delete array/hash items.
+9538 2011/10/03: Added first level of support for add/sub array items.
+9537 2011/10/03: Mildly improved comment.
+9536 2011/10/03: Added favicon icon for browser.
+9525 2011/09/29: Added cute favicon icon, as suggested by mw.
+9515 2011/09/27: Added an explanatory comment for the under-documented cp "-n" flag.
+9514 2011/09/27: Local design cache now updates on every reload.
+9513 2011/09/27: Added support for choosedesign to pass DEBUG var to getdesigns
+9512 2011/09/27: Updated and synchronized index*.htm pages.
+9511 2011/09/27: Added support to pass DBG variable to choosedesign.pl from index.htm
+9510 2011/09/27: Improved support to exclude unwanted design directories.
+9508 2011/09/26: Still tweaking the "publish" script.
+9507 2011/09/26: Fixed design-dir update process.
+9506 2011/09/26: Changed main "genesis" gui to use same design list as dev gui.
+9505 2011/09/26: Cleaned and added comments to config.csh
+9504 2011/09/26: Added yet another debug button; plus support for new security measures.
+9503 2011/09/26: Support for new security measures.
+9502 2011/09/26: Support for new security measures; plus timing info for debugging.
+9501 2011/09/26: Snapshot of latest design list.
+9497 2011/09/20: Cleaning up parameters and their comments.
+9496 2011/09/19: Moved comments into the sandstone box
+9495 2011/09/19: Fix debug button initial state
+9494 2011/09/19: Added support for secret buttons: "c" (hide comments) and "d" (debug).
+9492 2011/09/13: Script for testing new design_list.txt-based security regime.
+9491 2011/09/13: New tgt0-baseline for consistent parameter order.
+9490 2011/09/13: Security upgrade based on new "design_list.txt" database.
+9488 2011/09/13: Moving demo files to their new home.
+9479 2011/09/07: Got rid of NEW-REGIME nonsense.
+9476 2011/09/06: Cleaning out some *really old* comments etc.
+9475 2011/09/06: Slight tweak to instructions for publication.
+9474 2011/09/06: Changed colors on splash page to card/sandstone.
+9473 2011/09/06: Button beautification continues.  Plus some color tweaking.
+9472 2011/09/06: Second round of button beautification plan.
+9471 2011/09/06: Beautification of the download etc. buttons under the design...
+9470 2011/09/01: Added a couple of colors to the comments.
+9467 2011/09/01: Turned off scrolling, I think because of a bug report from Ofer...
+9460 2011/08/25: Cleaned up buildtarball.pl.
+9459 2011/08/25: Now it's more beeyootiful.  Probably needs one ore pass, though.
+9458 2011/08/25: Added links for individual .xml and .v files.
+9457 2011/08/25: Eliminated scratch dir nonsense that wasn't protecting anybody from anything.
+9456 2011/08/24: Slight change to layout of main page.
+9455 2011/08/23: Changed style of "Submit changes" button per OS suggestions.
+9454 2011/08/23: Per Ofer suggestions, reduced color garishness.
+9453 2011/08/22: Added support for embeddable links.
+9452 2011/08/22: Tweaks to the publish script.
+9422 2011/07/26: Fixed some bugs in the XML-2-javascript translator.
+9420 2011/07/25: New PYTHON version of XML decoder.
+9419 2011/07/25: Superceded by new PYTHON version.
+9418 2011/07/25: Be bold get rid of old stuff.
+9417 2011/07/25: This is about to go away.
+9415 2011/07/07: Cleaning up the directory and associated README
+9414 2011/07/07: Updated quicktest.
+9413 2011/07/07: No more old-regime decode.
+9412 2011/07/05: Added support to make complex parm changes persistent before Submit.
+9411 2011/07/05: Slight addition to "help" instructions.
+9410 2011/07/05: Cleaned up debug and error messages.
+9409 2011/07/05: Fixed pointer to "todo.htm"
+9408 2011/07/05: Forgot to delete old parm before inserting new parm.
+9407 2011/07/04: Added a couple new submodules.
+9406 2011/07/04: Streamlined the test program.
+9405 2011/07/04: Moved some subs out to new modules.
+9404 2011/07/04: Severe cleaning, includes moving some subs out to other modules.
+9401 2011/06/30: Added new module "emit_parms()"
+9400 2011/06/30: Cleaning up the code (significantly!)
+9399 2011/06/30: Module responsible for writing parms to change file.
+9398 2011/06/30: Cleaning up the code; moved "emit_parms() out to new module.
+9396 2011/06/30: Cleaning up the code...
+9395 2011/06/30: Improved test and debug info.
+9394 2011/06/30: Fixed a little (but egregious) bug.
+9393 2011/06/30: Cleaned up some ugly code; re-implemented set_PARMLIST...
+9388 2011/06/28: Support files for updatedesign.pl
+9387 2011/06/28: Support for changing hashes and arrays.
+9386 2011/06/28: Big BIG changes: support for changing hashes and arrays etc.
+9374 2011/06/23: Last round of cleaning before implement hasharray mods.
+9366 2011/06/21: Checkin before next round of major changes.
+9365 2011/06/21: Checkin of minor changes before a big change.
+9364 2011/06/21: Cleaning up in preparation for hasharray support.
+9363 2011/06/21: Simplified the code a little bit.
+9362 2011/06/21: Removed all support for old regime xml.
+9353 2011/06/15: Provided support for ArrayType's w/no ArrayItem's and HashType's w/no HashItems, i.e. "<ArrayType></ArrayType>".  Also provided support for hash keys with embedded dots i.e. 'PORT_HASH{"top.DUT.mb0"} = 5'.
+9343 2011/05/24: Added a comment only.
+9342 2011/05/24: Creeping up on support for hash and array items.
+9341 2011/05/24: Fairly major changes designed to support ability to change subparms.
+9340 2011/05/21: Fixed(?) a BIG problem sith sublists.  But it's messy.
+9339 2011/05/21: Borke and fixed subparm boxes.
+9338 2011/05/21: Slight improvement to error message reporting.
+9337 2011/05/21: Fixed a problem with blank "HierarchyTop" tags.
+9335 2011/05/19: Attempting to improve config-specific index.htm file.
+9334 2011/05/19: Tweaking the layout in an attempt at beautification.
+9333 2011/05/19: Maybe fixed a problem with reading an "empty_design" file.
+9332 2011/05/19: Hacked in a fix for "InstancePath" instead of "Val" in a hash item.
+9331 2011/05/19: Improved cleanup script to remove emacs backup files.
+9327 2011/05/17: Added/clarified installation instructions.
+9326 2011/05/16: Added a couple of missing config files.
+9325 2011/05/16: Fix/streamline the publish-the-gui flow.
+9324 2011/05/16: oops
+9323 2011/05/12: Fixed egregious error with mutable vs. immutable parm boxes.
+9322 2011/05/12: Deleted some ancient/unnecessary commented-out code.
+9321 2011/05/12: Changed all "head -1"s to "head -n 1"s for better compatibility.
+9320 2011/05/12: Turned off annoying pop-up.  Still works if debug ON.
+9319 2011/05/10: Added a helper file for choosedesign.pl
+9318 2011/05/10: Cleaning up my code.
+9317 2011/05/10: Choosedesign page now has expandible/collapsible design groups.
+9300 2011/05/07: Added some comments.
+9299 2011/05/05: Regression testing for the xml-to-javascript converter.
+9298 2011/05/05: Regression test for 
+9297 2011/05/05: Cleaning up the code...
+9296 2011/05/03: Snapshot while cleaning the code.
+9295 2011/05/03: Partially cleaned and debugged.
+9291 2011/05/02: A REALLY UGLY version works for new new format tgt0/fixed-by-hand.xml.
+9290 2011/05/02: xml2js.csh now uses CONFIG file instead of hard-coded pathname.
+9289 2011/05/02: Last iteration of decode_new.pl under old new format.
+9288 2011/05/02: Pass3 works with old new format; now to clean it up; then upgrade to new new format.
+9286 2011/04/30: Incrementally cleaning up decode_new.pl; finished pass1 of 0-5.
+9285 2011/04/30: Cleaned up pass 1 (range preprocessing) but found a bug elsewhere---things might get ugly...
+9284 2011/04/30: First step in cleaning up decode_new...arg processing.
+9283 2011/04/29: First hacky version of support for ranges, doc's (comments).
+9282 2011/04/29: Fixing publish problems with timestamp.
+9281 2011/04/29: Fixed some problems with the publish script and time compares.
+9280 2011/04/29: Forgot to turn off test mode.  OOPS!
+9275 2011/04/25: Cogent info about the XML decoder.
+9274 2011/04/25: Polishing off changes to support new XML format.
+9273 2011/04/24: REALLY UGLY working version supports both old and new xml formats.
+9272 2011/04/24: Updated to reflect new regime.
+9271 2011/04/24: Oops forgot to print javascript trailer.
+9270 2011/04/24: Updated to support new regime.
+9269 2011/04/24: Blank new-regime xml changes file.  A temporary hack.
+9268 2011/04/23: First (REALLY UGLY) working version.  I hope?
+9267 2011/04/22: (Temporary) decoder for new XML regime---eventually will replace existing decoder.
+9266 2011/04/16: Implemented USE_NEW_REGIME to optionally start using new xml.
+9265 2011/04/16: Fixed a bug in the "publish" script (maybe).
+9264 2011/04/16: Trying to isolate/remove some of the steveri-dependent ugliness in updatedesign.csh
+9263 2011/04/14: Error msg improvements for updatedesign.pl
+9262 2011/04/14: For better or worse, added a "die" clause to an "open" command.
+9261 2011/04/14: Changed pub script to preserve timestamps.
+9260 2011/04/14: Further support for system-dependent config files.
+9257 2011/04/13: Slight mod to publish script, for symbolic links.
+9254 2011/04/11: Forgot to turn off debugging.
+9253 2011/04/11: Stupid typo in opendesign.pl
+9252 2011/04/11: Fixed a small bug in opendesign.pl, to support pub/dev separation.
+9251 2011/04/11: Improved "publish" procedure.
+9250 2011/04/11: Support for separation of dev and pub versions of the gui.
+9248 2011/04/11: Looking for a cleaner way to move CONFIG.TXT
+9247 2011/04/11: Created new configs directory.
+9241 2011/04/09: Cleaned up some of the code from the previous fix.
+9240 2011/04/09: Working snapshot of progress toward dev/pub separation.
+9236 2011/04/07: Changed decoder so as to make multiple small instead of one huge javascript.
+9235 2011/04/07: Shifted more system dependence to CONFIG.TXT; one step closer to dev/pub separation.
+9233 2011/04/04: We were not correctly sourcing the chipgen environment for the gui.
+9231 2011/04/02: Fixes for Jolin including concurrent design update and separate config file.
+9230 2011/04/02: Support for better tmp.php files to enable concurrent editing...
+9229 2011/04/02: Oops wrong files were going into the tarball.
+9228 2011/03/31: Fixed a couple of typos.  Thanks Ofer!
+9227 2011/03/31: "Download" button should work now.
+9226 2011/03/30: Hack(?) to fix problems with null config files.
+9225 2011/03/24: Added initial support for download button.
+9223 2011/03/17: Fixed the Submit button that I broke w/change 9221.
+9221 2011/03/16: Fixed immutable-parm formats (again!), including now for IE.
+9220 2011/03/16: Fixed a problem with nested subparm lists.
+9219 2011/03/16: Fix some IE compatibility issues (don't use currentTarget!!!)
+9214 2011/03/14: Added pointer to bugzilla.
+9213 2011/03/14: Small cosmetic changes.
+9212 2011/03/14: Made some cosmetic improvements.
+9210 2011/03/07: Fixed a small redundancy in the design listing.
+9209 2011/03/07: Correcting a typo.
+9208 2011/03/07: Prettified the design-selection list.
+9205 2011/03/06: How to add existing designs to the gui.
+9204 2011/03/06: GUI calls this script to do the heavy lifting after a "submit".
+9203 2011/03/06: Changed "choosedesign" to exclude unwanted directories.
+9202 2011/03/04: Added "CloneOf" notice for clones instead of empty parm list.
+9201 2011/03/04: Added captions to identify mutable vs. immutable parameters.
+9199 2011/03/03: updatedesign.pl now writes complete xml file, not just incr. changes
+9198 2011/03/03: Gray-out immutable read-only parms.
+9195 2011/03/02: Slight rewording made it slightly less confusing for me.
+9194 2011/03/01: Use makefile for updates.
+9193 2011/02/28: GUI now reads xml files directly, rather than .js files
+9166 2011/01/31: Oops I broke it, oging back to the original.
+9165 2011/01/31: Fixed broken "module" command.
+9155 2011/01/19: Checked off a couple off to-do items.
+9154 2011/01/19: Finished cleaning up cgi files, at least for now.
+9153 2011/01/19: Code cleanup checkpoint.
+9152 2011/01/19: Oops busted something (filename unpacking).
+9151 2011/01/19: Cleaning up the cgi files etc.
+9150 2011/01/19: Incremental cleanup.
+9147 2011/01/18: No more DEBUG annoyances.
+9142 2011/01/12: Slight tweak to SoC demo.
+9141 2011/01/12: Javascript and xml files for the new demo.
+9140 2011/01/12: Added toy SoC generator as a new demo.
+9139 2011/01/12: Added toy SoC generator as a new demo.
+9138 2011/01/12: Changed filter to allow dashes and underbars in design names.
+9131 2011/01/10: Cleaning things up.
+9127 2011/01/08: Minor tweaks to title.
+9126 2011/01/08: New splash page.
+9073 2010/11/21: Small changes to allow better function on iPhone
+9041 2010/09/21: Pulled out new module "Submodules.js"
+9040 2010/09/21: Pulled out new module "ModuleProperties.js"
+9039 2010/09/21: Added floatbox, right-click menu for properties.
+9038 2010/09/21: Latest checkpoint of todo list.
+9037 2010/09/21: Small change to support bigger changes.
+9009 2010/08/31: Okay couldn't resist one last cleanup.
+9008 2010/08/31: Finished code cleanup (finally!)
+9007 2010/08/31: Oops that last checkin probably broke something.
+9006 2010/08/31: Code cleanup checkpoint.
+9004 2010/08/31: Don't need ParmBoxList.js anymore.
+9003 2010/08/31: Code cleanup checkpoint.
+9002 2010/08/31: Code cleanup
+8999 2010/08/30: Code cleanup checkpoint.
+8998 2010/08/30: Changed my mind
+8997 2010/08/30: Changed "module" parameters to "instance" parameters.
+8996 2010/08/29: Big Changes designed to make subparameter arrays work as well as subsub, subsubsub...
+8995 2010/08/29: Slighlty cleaned-up version of new decoder NOT TESTED!
+8994 2010/08/29: decoder reflects new protocol; seems to work.
+8967 2010/08/16: Finished simplifying how design names are tracked and handled....
+8966 2010/08/16: Changing the way designs are named: phase 2.
+8965 2010/08/16: Changing the way designs are designated: phase 1.
+8964 2010/08/16: Improved the welcome message and instructions.
+8963 2010/08/16: First check-in for crucial file index.htm!
+8959 2010/08/12: It works!  I can now change NUM_MEM_MATS, NUM_PROCS etc.
+8958 2010/08/09: Creeping towards a working "updatedesign" called by "Submit Changes" button.
+8957 2010/08/05: "Submit Changes" button is starting to do interesting things...
+8956 2010/08/05: Still tweaking the parameters for the cgi script.
+8955 2010/08/05: Changed how cgi script parameters are formed.
+8953 2010/08/03: This should bring everything up to date.
+8952 2010/08/03: Deleted to make room for new cgi-based regime.
+8951 2010/08/03: This is about to be deleted.
+8950 2010/08/03: Support for new cgi-based regime.
+8949 2010/08/03: "Submit Changes" button.
+8948 2010/08/03: Added support for "Submit Changes" button.
+8947 2010/08/03: Updated to reflect new Genesis2 xml conventions.
+8946 2010/08/03: Fixed a stupid little mistake.
+8945 2010/08/03: Template for cgi-generated design.
+8944 2010/08/03: Updated for new Genesis xml conventions.
+8940 2010/07/29: Moved to "designs" subdirectory.
+8927 2010/07/20: Updated todo, forwarding pointers.
+8898 2010/07/12: New wordcount ignores acknowledgments.
+8894 2010/07/08: Changed graphs from plain back to fancy...
+8893 2010/07/08: New figures
+8892 2010/07/08: New figures.
+8891 2010/07/08: New figures.
+8879 2010/07/05: Addressing Reviewer 2's concerns about Figure 10.
+8862 2010/06/24: Coupla tiny tweaks.
+8861 2010/06/24: Tools for turning xml database into javascript data structures.
+8860 2010/06/24: Genesis GUI (ig) version 1.0.
+8840 2010/06/11: SR changes to abstract.
+8839 2010/06/11: More SR changes for examples.tex; also implemented Ofer's outstanding changes.
+8838 2010/06/11: SR changes to examples.tex
+8837 2010/06/11: Alex's typo fixes.
+8825 2010/06/10: SR read-through of latest version.
+8820 2010/06/10: Final(?) read through by SR.
+8819 2010/06/10: Last read-through of costs section, maybe.
+8817 2010/06/10: My final(?) read-through.
+8816 2010/06/10: Commented-out an unused subroutine.
+8790 2010/06/06: Cleaning up some bib formats.
+8787 2010/06/06: SR comments.
+8786 2010/06/06: SR tweaks.
+8785 2010/06/06: Comments on the "costs" section.
+8784 2010/06/06: Slight change of wording to help elaborate a point.
+8778 2010/06/05: More work with examples.tex.
+8777 2010/06/05: Quick scrub through sm_arch.
+8776 2010/06/05: Finished checking background section, now on to sm_arch...
+8775 2010/06/05: Slight changes to intro, mostly just looking for typos.
+8774 2010/06/05: SR tweaks to abstract.
+8773 2010/06/05: Undo mistken changes to wrong paper oops.
+8772 2010/06/05: SR changes to coverage discussion.
+8771 2010/06/05: Last tweak on the coverage, for now.
+8770 2010/06/05: More tweaking of coverage discussion.
+8769 2010/06/05: SR changes to coverage discussion.
+8745 2010/05/28: SR comments on intro.
+8732 2010/05/25: An attempt to fix what I broke.
+8731 2010/05/25: Support for 4quad cheating, simprint debugging.
+8715 2010/05/17: More minor bug fixes on icache/no-icache.
+8714 2010/05/17: Fixed a trivial bug.
+8706 2010/05/14: Updated config files and flow to support four-quad environment.
+8700 2010/05/13: Altered make-c-config to support 4-quad environment.
+8682 2010/05/04: Implemented Megan's suggestions.
+8641 2010/04/26: How was this not already in here?
+8635 2010/04/22: Fixed a bug.
+8619 2010/04/19: Trying to impose more order on the refs.
+8618 2010/04/19: Checkpointing my changes so far.
+8617 2010/04/19: Last one, I promise! --SR
+8616 2010/04/19: Extremely minor tweak, moved an adverb back a bit.
+8615 2010/04/19: Couldn't resist a last-minute change or two.
+8594 2010/04/17: Final SR changes.
+8593 2010/04/17: SR 4th-quarter changes.
+8528 2010/04/05: Tweaking my own conclusion section...
+8527 2010/04/05: SR updates.
+8525 2010/04/05: SR edits.
+8524 2010/04/05: SR comments and edits.
+8523 2010/04/05: SR changes to optimization section.
+8520 2010/04/05: Added a Moore's law citation, tweaked some verbage.
+8517 2010/04/05: SR changes.
+8516 2010/04/05: Minor tweaks.
+8494 2010/03/30: More wordcount format tweaks.
+8493 2010/03/30: Improved "make wordcount" output format.
+8492 2010/03/30: Improved "make wordcount" output format.
+8491 2010/03/30: SR changes.
+8475 2010/03/25: wordcount now counts "abstract" as a separate section.
+8460 2010/03/24: Enhanced debug capabilities.
+8455 2010/03/24: Implemented Mark's changes to conclusions.
+8442 2010/03/22: SR changes, mostly to sections 5.2 - 5.4
+8440 2010/03/22: Fixed a bug---now it finds all the subsections.
+8439 2010/03/22: Added support for wordcount.
+8434 2010/03/20: Steve's conclusions.  I expect this will change substantially before final publication...!
+8433 2010/03/20: Oops forgot to close a curly-bracket. :)
+8432 2010/03/20: SR tweaks.
+8431 2010/03/20: SR changes to Section 5.
+8430 2010/03/20: SR comments/edits on the CG intro.
+8429 2010/03/20: SR edits.
+8412 2010/03/18: Fixed multiple problems with IE compatibility.
+8404 2010/03/17: Minor tweaks.
+8403 2010/03/17: Javascript-based interactive chip generator (formerly "interactive chip thingy").
+8319 2010/01/19: sr comments and changes
+8318 2010/01/19: SR comments and changes.
+8317 2010/01/19: Snapshot---part way through comments for section 2.
+8316 2010/01/19: Initial comments on section 1 / intro.
+8315 2010/01/19: No changes to text, just formatting for readability
+8288 2009/12/09: Notes on how to test the board.
+8287 2009/12/09: Minor update.
+8283 2009/11/30: Notes on TWiki-to-MediaWiki conversion.
+8282 2009/11/30: Support files for the great TWiki-to-mediawiki conversion of Nov 2009.
+8182 2009/11/09: Tweaks, no big changes.
+8181 2009/11/09: Tweaks.
+8180 2009/11/09: Tweaks.
+8179 2009/11/09: Minor tweaks.
+8169 2009/11/06: Attempting to organize the background section in a slightly more logical way...
+8168 2009/11/06: Slight corrections and alterations.
+8159 2009/11/05: Included a pkg for "sout" strikeout-text environment.
+8158 2009/11/05: Added a pkg for strikeout text.
+8154 2009/11/05: SR changes, notes, recommendations...
+8153 2009/11/05: Amended SR changes.
+8152 2009/11/05: SR changes.
+8134 2009/10/29: Cleaning up the code.
+8128 2009/10/27: Fixed errors/warnings in execution of GenCCTasks.pl
+8097 2009/10/06: Updated chip-validation suite generator.
+8096 2009/10/06: Improved explanatory comments.
+8095 2009/10/06: Slight change to countdown printf format.
+8093 2009/09/28: 10350 appears to work now, so it's no longer blocked by cr-gen-script.
+8092 2009/09/28: Fixed config 10550 to use mat 1 for FIFO instead of mat 11.
+8091 2009/09/28: Improved compile time by reducing # rawsubs per subroutine/bb from 100 to 20.
+8090 2009/09/28: Cleaned up chip regression flags in Makefile.common.
+8087 2009/09/25: Final (for now) load_program.c tuneup.
+8086 2009/09/25: Much cleaner version of load_program.c
+8085 2009/09/25: Checkpointing intermediate ugly (but functional) load_program.c
+8083 2009/09/24: Hack to make load_program work better, by ignoring segment 11.
+8070 2009/09/16: Removed an annoying debug printf from sm_resetnio
+8069 2009/09/16: Added variable timeout period for apps running on the chip.
+8068 2009/09/16: Eliminated useless read operation from sm_mc.c
+8062 2009/09/10: A little fine tuning for run_test.sh.
+8061 2009/09/10: Fixed csys configs 10510 - 10560.
+8058 2009/09/06: Tweaking the new retry algorithm...that last one may have been faulty.
+8057 2009/09/05: Changed run_test.csh such that mc config occurs while chip is in reset.
+8056 2009/09/04: One final tweak to sm_mc.c, to make its output less obnoxious.
+8055 2009/09/04: All calls to mc_config_write() are now calls to mc_config() with retry.
+8054 2009/09/04: Changed nchecks from 300K down to 60K.
+8053 2009/09/04: Changed nchecks from 300K down to 60K.
+8052 2009/09/04: Implemented new protocol for mc_config reads and writes.
+8051 2009/09/04: Implemented new mc_config read and write protocol.
+8045 2009/08/31: Updated tools for analyzing validation test results.
+8044 2009/08/31: New test regime should be faster, more robust.
+8037 2009/08/22: Tweaked so that TCC tests don't fail (but take longer to compile).
+8036 2009/08/20: Fixed what we borke.
+8035 2009/08/20: Fixed odd-processor bug in runtime config
+8034 2009/08/19: Updated sample regression script.
+8031 2009/08/18: Simplified make-vr-config while hopefully preserving functionality.
+8030 2009/08/18: make-vr-config looks for existing custom config before giving up.
+8029 2009/08/18: Addressed bug 621 by removing some "check_cmd" flags.
+8027 2009/08/14: FAST_CHIP_REGRESSIONS environment variable makes regressions compile faster.
+8026 2009/08/14: Script for running exhaustive memory-mat tests.
+8025 2009/08/12: Exhaustive chip-level memory mat tests.
+8024 2009/08/12: Tools for auto-generation of mem tests.
+8023 2009/08/12: Improved scripts for analyzing chip regressions.
+8022 2009/08/09: Scripts for running chip-level regressions on SMASH.
+8021 2009/08/08: Reduced timeout period so regressions will run faster.
+8020 2009/08/08: Not ready for prime time.
+8019 2009/08/07: Changed format %x => %08x so stdout will match reference file.
+8018 2009/08/07: Fixed typos in "kmeans" test.
+8017 2009/08/07: "Fixed" some type mismatches by adding casts.
+8016 2009/08/07: A regression test for the SMASH chip.
+8014 2009/08/05: Cleanup to reduce compile-time warnings.
+8013 2009/08/05: Cleaning up.
+8012 2009/08/05: Implemented jtagRead and jtagWrite for FPGA-based regressions.
+8011 2009/08/05: Changed all sndrID to cpuID, to clean up.
+8008 2009/08/03: Implemented ExternRandom function so RAW tests will work on the chip.
+8000 2009/07/27: Increased number of retries from three to five.
+7998 2009/07/27: Cleaner version of prior checkin.
+7997 2009/07/27: Added timeout and retry.  Quick and dirty version.
+7963 2009/07/15: Updated regression scripts.
+7962 2009/07/15: Tool for decoding .tpp files.
+7955 2009/07/13: Fixed bug618---can now configure from any even-numbered processor.
+7934 2009/07/08: Sync with newer $REL version.
+7933 2009/07/08: Sync with newer changes in Smash_rel
+7932 2009/07/08: Sync Smash with Smash_rel.
+7931 2009/07/08: Sync $SMASH with $REL.
+7930 2009/07/08: Added (old) helper file for building JTAG configurations.
+7920 2009/07/06: Documentation for some of the CCMem tools in $SMASH/bin
+7919 2009/07/06: Checking in some long-overdue verilog files.
+7918 2009/07/06: Documentation for regressions.
+7915 2009/07/06: Cleaned up my mess in SysConfig and runtime directories.
+7914 2009/07/06: More checkpointing of runtime_quad_config.c
+7913 2009/07/06: Checkpointing as I clean runtime_quad_config.c
+7910 2009/07/04: Cleaning up the code in runtime_quad_config.c.
+7909 2009/07/04: Offloaded some obsolete code from runtime_quad_config.c to a README file.
+7908 2009/07/04: Cleaned up Quad_Config_template.c.
+7907 2009/07/02: Decreased likelihood of license checkout errors while building libsim.
+7906 2009/07/02: Improved error checking for libsim build.
+7899 2009/07/01: Fixed a small error in the new quick_csys_tests.tpp script.
+7898 2009/07/01: Slight alterations to some tpp regression scripts.
+7896 2009/07/01: Fixing what I broke in SMASH,REL versions of QuadXT_RunTest.pl
+7895 2009/07/01: Regression scripts for testing csys configurations.
+7888 2009/06/29: Fixed some bugs.
+7877 2009/06/24: Fixed a small bug in Quad_Config_001.vr
+7876 2009/06/24: Bug 616: use METADATA_CHEAT instead of SKIP_METADATA_CHEAT.
+7871 2009/06/22: Updated list of people to notify after each regression test.
+7866 2009/06/19: Changed DEBUG, DEBUGN variants into a single pair of vararg functions.
+7865 2009/06/19: Rewriting DEBUGN with var args: checkpoint 1.
+7864 2009/06/19: make-c-configs now creates trash files ONLY in destination directory.
+7863 2009/06/18: Still cleaning it up.
+7862 2009/06/18: Uninitialized variable was causing verification problems.
+7860 2009/06/18: Continuing to clean up Quad_Config_template.c.
+7859 2009/06/18: Cleaning up Quad_Config_template...
+7858 2009/06/18: Change 7843 on 2009/06/15 by steveri@steveri_design
+softReset from 0xffef to: hange 7842 on 2009/06/15 by steveri@steveri_design
+unnecessary cheat.
+
+Change 7841: "make-c-config -E" now preserves source-code comments.
+7836 2009/06/12: "make-c-config -E" now preserves source-code comments.
+7835 2009/06/12: Added a dash-e flag to make-c-config.
+7737 2009/05/27: Changed "ffef" to "0003".
+7733 2009/05/27: Updated the way PLA registers are read back.
+7732 2009/05/27: Automated the way config 110 test is generated.
+7731 2009/05/27: Fixed(?) the way PLA entries are read back.
+7729 2009/05/26: Final tweak to test2a.
+7728 2009/05/26: May have fixed test2b and the way it's generated.
+7727 2009/05/26: Fixed test2a, I hope, by writing to reg 24 (0x60) instad of 22 (0x58).
+7704 2009/05/20: Updated to reflect new location for svf tests.
+7702 2009/05/20: Removing redundant file.
+7701 2009/05/20: Fixing buggy svf tests.
+7700 2009/05/20: Added some help messages etc.
+7699 2009/05/20: An alternate version for comparison.
+7698 2009/05/20: Fixed a bug in the dram-conversion part.
+7684 2009/05/19: 0000ffee00 should have been 0000000200; now it's correct.
+7677 2009/05/18: Transform dram0,iram0.data files into dot-mem files.
+7675 2009/05/18: Simplifed and reduced.
+7674 2009/05/18: Added a comment.
+7673 2009/05/18: Added "compile-raw-instrustions" tool chain.
+7672 2009/05/18: Added support for "loadreg".
+7671 2009/05/18: Tools for building and loading simple raw-based programs.
+7670 2009/05/18: Sample inputs and outputs for raw-compile tool chain.
+7660 2009/05/15: Added (largely untested) support for reading and writing metadata.
+7659 2009/05/15: Cleaned up the gen-svf script a bit, fixed some bugs in the ReadPLA algorithm.
+7657 2009/05/15: Corrected PLA readback method for test2c.
+7655 2009/05/15: Clever suite use TileReg.v to generate config reg addresses and values.
+7654 2009/05/15: Corrected some errant values; expected values are now generated directly from TileReg.v
+7651 2009/05/13: Changed the way test1b is generated.
+7650 2009/05/13: Added "write-only" option, still needs more documentation.
+7649 2009/05/13: Enhancements and bug fixes.
+7647 2009/05/13: Updates, bug fixes, nothing major.
+7646 2009/05/13: SVF test3a attempts to have the processor execute a RAWSTORE.
+7640 2009/05/11: A script to automatically generate SVF tests.
+7639 2009/05/11: SVF tests for Smart Memories.
+7638 2009/05/11: Sample svf program to write config 200.
+7634 2009/05/11: Sample mem-spec file for config 200.
+7633 2009/05/11: Sample JtagWrite file for config 200.
+7632 2009/05/11: Change 7631 on 2009/05/11 by steveri@steveri_design
+"jtagWrite into "mem" specifications: hange 7630 on 2009/05/11 by steveri@steveri_design
+"mem into svf programs: hange 7597 on 2009/04/20 by steveri@steveri_design
+up_Config_j110 and: hange 7596 on 2009/04/20 by steveri@steveri_design
+a-based abs diag: hange 7595 on 2009/04/20 by steveri@steveri_design
+based of configuration 110: hange 7571 on 2009/04/03 by steveri@steveri_design
+final of changes is: hange 7570 on 2009/04/03 by steveri@steveri_design
+grammar spelling etc.
+
+Change: More spelling and grammar and minor rewordings.
+7568 2009/04/03: SR changes, mostly spelling and grammar stuff.
+7463 2008/12/08: Bibliography cleanup.
+7462 2008/12/08: Slight rewrite makes this section shorter by eliminating orphan words in paragraphs.
+7460 2008/12/08: Minor last-minute tweaks.
+7459 2008/12/08: Small last-minute changes.
+7436 2008/12/03: Some minor touch-up after yet another readthrough.
+7435 2008/12/03: My first pass at a conclusion paragraph.
+7434 2008/12/03: SR changes to test & verify section.
+7433 2008/12/03: SR readthrough of section 2.3.
+7432 2008/12/03: Small changes to Section 2.2.
+7431 2008/12/03: Changes to Engineering Efforts intro.
+7430 2008/12/03: My changes to the introduction.
+7429 2008/12/03: Changes to title and abstract.
+7404 2008/11/28: Added three paragraphs to testing section.
+7399 2008/11/25: Changed name of bibliography.
+7398 2008/11/25: Updated Makefile to reflect correct bib dependences.
+7397 2008/11/25: This is now called chip_gen.bib
+7387 2008/11/24: Finishing up the conclusions.
+7386 2008/11/24: Fixed a tiny error that prevented compilation.
+7385 2008/11/24: Last of the mh changes.  Now for the final check!
+7384 2008/11/24: mh changes up to 5.4.4
+7382 2008/11/24: mh changes through section 5.4.
+7381 2008/11/24: Finished mh changes through section 5.3.
+7380 2008/11/24: test.
+7379 2008/11/24: Mh changes intermediate save.
+7376 2008/11/24: Final merge.  Hope I haven't screwed things up!
+7375 2008/11/24: merge
+7374 2008/11/24: Working through a merge...
+7373 2008/11/24: Long painful spell-check.
+7370 2008/11/24: MH changes.
+7369 2008/11/24: Mark's changes to methodology section.
+7367 2008/11/24: Implemented Mark's changes.
+7366 2008/11/24: Mark's changes to intro.tex.
+7365 2008/11/24: Added Mark's changes to abstract.
+7364 2008/11/24: Small changes designed to remove grammatical errors and improve the flow.
+7362 2008/11/24: Changed the wording a little bit, fixed a typo.
+7361 2008/11/24: Changed class file from 9pt to 11pt.
+7360 2008/11/24: Added a makefile dependence for .cls file
+7347 2008/11/23: Minor changes to background and bib.
+7346 2008/11/23: Still refining.
+7345 2008/11/23: Lots of changes, still more to do.  sr-bib.tex compiles correctly, larger paper does not.
+7342 2008/11/23: Fixed all errors that prevented correct compilation of pdf file.
+7340 2008/11/23: Latest round of changes.
+7339 2008/11/23: Initial bibloiography, may eventually want to merge/rename.
+7032 2008/08/11: Raised time limit for config 10200.c from 500K to 5M.
+7012 2008/08/04: Added a comment/question to one of the RTL source files.
+7000 2008/07/29: New regime: segments are now specified as command-line switch.
+6991 2008/07/24: Creeping excellence in the New Regime.
+6987 2008/07/21: Deleting the old regime: TCC configs Quad_Config_10???.vr
+6986 2008/07/21: Deleting the old regime: Quad_Config_{600,650,660,800,900,1000,1100}.vr
+6985 2008/07/21: Deleting the old regime: Quad_Config_[345]??.vr
+6984 2008/07/21: Deleted one file too many.
+6983 2008/07/21: Deleting the old regime: Quad_Config_2??.vr
+6982 2008/07/21: Deleting the old regime.
+6979 2008/07/21: Improved new test regime, plus fixed a FourQuad bug in Quad_Config_template.vr.
+6970 2008/07/18: Creeping excellence for the new testing regime.
+6959 2008/07/15: Continuing to simplify the new testing regime...
+6956 2008/07/14: Gussied up the test script GenVeraConfig-test.
+6953 2008/07/14: Streamlining config template Quad_Config_template.vr.
+6952 2008/07/14: Changed make-c-config to exit more gracefully on compile errors.
+6951 2008/07/14: Stupid curly brace!
+6944 2008/07/11: Oops forgot this file when I checked in change 6941.
+6943 2008/07/11: Must call CCSingleWordCacheRefill() for STREAM config's, too!
+6941 2008/07/11: Fixed CCSingleWordTCCCacheRefill problem.
+6938 2008/07/11: Fixed RunBench scripts to use new testing regime.
+6933 2008/07/09: Fixed another small problem with make-vr-config script.
+6932 2008/07/09: Oops had to fix a problem with make-vr-config script.
+6931 2008/07/09: Incremental improvements to new testing regime.
+6930 2008/07/09: Fixed CCSingleWordTCCCacheRefill, I hope!
+6928 2008/07/09: Oops fixed small error in previous edit.
+6927 2008/07/09: Added a no-usedefault test to quadxt_gate_regression.tpp.
+6921 2008/07/07: Phase one of trying to clean out the old testing regime.
+6920 2008/07/07: Enabling new testing regime---hope nothing breaks!
+6916 2008/07/04: README file for new testing regime.
+6915 2008/07/04: Preparing for the new testing regime.
+6914 2008/07/03: Still cleaning up config files.  Last one?
+6913 2008/07/03: Fixed TileTasks.v to support 3-way caches.
+6912 2008/07/03: Fixed SetCacheTags calls for configs Quad_Config_*5.vr
+6911 2008/07/03: Cleaning up config files.
+6910 2008/07/03: Cleaning up some config files.
+6906 2008/07/02: Minor formatting changes to ease transition to new testing regime.
+6891 2008/06/23: Final comment fix for 700 config's (I hope!!!)
+6890 2008/06/23: Oops returning a line lost in earlier edits.
+6889 2008/06/23: Fixing slight problems with comments in config files.
+6888 2008/06/23: Fixing slight bugs in config file comments.
+6887 2008/06/23: Fixed faulty comments.
+6886 2008/06/23: Propagate changes from configs 700 to 701, y02 and 703.
+6885 2008/06/23: Oops had to return a variable I'd dropped, in Quad_Config_700.vr.
+6884 2008/06/23: Propagated changes from config 700 to 701, 702 and 703.
+6882 2008/06/23: Fixing small discrepancies among config files.
+6881 2008/06/23: Fixed i-cache comment in Quad_Config_530.vr
+6876 2008/06/19: I give up!  Fixing config 540 the old-fashioned way...
+6875 2008/06/19: I think 240 and 340 are in sync now.
+6874 2008/06/19: Still trying to get this integ stuff right.
+6873 2008/06/19: Clearly I don't understand how "integ" is supposed to work.
+6872 2008/06/19: This should put 240 in sync with 340.
+6871 2008/06/19: Trying to get config 240 integrated with 340 and 540.
+6870 2008/06/19: I'm lost in perforce HELL.
+6869 2008/06/19: Propagate changes from config 240 to config 540.
+6868 2008/06/19: Propagated changes from config 240 to config 340.
+6866 2008/06/19: Propagated Amin's SetVCMask changes backward from config 340 to config 240(?)
+6864 2008/06/19: Minor change to faulty comments.
+6842 2008/06/11: Fixed config 10550 to have FIFO mat 11 instead of 1.
+6841 2008/06/11: Added support for TCC configs 10{25,26,30,33,35,36,45,46,50,51,53,55,56}0.
+6791 2008/05/27: Re-generated jtag configuration files in response to RTL changes.
+6688 2008/04/25: A script for checking the validity of SysConfig files Quad_Config_j{200,1000,10200}.vr
+6639 2008/04/10: Fixed problem with j10200.
+6628 2008/04/07:        Fixing the latest round of CCTask bugs.
+6627 2008/04/07: Fixing the latest round of CCTask bugs.
+6605 2008/03/28: Changed GenCCTasks.pl to reflect changes in CCTasks.v
+6602 2008/03/27: 1. For TCC, Some CC config must be done BEFORE icache enabled.
+6566 2008/03/21: Touched up some debug information for tracking CC config.
+6553 2008/03/17: Added some innocuous comments and debug messages.
+6535 2008/03/12: cc_definitions.vh: Fixed a #define macro.
+6528 2008/03/11: Cleaned up GenCCTasks.pl some more.
+6527 2008/03/11: Cleaned up GenCCTasks.pl.
+6526 2008/03/11: Updated GenCCTasks.pl to reflect new cache controller.
+6525 2008/03/11: Updated cc_definitions.vh to reflect new cache controller.
+6464 2008/02/29: Fixed DRAM initialization in Quad_Config_j1000.vr.
+6447 2008/02/25: Added many more cached configurations to the boot tests.
+6439 2008/02/21: Updated regression tests to use new "non-cheat" dram init for TCC.
+6438 2008/02/21: Updated Quad_Config_j*.vr files so as to fix bug 578.
+6437 2008/02/20: Cyclades has changed its submission protocol.
+6307 2008/01/16: Added a comment.
+6304 2008/01/16: Added, but not enabled, code for mat gang-clear.
+6303 2008/01/16: Cleaned up code in Quad_Config_template.c.
+6301 2008/01/15: Uses raw_stores for dram initialization, instead of vera task Dram_Init().
+6250 2008/01/07: Cleaned up some comments.
+6247 2008/01/07: This change may have fixed all remaining .c configurations in Quad_Config_template.c, including 3xx, 4xx and 6xx.
+6245 2008/01/07: Cleaning up my own code; functionality should not have changed.
+6241 2008/01/06: Changed to reflect Amin's change 6239 of CCTasks.v
+6211 2008/01/04: Minor change to comments, marking hacks for later update.
+6144 2008/01/02: Propagating Amin's changes (change 6128) to SysConfig/Quad_Config_j{200,1000,10200}.vr
+6143 2008/01/02: Propagating Amin's changes (change 6128) to Quad_Config_template.c.
+6137 2008/01/02: j10200 was not clearing metadata in mat 0, now it is.
+6133 2007/12/31: Documentation for files found in SysConfig directory.
+6104 2007/12/27: Propagated Amin's recent CC config changes for VC mask.
+6103 2007/12/27: As a short term fix, updated Quad_Config_j10200.vr.  Longer term, need the hack!
+6025 2007/12/19: Replaced wrong UsersGuide with the right one.
+6024 2007/12/19: Fix for bug 522?  Configure TCC icache same as CCSYNC?
+6023 2007/12/19: Turned of minimal-cache for config 400; added vcblockmask for vc3.
+5961 2007/12/15: Changed tilereg tests to match new tile regs.
+5960 2007/12/15: Changed tile reg tests to reflect new tile regs.
+5948 2007/12/14: Added jtag boot tests to regression.
+5862 2007/12/10: Replaced problematic gagn-clears with more standard metadata clear ops.
+5859 2007/12/10: CCTasks.v changed, so now GenCCTasks.pl must change.
+5842 2007/12/10: Expanded the range of config files that can be used w/out modification.
+5841 2007/12/10: Added a hack for gang clear configuration in runtime_quad_config.c.
+5808 2007/12/06: Minor changes update doc and comments to reflect reality.
+5807 2007/12/06: Slight oops...removed a reference to a missing test (tilereg ro "f").
+5806 2007/12/06: Repaired tilereg-test generator so as not to produce extraneous "f" tests.
+5805 2007/12/06: Deleting extraneous/useless/erroneously-generated tilereg tests.
+5804 2007/12/06: Fixed errors in how tilereg tests were generated.
+5803 2007/12/06: Fixed erroneous tilereg tests---jtag.
+5802 2007/12/06: Fixed erroneous tilereg tests.
+5794 2007/12/05: Deleting old regime JTAG tilereg tests.
+5793 2007/12/05: Deleting old regime RAW tilereg tests.
+5792 2007/12/05: Added new tilereg test regime to regression tests.
+5791 2007/12/05: Added new regime for JTAG and RAW tilereg tests.
+5790 2007/12/05: New regime for generating JTAG and RAW tilereg tests.
+5784 2007/12/04: Removed unused jtag list.
+5783 2007/12/04: Removed unused jtag lists.
+5778 2007/12/04: Fixed METADATA cheat (I hope!!!).
+5759 2007/12/03: Extensive changes designed to test JTAG boot sequence.
+5749 2007/12/03: Added a couple of streaming tests to quadxt_regression.tpp.
+5715 2007/11/30: Cleaned up file Quad_Config_000.c.
+5703 2007/11/29: Removed some extraneous comments from runtime_quad_config.c
+5698 2007/11/28: Oops JTAG config files were clearing too many tiles (!??)
+5697 2007/11/28: New JTAG-based config file for streaming.
+5695 2007/11/28: Non-cheat version of Quad_Config_j10200.vr, still needs verification.
+5694 2007/11/28: Working "cheat" version of Quad_Config_j10200.vr.
+5693 2007/11/28: Latest round of changes in j-config development.
+5677 2007/11/27: make-j-config.pl: put config num on command line.
+5671 2007/11/26: New JTAG boot config Quad_Config_j200.vr and its generating script.
+5665 2007/11/24: ??Perforce added something it shouldn't have...??
+5664 2007/11/24: Undo previous submit, it was an accident.
+5663 2007/11/24: Something wrong with gang-writes?
+5662 2007/11/24: Something wrong with gang writes?
+5636 2007/11/19: related.tex minor corrections.
+5635 2007/11/19: eval.tex: Exceedingly minor corrections.
+5634 2007/11/19: Minor typographical corrections.
+5632 2007/11/19: Minor grammatical corrections.
+5583 2007/11/14: For consistency, changed all instances of "gold model" or "Golden Model" to "golden model".
+5582 2007/11/14: Slight grammar and style changes.
+5581 2007/11/14: Corrected a couple of obvious typographical errors.
+5580 2007/11/14: Minor grammatical/typographical corrections.
+5573 2007/11/12: A user's guide for Smart Memories.
+5539 2007/11/06: Increased jtag_tilereg time limit from 2M to 4M cycles.
+5481 2007/10/27: Updated JTAG and RAW tests to reflect change 5473.
+5469 2007/10/25: Added support for an icache-only configuration i.e. "-csys 200.i".
+5466 2007/10/25: Added a couple of "-csys" tcc apps to the regressions.
+5455 2007/10/24: Added MAT_GANG_WRITE's.
+5454 2007/10/24: Clear all metadata mats for TCC.
+5453 2007/10/24: Added option to skip metadata cheat but still load dram.
+5439 2007/10/23: Fixed a couple of typos in a README file.
+5399 2007/10/16: Fixed fifo setup in SetTCCCacheWay/ConfigureTCC in runtime_quad_config.c.
+5398 2007/10/16: Added support for new matmem monitor.
+5394 2007/10/16: Updated time limits for jtag and raw tilereg tests in quadxt_regression.tpp.
+5393 2007/10/16: Added optional debug code to track matmem values.
+5380 2007/10/15: QuadTasks.vr: eliminated an annoying debug message.
+5378 2007/10/15: Segment table hack to keep environment updated.
+5364 2007/10/14: Changes to support TCC; particularly the stack-save procedure; may make all apps run longer!
+5319 2007/10/10: Improved TCC configuration, but it's still not working.
+5316 2007/10/10: Added "exit -1" for error case.
+5274 2007/10/08: New JTAG and RAW op tests exercise read-only registers.
+5264 2007/10/05: Fixed a slight error in one of my signal monitors.
+5260 2007/10/05: Upped (doubled) -maxtime and -pclmt values on "csys" tests in quadxt_regression.tpp.
+5241 2007/10/05: Tile.csv changes, so all the tilereg tests had to change.
+5240 2007/10/05: Updated tool chain for generating tilereg JTAG and RAW tests.
+5229 2007/10/04: TileReg.v and GenRegs.pl are updated to reflect final PreventReset signal.
+5228 2007/10/04: Tile.xls and Tile.txt are replaced by a single file Tile.csv.
+5176 2007/10/01: Slight change; trying to be compatible with emacs AUTO flow.
+5174 2007/10/01: Latest checkin of HoldCPU.  Hoping this is the last!
+5168 2007/10/01: README is now a loadable elisp file.
+5161 2007/10/01: Double-flopped HoldCPU impelemented (finally!) in TileReg.v via GenRegs.pl.
+5153 2007/09/29: Fixed GenRegs and Tile.txt to reflect new TileReg.v
+5152 2007/09/29: HoldCPU added and verified
+5126 2007/09/27: Innocuous intermediate edits working toward savestack in runtime_quad_config.c.
+5122 2007/09/26: ResetGo entered and tested w/o resetgo switch; still need to test -resetgo.
+5102 2007/09/25: Stupid typo CCCMEM => CCMEM arg!
+5097 2007/09/24: Changed name of monitor from MONITOR_CONFIG_REGS to MONITOR_CCMEM
+5076 2007/09/24: Cosmetic and intermediate changes to runtime_quad_config.c.
+5073 2007/09/24: Provided an option for MONITOR to track read-only registers.
+5072 2007/09/24: Provided an option for MONITOR to track readonly registers.
+5071 2007/09/24: Touching up some documentation.
+5067 2007/09/23: Everything you need for jtag and raw-op write/read tests on tile config regs.
+5066 2007/09/23: quadxt_regression.tpp: Added jtag and raw-op write/read tests for tile config registers.
+5062 2007/09/22: stats.v: give stat monitor a separate ifdef option
+5057 2007/09/21: TileReg.v: Minor fine-tuning on CMEM monitor.
+5030 2007/09/20: GenTileMasks uses Tile.txt to produce appropriate per-register masks.
+5014 2007/09/19: New and improved.
+5013 2007/09/19: Slight tweaks.
+5011 2007/09/19: Sample output for GenCCRegs.pl.
+5010 2007/09/19: Adding support for loading dram data, to Quad_Config_001.vr.
+5009 2007/09/19: Added a comment.
+5008 2007/09/19: Quad_Config_template.c was setting mat mask incorrectly.
+5007 2007/09/19: CC_ConfigMem.vrh: size and width parameters for each block of CC config mem.
+4965 2007/09/16: Added some explanatory notes to CCMemMonitorGen.pl.
+4948 2007/09/13: bin/GenCCTasks: Fixed bitwise seg table, updated sample output.
+4937 2007/09/13: Debugged section 5 for TCC, still needs more work to clean up.
+4936 2007/09/13: GenCCTasks.pl: ongoing development, still buggy.
+4935 2007/09/13: make-c-config: crucial change: incorrect "-I" order prevented use of new CCTasks.c.
+4932 2007/09/13: Danger! Untested improvements.  Well.  Not so much "untested" as maybe "not fully verified."  Still.  Danger!
+4930 2007/09/13: Snapshot of latest ongoing (still buggy) GenCCTasks.pl.
+4928 2007/09/13: Updated GenCCTasks-sample-output.txt.
+4927 2007/09/13: CCMemMonitorGen.pl: touched up an errant comment.
+4926 2007/09/13: rename CCMemGetFinalConfig.pl -> CCMemMonitorRedux.pl; CCMemGenCCMonitors.pl -> CCMemMonitorGen.pl
+4914 2007/09/12: Oops, guess I missed one.
+4913 2007/09/12: cc_definitions.vh tweaks and bug fixes.
+4912 2007/09/12: Updated GenCCDefs-sample-output.txt to reflect latest cc_definitions.vh.
+4909 2007/09/12: cc_definitions.vh: Added definitions for CCREGBASE(q).
+4906 2007/09/12: make-c-cofig now uses cc_definitions.vh to auto-generate a new cc_definitions.h on-the-fly.
+4879 2007/09/11: Altered CCMemMakeDbase.pl to emit clever #define's.
+4878 2007/09/11: Updated CCMemMakeDbase.pl sample output files.
+4874 2007/09/10: Deleted file CCMemMakeZmonitors.pl; use CCMemGenCCMonitors.pl instead.
+4873 2007/09/10: For Amin, moved zmonitors to Env_rtl.
+4872 2007/09/10: TileReg.v: somehow my MONITOR_CONFIG_REGS got lost...
+4871 2007/09/10: make-c-config: fixed problem with 000 (null) configuration.
+4870 2007/09/10: CCMemGetFinalConfig.pl interprets zmonitor outputs.
+4869 2007/09/10: GenCCTasks-sample-output.txt = sample CCTasks.c file for reference.
+4868 2007/09/10: Minor changes to Quad_Config_template.c.
+4867 2007/09/10: Oops.
+4865 2007/09/10: Fixed CCTasks.c to REALLY generate on-the-fly.
+4864 2007/09/10: Sample CCReg database = bin/CCMemMakeDbase-sample-output.txt.
+4862 2007/09/10: Cleaning up binaries etc. in rtl/CacheController, moving them to $SMASH/bin.
+4860 2007/09/10: moved rtl/CacheController/find-cc-mem to bin/CCMemFind.csh
+4858 2007/09/10: Fixed redundant CCMEM report in data_pipe_access_gen_configmem.v.
+4853 2007/09/09: New tools for tracking config mem accesses.
+4852 2007/09/09: Script for auto-generating zmonitor* files, plus sample output.
+4851 2007/09/09: Added zmonitors to help watch and verify CC config memory contents.
+4850 2007/09/09: zmonitor*.v files help track CC config register accesses.
+4845 2007/09/08: makemonitors: to verify CC config mem writes.
+4844 2007/09/08: Oops forgot to check this in.  CCTasks.c = CacheController config tasks.
+4843 2007/09/08: make-cc-mem-dbase* tools for building a database of CC memory block info.
+4842 2007/09/08: "find-cc-mem" output should be generated dynamically when needed.
+4841 2007/09/08: find-cc-mem: removed track_main's unused [UC]_ConfigMem_f regs.
+4840 2007/09/08: track_main.v: eliminated unused/unneeded regs [UC]_ConfigMem_f.
+4833 2007/09/07: Added first-draft CCMEM monitor to CacheController files.
+4832 2007/09/07: TileReg.v: Slight improvement to my config mem monitor.
+4829 2007/09/07: Updated find-cc-mem, better output format.
+4828 2007/09/07: find-cc-mem: Search and find all CacheController config mem locations.
+4824 2007/09/07: Quad_Config_template.c: Added TCC segment table setup.
+4823 2007/09/07: Wrapped most of runtime_quad_config.c in a #ifdef, to cut down on size of executables.
+4822 2007/09/07: Tiny tiny change to TileReg.v: print reg contents in 032b format instead of 08h.
+4819 2007/09/06: Added options ADD_VCS_FLAGS, ADD_VERA_FLAGS to Makefile.
+4818 2007/09/06: Fixed "make_rtl" option in QuadXT_Simulator.pm.
+4817 2007/09/06: Added option MONITOR_CONFIG_REGS to monitor config mem activity.
+4792 2007/09/05: Finished task ConfigureTCC in runtime_quad_config.c.  Still needs testing.
+4791 2007/09/05: Small improvements to GenCCRegs.pl, GenCCTasks.pl.
+4789 2007/09/05: Not needed, use "-csys 200.t0c" instead.
+4787 2007/09/05: Added new system for generating CCTasks.c from CCTasks.v, and then using it, all on-the-fly.
+4783 2007/09/05: Updated ConfigureCaches declaration in runtime_quad_config.h.
+4782 2007/09/05: For GenCCTasks.pl (make-cc-tasks.pl), added comments and a def to cc_definitions.vh.
+4781 2007/09/05: Perforce test---no change to file.
+4779 2007/09/04: Minor changes to runtime_quad_config.c.
+4778 2007/09/04: Slight improvements to Quad_Config_template.c.
+4768 2007/09/04: Adding (untested) TCC functionality.
+4767 2007/09/04: Adding (untested) TCC functionality.
+4766 2007/09/04: Adding TCC functionality...
+4765 2007/09/04: Adding (untested) 10200 functionality to Quad_Config_template.c.
+4764 2007/09/04: Adding (untested) TCC functionality to runtime_quad_config.[ch]
+4763 2007/09/04: Adding (untested) TCC functionality to runtime_quad_config.[ch]
+4762 2007/09/04: Adding TCC tasks to runtime_quad_config.[ch]
+4761 2007/09/04: Adding TCC tasks to runtime_quad_config.[ch]
+4758 2007/09/04: Quad_Config_template.c: same functionality, cleaner implementation.
+4754 2007/09/03: Starting to enter TCC routines into runtime_quad_config.c.
+4753 2007/09/03: Improved modularity of runtime_quad_config.c; same functionality.
+4752 2007/09/02: Eliminated unnecessary declaration in runtime_quad_config.h.
+4751 2007/09/02: Rewrote a couple of tasks in runtime_quad_config.c, same functionality.
+4728 2007/08/29: Slightly cleaner version of QuadXT_Bench.pm.
+4727 2007/08/29: Simplified case "-csys 000" in QuadXT_Bench.pm.
+4724 2007/08/29: "make-c-config 000" now does the right thing.
+4722 2007/08/29: Restored csys tests to quadxt_regression.tpp, hope they work better this time!
+4706 2007/08/28: Fixed QuadXT_Bench.pm problem with -csys 000 (I hope!).
+4703 2007/08/28: Reverted QuadXT_Bench.pm back to an unbroken version (oops!).
+4699 2007/08/28: make-c-config now understands four alternatives "200", "200.c", "200.t0" and "200.t0c".
+4698 2007/08/28: Fixed a dumb bug in runtime_quad_config.c---missing printf arg for rawsub calls.
+4697 2007/08/28: Changed QuadXT_Bench.pm to generate csys config files on-the-fly.
+4689 2007/08/27: Don't need c config files anymore.  In the future, they'll be created on-the-fly.
+4688 2007/08/27: List contains one simple benchmark---abs---for debugging regression script.
+4684 2007/08/27: Removed c-config tests until I can get them fixed.
+4681 2007/08/27: One-entry list, useful for debugging regression script.
+4664 2007/08/24: Finally(!) added some csys configurations to the regression tests.
+4663 2007/08/24: Fixed problem with csys vs. sys; sometimes need BOTH.
+4656 2007/08/22: Cleaned up CHEAT option for MatMetaData.
+4655 2007/08/22: Cleaned up CHEAT option for MatMetaData.
+4654 2007/08/22: Cleaned up CHEAT code.
+4653 2007/08/22: New command-line switches -nocheat, -t0p0.
+4652 2007/08/22: All-inclusive no-cheat configuration for single-tile operation.
+4621 2007/08/15: Eliminated huge basic block by creating lots of tiny subroutines.
+4620 2007/08/15: These csh scripts use Quad_Config_template.c to create Quad_Config_*.c files.
+4619 2007/08/15: New set of config files generated by latest Quad_Config_template.c, make-c-configs.
+4597 2007/08/11: Fixed problems with uninitialized bit fields in some registers.
+4596 2007/08/11: Fixed problems with uninitialized memory locations.
+4589 2007/08/10: Fixed stupid error in sr date format.
+4567 2007/08/07: Changed so as to delete tmp files better.
+4566 2007/08/07: Fixed problem with tmp file.  Also, shell now cleans up after itself.
+4560 2007/08/06: Added correct exit status.
+4559 2007/08/06: Using xt-xcc-shell to circumvent out-of-licenses problem.
+4558 2007/08/06: Backoff-and-retry version of xcc, in case of license manager problems.
+4553 2007/08/02: Various changes, hopefully innocuous and minor.  Let me know if there are problems.
+4544 2007/07/31:        Latest update.
+4543 2007/07/31: Latest update.
+4542 2007/07/31: // [0:100] not enough for off-chip accesses whose latency averages 100.
+4541 2007/07/31:        New Quad_Config_*.c files.
+4530 2007/07/27:        I needed it to report hostname, for qsub debugging.
+4513 2007/07/25: Quad_Config and runtime_quad_config must be compiled -O3
+4442 2007/07/12: Oops forgot to remove local #include of fp200.c.
+4438 2007/07/11: This one is messy, but it works for Config 200 and simple diagnostics.
+4437 2007/07/11: Extensive updates to support my new runtime_quad_config.c.
+4436 2007/07/11: New config 200 uses RAW_STORES instead of vera tasks and jtag writes.
+4435 2007/07/11: Vera task shortcuts initialize metadata in all 64 mats.
+4434 2007/07/10: Added/fixed switches -cyclmt, -pclmt and -pwaitlmt.
+4433 2007/07/10: Added/fixed switches -cyclmt, -pclmt and -pwaitlmt.
+4418 2007/07/09: Fixed a slight bug with ARCH2
+4390 2007/06/29: Slight change: error message now refers to "QuadXT_Bench.pm", not "QuadXT_Bench.pl"
+4085 2007/05/22: Added minor comment.  Testing my usage of p4.

@@ -1,0 +1,7 @@
+build a function cycle_radix(string) that does this:
+
+  1. detext whether string is dec, hex or binary
+  2. convert to next in sequence dec=>hex=>binary
+
+function cycle_radix(n) {
+

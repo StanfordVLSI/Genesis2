@@ -1,0 +1,28 @@
+Created /etc/apache2/httpd.conf:
+
+<Directory /var/www/homepage/genesis>
+  AuthType Basic
+  AuthName "(contact chipgenesis@gmail.com for access)"
+  AuthUserFile /etc/apache2/passwords
+  Require valid-user
+</Directory>
+
+------------------------------------------------------------------------
+Used htpasswd to create password in /etc/apache2/passwords:
+
+genesis:rjU3mEj4EUprE
+
+------------------------------------------------------------------------
+To re-read httpd.conf file I think I will do:
+
+
+/usr/sbin/apache2ctl restart
+
+Other things to try:
+/usr/sbin/apache2 -k restart
+kill -SIGHUP <process_id)
+
+(Derived from:
+
+"/usr/local/apache/bin/apachectl restart    (to cause httpd to re-read httpd.conf)"
+)
