@@ -1,0 +1,1 @@
+setup_stanford.cshrc
