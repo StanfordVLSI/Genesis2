@@ -1,0 +1,1764 @@
+Content-type: text/html
+
+Welcome to updatedesign.pl
+
+querystring = "newdesign=udtest&curdesign=updatedesign.dir%2Ftest%2Ftgt0-baseline.js&modpath=top.DUT.p0&DBG=1&USE_SHIM=bar&SPECIAL_DATA_MEM_OPS.2.tiecode=foo"
+
+Found design dir "updatedesign.dir/test"
+
+Looking for module "top.DUT.p0"
+
+curdesign = updatedesign.dir/test/tgt0-baseline.xml
+directory = updatedesign.dir/test
+modpath   = top.DUT.p0
+newdesign = udtest-110628-101655
+
+Creating change file "updatedesign.dir/test/tmp-udtest-out.xml"
+
+PARMLIST{SPECIAL_DATA_MEM_OPS}{2}{tiecode} = foo
+
+defined(PARMLIST{a}{b}{c}) = FALSE
+
+defined(PARMLIST{SPECIAL_DATA_MEM_OPS}{2}{tiecode} = TRUE
+
+defined(PARMLIST{SPECIAL_DATA_MEM_OPS}) = TRUE
+
+defined_parm(PARMLIST{SPECIAL_DATA_MEM_OPS}{2}{tiecode} = 1
+
+defined_parm(PARMLIST{a}{b}{c} = 0
+
+DBG lapib             <ParameterItem>
+DBG ppi calls fnok to find parm name
+DBG (fnok               <Doc></Doc>
+DBG (fnok               <Name>USE_SHIM</Name>
+DBG (fnok found parm name USE_SHIM
+DBG PARMNAME = "USE_SHIM"
+DBG
+DBG Found name; now look for value
+DBG ppi               <Doc></Doc>
+DBG ppi               <Name>USE_SHIM</Name>
+DBG ppi               <Range></Range>
+DBG ppi               <Val>off</Val>
+DBG ppi found parameter "USE_SHIM" = "off"
+DBG WHOA NO WAY!  Found a parm!!!
+DBG ppi               <Val>bar</Val>
+DBG ppi             </ParameterItem>
+PARM "USE_SHIM" = "off"
+
+DBG lapib             <ParameterItem>
+DBG ppi calls fnok to find parm name
+DBG (fnok               <Doc></Doc>
+DBG (fnok               <Name>USE_XT</Name>
+DBG (fnok found parm name USE_XT
+DBG PARMNAME = "USE_XT"
+DBG
+DBG Found name; now look for value
+DBG ppi               <Doc></Doc>
+DBG ppi               <Name>USE_XT</Name>
+DBG ppi               <Range></Range>
+DBG ppi               <Val>SIM4Xtensa</Val>
+DBG ppi found parameter "USE_XT" = "SIM4Xtensa"
+DBG ppi             </ParameterItem>
+PARM "USE_XT" = "SIM4Xtensa"
+
+DBG lapib             <ParameterItem>
+DBG ppi calls fnok to find parm name
+DBG (fnok               <Doc></Doc>
+DBG (fnok               <Name>DATA_BUS_WIDTH</Name>
+DBG (fnok found parm name DATA_BUS_WIDTH
+DBG PARMNAME = "DATA_BUS_WIDTH"
+DBG
+DBG Found name; now look for value
+DBG ppi               <Doc></Doc>
+DBG ppi               <Name>DATA_BUS_WIDTH</Name>
+DBG ppi               <Range></Range>
+DBG ppi               <Val>32</Val>
+DBG ppi found parameter "DATA_BUS_WIDTH" = "32"
+DBG ppi             </ParameterItem>
+PARM "DATA_BUS_WIDTH" = "32"
+
+DBG lapib             <ParameterItem>
+DBG ppi calls fnok to find parm name
+DBG (fnok               <Doc></Doc>
+DBG (fnok               <Name>INSTRUCTION_BUS_WIDTH</Name>
+DBG (fnok found parm name INSTRUCTION_BUS_WIDTH
+DBG PARMNAME = "INSTRUCTION_BUS_WIDTH"
+DBG
+DBG Found name; now look for value
+DBG ppi               <Doc></Doc>
+DBG ppi               <Name>INSTRUCTION_BUS_WIDTH</Name>
+DBG ppi               <Range></Range>
+DBG ppi               <Val>64</Val>
+DBG ppi found parameter "INSTRUCTION_BUS_WIDTH" = "64"
+DBG ppi             </ParameterItem>
+PARM "INSTRUCTION_BUS_WIDTH" = "64"
+
+DBG lapib             <ParameterItem>
+DBG ppi calls fnok to find parm name
+DBG (fnok               <Doc></Doc>
+DBG (fnok               <Name>TIE_OPCODE_WIDTH</Name>
+DBG (fnok found parm name TIE_OPCODE_WIDTH
+DBG PARMNAME = "TIE_OPCODE_WIDTH"
+DBG
+DBG Found name; now look for value
+DBG ppi               <Doc></Doc>
+DBG ppi               <Name>TIE_OPCODE_WIDTH</Name>
+DBG ppi               <Range></Range>
+DBG ppi               <Val>6</Val>
+DBG ppi found parameter "TIE_OPCODE_WIDTH" = "6"
+DBG ppi             </ParameterItem>
+PARM "TIE_OPCODE_WIDTH" = "6"
+
+DBG lapib             <ParameterItem>
+DBG ppi calls fnok to find parm name
+DBG (fnok               <ArrayType>
+DBG (fnok ppi found ArrayType, calling phat
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>METALOAD</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>4</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>METASTORE</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>36</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>SYNCLOAD</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>2</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>SYNCSTORE</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>34</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>RESETLOAD</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>3</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>SETSTORE</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>35</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>FUTURELOAD</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>1</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>RAWLOAD</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>5</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>RAWSTORE</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>37</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>RAWMETALOAD</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>6</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>RAWMETASTORE</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>38</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>FIFOLOAD</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>7</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>FIFOSTORE</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>39</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>CACHEGANGCLEAR</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>40</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>CACHECONDGANGCLEAR</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>41</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>MATGANGCLEAR</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>42</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>MATCONDGANGCLEAR</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>43</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>HARDINTCLEAR</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>44</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>MEMBAR</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>19</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>SM_DHWB</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>52</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>SM_DHWBI</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>53</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>SM_DHI</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>54</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>SM_DII</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>55</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>SM_DIWB</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>56</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>SM_DIWBI</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>57</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>SM_DPFR</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>58</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>SM_DPFW</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>59</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>SM_IHI</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>60</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>SM_III</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>61</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>SM_IPF</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>62</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>SAFE_LOAD</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>16</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat                 <ArrayItem>
+DBG (shat found Array.Item, calling shai
+DBG (shai                   <HashType>
+DBG (shai found HashType, calling shat
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>name</Key>
+DBG (shai                       <Val>SPEC_CMD</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                     <HashItem>
+DBG (shat found Hash.Item, calling shai
+DBG (shai                       <Key>tiecode</Key>
+DBG (shai                       <Val>46</Val>
+DBG (shai                     </HashItem>
+DBG (shai DONE
+DBG (shat                   </HashType>
+DBG (shat DONE
+DBG (shai                 </ArrayItem>
+DBG (shai DONE
+DBG (shat               </ArrayType>
+DBG (shat DONE
+DBG (fnok               <Doc></Doc>
+DBG (fnok               <Name>SPECIAL_DATA_MEM_OPS</Name>
+DBG (fnok found parm name SPECIAL_DATA_MEM_OPS
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS"
+DBG
+DBG Found name; now look for value
+DBG ppi               <ArrayType>
+DBG ppi found ArrayType, calling phat
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.0"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>METALOAD</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.0.name"
+DBG HEY found complex parm value METALOAD
+PARM "SPECIAL_DATA_MEM_OPS.0.name" = "METALOAD"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>4</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.0.tiecode"
+DBG HEY found complex parm value 4
+PARM "SPECIAL_DATA_MEM_OPS.0.tiecode" = "4"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.1"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>METASTORE</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.1.name"
+DBG HEY found complex parm value METASTORE
+PARM "SPECIAL_DATA_MEM_OPS.1.name" = "METASTORE"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>36</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.1.tiecode"
+DBG HEY found complex parm value 36
+PARM "SPECIAL_DATA_MEM_OPS.1.tiecode" = "36"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.2"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>SYNCLOAD</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.2.name"
+DBG HEY found complex parm value SYNCLOAD
+PARM "SPECIAL_DATA_MEM_OPS.2.name" = "SYNCLOAD"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>2</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.2.tiecode"
+DBG HEY found complex parm value 2
+PARM "SPECIAL_DATA_MEM_OPS.2.tiecode" = "2"
+DBG WHOA NO WAY!  Found a parm!!!
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.3"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>SYNCSTORE</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.3.name"
+DBG HEY found complex parm value SYNCSTORE
+PARM "SPECIAL_DATA_MEM_OPS.3.name" = "SYNCSTORE"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>34</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.3.tiecode"
+DBG HEY found complex parm value 34
+PARM "SPECIAL_DATA_MEM_OPS.3.tiecode" = "34"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.4"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>RESETLOAD</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.4.name"
+DBG HEY found complex parm value RESETLOAD
+PARM "SPECIAL_DATA_MEM_OPS.4.name" = "RESETLOAD"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>3</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.4.tiecode"
+DBG HEY found complex parm value 3
+PARM "SPECIAL_DATA_MEM_OPS.4.tiecode" = "3"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.5"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>SETSTORE</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.5.name"
+DBG HEY found complex parm value SETSTORE
+PARM "SPECIAL_DATA_MEM_OPS.5.name" = "SETSTORE"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>35</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.5.tiecode"
+DBG HEY found complex parm value 35
+PARM "SPECIAL_DATA_MEM_OPS.5.tiecode" = "35"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.6"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>FUTURELOAD</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.6.name"
+DBG HEY found complex parm value FUTURELOAD
+PARM "SPECIAL_DATA_MEM_OPS.6.name" = "FUTURELOAD"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>1</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.6.tiecode"
+DBG HEY found complex parm value 1
+PARM "SPECIAL_DATA_MEM_OPS.6.tiecode" = "1"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.7"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>RAWLOAD</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.7.name"
+DBG HEY found complex parm value RAWLOAD
+PARM "SPECIAL_DATA_MEM_OPS.7.name" = "RAWLOAD"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>5</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.7.tiecode"
+DBG HEY found complex parm value 5
+PARM "SPECIAL_DATA_MEM_OPS.7.tiecode" = "5"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.8"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>RAWSTORE</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.8.name"
+DBG HEY found complex parm value RAWSTORE
+PARM "SPECIAL_DATA_MEM_OPS.8.name" = "RAWSTORE"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>37</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.8.tiecode"
+DBG HEY found complex parm value 37
+PARM "SPECIAL_DATA_MEM_OPS.8.tiecode" = "37"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.9"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>RAWMETALOAD</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.9.name"
+DBG HEY found complex parm value RAWMETALOAD
+PARM "SPECIAL_DATA_MEM_OPS.9.name" = "RAWMETALOAD"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>6</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.9.tiecode"
+DBG HEY found complex parm value 6
+PARM "SPECIAL_DATA_MEM_OPS.9.tiecode" = "6"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.10"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>RAWMETASTORE</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.10.name"
+DBG HEY found complex parm value RAWMETASTORE
+PARM "SPECIAL_DATA_MEM_OPS.10.name" = "RAWMETASTORE"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>38</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.10.tiecode"
+DBG HEY found complex parm value 38
+PARM "SPECIAL_DATA_MEM_OPS.10.tiecode" = "38"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.11"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>FIFOLOAD</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.11.name"
+DBG HEY found complex parm value FIFOLOAD
+PARM "SPECIAL_DATA_MEM_OPS.11.name" = "FIFOLOAD"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>7</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.11.tiecode"
+DBG HEY found complex parm value 7
+PARM "SPECIAL_DATA_MEM_OPS.11.tiecode" = "7"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.12"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>FIFOSTORE</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.12.name"
+DBG HEY found complex parm value FIFOSTORE
+PARM "SPECIAL_DATA_MEM_OPS.12.name" = "FIFOSTORE"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>39</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.12.tiecode"
+DBG HEY found complex parm value 39
+PARM "SPECIAL_DATA_MEM_OPS.12.tiecode" = "39"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.13"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>CACHEGANGCLEAR</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.13.name"
+DBG HEY found complex parm value CACHEGANGCLEAR
+PARM "SPECIAL_DATA_MEM_OPS.13.name" = "CACHEGANGCLEAR"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>40</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.13.tiecode"
+DBG HEY found complex parm value 40
+PARM "SPECIAL_DATA_MEM_OPS.13.tiecode" = "40"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.14"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>CACHECONDGANGCLEAR</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.14.name"
+DBG HEY found complex parm value CACHECONDGANGCLEAR
+PARM "SPECIAL_DATA_MEM_OPS.14.name" = "CACHECONDGANGCLEAR"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>41</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.14.tiecode"
+DBG HEY found complex parm value 41
+PARM "SPECIAL_DATA_MEM_OPS.14.tiecode" = "41"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.15"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>MATGANGCLEAR</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.15.name"
+DBG HEY found complex parm value MATGANGCLEAR
+PARM "SPECIAL_DATA_MEM_OPS.15.name" = "MATGANGCLEAR"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>42</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.15.tiecode"
+DBG HEY found complex parm value 42
+PARM "SPECIAL_DATA_MEM_OPS.15.tiecode" = "42"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.16"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>MATCONDGANGCLEAR</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.16.name"
+DBG HEY found complex parm value MATCONDGANGCLEAR
+PARM "SPECIAL_DATA_MEM_OPS.16.name" = "MATCONDGANGCLEAR"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>43</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.16.tiecode"
+DBG HEY found complex parm value 43
+PARM "SPECIAL_DATA_MEM_OPS.16.tiecode" = "43"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.17"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>HARDINTCLEAR</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.17.name"
+DBG HEY found complex parm value HARDINTCLEAR
+PARM "SPECIAL_DATA_MEM_OPS.17.name" = "HARDINTCLEAR"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>44</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.17.tiecode"
+DBG HEY found complex parm value 44
+PARM "SPECIAL_DATA_MEM_OPS.17.tiecode" = "44"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.18"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>MEMBAR</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.18.name"
+DBG HEY found complex parm value MEMBAR
+PARM "SPECIAL_DATA_MEM_OPS.18.name" = "MEMBAR"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>19</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.18.tiecode"
+DBG HEY found complex parm value 19
+PARM "SPECIAL_DATA_MEM_OPS.18.tiecode" = "19"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.19"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>SM_DHWB</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.19.name"
+DBG HEY found complex parm value SM_DHWB
+PARM "SPECIAL_DATA_MEM_OPS.19.name" = "SM_DHWB"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>52</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.19.tiecode"
+DBG HEY found complex parm value 52
+PARM "SPECIAL_DATA_MEM_OPS.19.tiecode" = "52"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.20"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>SM_DHWBI</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.20.name"
+DBG HEY found complex parm value SM_DHWBI
+PARM "SPECIAL_DATA_MEM_OPS.20.name" = "SM_DHWBI"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>53</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.20.tiecode"
+DBG HEY found complex parm value 53
+PARM "SPECIAL_DATA_MEM_OPS.20.tiecode" = "53"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.21"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>SM_DHI</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.21.name"
+DBG HEY found complex parm value SM_DHI
+PARM "SPECIAL_DATA_MEM_OPS.21.name" = "SM_DHI"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>54</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.21.tiecode"
+DBG HEY found complex parm value 54
+PARM "SPECIAL_DATA_MEM_OPS.21.tiecode" = "54"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.22"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>SM_DII</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.22.name"
+DBG HEY found complex parm value SM_DII
+PARM "SPECIAL_DATA_MEM_OPS.22.name" = "SM_DII"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>55</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.22.tiecode"
+DBG HEY found complex parm value 55
+PARM "SPECIAL_DATA_MEM_OPS.22.tiecode" = "55"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.23"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>SM_DIWB</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.23.name"
+DBG HEY found complex parm value SM_DIWB
+PARM "SPECIAL_DATA_MEM_OPS.23.name" = "SM_DIWB"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>56</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.23.tiecode"
+DBG HEY found complex parm value 56
+PARM "SPECIAL_DATA_MEM_OPS.23.tiecode" = "56"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.24"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>SM_DIWBI</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.24.name"
+DBG HEY found complex parm value SM_DIWBI
+PARM "SPECIAL_DATA_MEM_OPS.24.name" = "SM_DIWBI"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>57</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.24.tiecode"
+DBG HEY found complex parm value 57
+PARM "SPECIAL_DATA_MEM_OPS.24.tiecode" = "57"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.25"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>SM_DPFR</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.25.name"
+DBG HEY found complex parm value SM_DPFR
+PARM "SPECIAL_DATA_MEM_OPS.25.name" = "SM_DPFR"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>58</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.25.tiecode"
+DBG HEY found complex parm value 58
+PARM "SPECIAL_DATA_MEM_OPS.25.tiecode" = "58"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.26"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>SM_DPFW</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.26.name"
+DBG HEY found complex parm value SM_DPFW
+PARM "SPECIAL_DATA_MEM_OPS.26.name" = "SM_DPFW"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>59</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.26.tiecode"
+DBG HEY found complex parm value 59
+PARM "SPECIAL_DATA_MEM_OPS.26.tiecode" = "59"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.27"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>SM_IHI</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.27.name"
+DBG HEY found complex parm value SM_IHI
+PARM "SPECIAL_DATA_MEM_OPS.27.name" = "SM_IHI"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>60</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.27.tiecode"
+DBG HEY found complex parm value 60
+PARM "SPECIAL_DATA_MEM_OPS.27.tiecode" = "60"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.28"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>SM_III</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.28.name"
+DBG HEY found complex parm value SM_III
+PARM "SPECIAL_DATA_MEM_OPS.28.name" = "SM_III"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>61</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.28.tiecode"
+DBG HEY found complex parm value 61
+PARM "SPECIAL_DATA_MEM_OPS.28.tiecode" = "61"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.29"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>SM_IPF</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.29.name"
+DBG HEY found complex parm value SM_IPF
+PARM "SPECIAL_DATA_MEM_OPS.29.name" = "SM_IPF"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>62</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.29.tiecode"
+DBG HEY found complex parm value 62
+PARM "SPECIAL_DATA_MEM_OPS.29.tiecode" = "62"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.30"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>SAFE_LOAD</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.30.name"
+DBG HEY found complex parm value SAFE_LOAD
+PARM "SPECIAL_DATA_MEM_OPS.30.name" = "SAFE_LOAD"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>16</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.30.tiecode"
+DBG HEY found complex parm value 16
+PARM "SPECIAL_DATA_MEM_OPS.30.tiecode" = "16"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat                 <ArrayItem>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.31"
+DBG phat found Array.Item, calling phai
+DBG phai                   <HashType>
+DBG phai found HashType, calling phat
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>name</Key>
+DBG (fnok found hash key name
+DBG phai                       <Key>name</Key>
+DBG phai                       <Val>SPEC_CMD</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.31.name"
+DBG HEY found complex parm value SPEC_CMD
+PARM "SPECIAL_DATA_MEM_OPS.31.name" = "SPEC_CMD"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                     <HashItem>
+DBG phat found Hash.Item, calling phai
+DBG (fnok                       <Key>tiecode</Key>
+DBG (fnok found hash key tiecode
+DBG phai                       <Key>tiecode</Key>
+DBG phai                       <Val>46</Val>
+DBG PARMNAME = "SPECIAL_DATA_MEM_OPS.31.tiecode"
+DBG HEY found complex parm value 46
+PARM "SPECIAL_DATA_MEM_OPS.31.tiecode" = "46"
+DBG phai                     </HashItem>
+DBG phai DONE
+DBG phat                   </HashType>
+DBG phat DONE
+DBG phai                 </ArrayItem>
+DBG phai DONE
+DBG phat               </ArrayType>
+DBG phat DONE
+DBG ppi               <Doc></Doc>
+DBG ppi               <Name>SPECIAL_DATA_MEM_OPS</Name>
+DBG ppi             </ParameterItem>
+DBG lapib           </Parameters>
