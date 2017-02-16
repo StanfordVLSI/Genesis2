@@ -1,0 +1,41 @@
+Thank you for your interest. We are happy to share Genesis2. You may also want to look into using some of our generators written in Genesis2 (like Min-Area FFT Generator, Floating Point Mult-Acc Generator, Stencil Engine Generator, Network Parser Generator, etc.).   Note that I am actually no longer at Stanford, but I still can help when needed.  Steve Richardson continues to maintain the compiler code, the GUI and the webpage. Prof. Brunhaver at ASU (CC'ed) is also actively adding features.  
+
+If your interest becomes more than just experimental/educational, it will require the help of the stanford office of technology licensing to issue a license for commercial use. But don't worry -- it was already licensed to a few companies so the process is fully debugged ;-) 
+
+Attached please find the executable for genesis2 in zip format. Please acknowledge you received it since some spam filters block tar files. Installing will take you about two minutes. If you want/need to discuss on the phone to get started, we can set something up. The toolset includes three key parts:
+1. Genesis2 compiler which sits atop system verilog
+2. Genesis2 GUI
+3. Genesis2 XML parser (the tool provide an XML representation of the design which can be used to generate software drivers and backend collateral)
+ 
+To install, all you need is a linux machine that runs Perl 5.8.5 or above (pretty much anything after 2004 I think). Installation instructions below, but can also be found here: http://genesis2.stanford.edu/mediawiki/index.php/Genesis2#Installing_Genesis2
+
+    Save the file. Say the tarball is called r#####.tar.bz2 and you put it in a folder called $GENESIS/
+    Unzip the file:
+
+     cd $GENESIS
+     tar -xjf r#####.tar.bz2 -C ./
+
+    Now you should see a folder named r#####/Genesis2Tools that contains a number of sub-folders: bin, demo, gui, Info, PythonLibs and PerlLibs. The demo contains a few small design examples for you to play with/get started, including makefiles. 
+    Add Genesis2 (and GUI) to your execution path, and some key libraries that it uses: simply type (or add to the end of your .cshrc file)
+
+      % setenv GENESIS_HOME "$GENESIS/r#####/Genesis2Tools"
+      % set path=($GENESIS_HOME/bin $GENESIS_HOME/gui/bin $path)
+      % setenv PERL5LIB "$PERL5LIB":$GENESIS_HOME/PerlLibs/ExtrasForOldPerlDistributions
+
+That's it for the genesis compiler. If you want to also try the GUI to brows through your hierarchy, set parameters and even generate verilog follow the next step below. You can see some GUI examples at:
+* http://vlsiweb.stanford.edu:8080/configs/fftgen_gateway.htm (e.g., change the number of points, click submit, click the download button and check the generated XML and Verilog files)
+* http://vlsiweb.stanford.edu/genesis/demo/fpdemo.php 
+* More examples that are tied to students work dirs so may fail: http://www-vlsi.stanford.edu/genesis/
+* More examples that are tied to students at CMU work dirs so may fail: http://genesis.web.ece.cmu.edu/gui/
+
+    To build a private standalone GUI that runs on your own machine (easy!) follow this link and/or simply do the following:
+
+      % $GENESIS_HOME/gui/bin/stewie start ~/mystewie
+
+     Or, to build a public GUI that runs on the university server (harder), follow this link
+
+
+That's it, you are ready to run the demos or write your own generator. Complete documentation can be found at genesis2.stanford.edu 
+
+Good luck and let me know if you need any help,
+Ofer.
