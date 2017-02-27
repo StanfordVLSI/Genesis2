@@ -50,8 +50,12 @@
         //else        { alert("it's not stewie.  cgi='" + cgi); }
 
         // I do this instead of "base href"
+        // document.getElementById("a_cmpdemo").href = cgi + 
+        //     '/opendesign.pl?newdesign=cmpdemo&file=../designs/CMP/cmp-baseline.xml';
+      
+        // That's not working, maybe "empty" is more robust?
         document.getElementById("a_cmpdemo").href = cgi + 
-            '/opendesign.pl?newdesign=cmpdemo&file=../designs/CMP/cmp-baseline.xml';
+            '/opendesign.pl?newdesign=cmpdemo&file=../designs/CMP/empty.xml';
 
         document.getElementById("a_choosedesign").href = cgi + "/choosedesign.pl";
         document.getElementById("a_about").href        = cgi + "/about.pl";
