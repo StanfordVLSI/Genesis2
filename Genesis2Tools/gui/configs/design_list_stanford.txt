@@ -14,7 +14,7 @@
 
 #######################################################################################################
 # SR designs
-CMP                          /home/steveri/smart_memories/Smart_design/ChipGen/bin/Genesis2Tools/gui/examples/cmp
+# CMP                          /home/steveri/smart_memories/Smart_design/ChipGen/bin/Genesis2Tools/gui/examples/cmp
 FFTGenerator                 /home/steveri/fftgen
 
 #######################################################################################################
@@ -23,9 +23,9 @@ FloatingPointGen	      /home/shacham/projects/smart_memories/design/ChipGen/FP-G
 
 #######################################################################################################
 # MW designs
-tile_megan                     /home/wachs/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest
+# tile_megan                     /home/wachs/smart_memories/Smart_design/ChipGen/TileTest/TileGenTest
 
 
 #######################################################################################################
 # AD designs
-tile_official                 /home/danowitz/chipgen/ChipGen/TileTest/TileGenTest
+# tile_official                 /home/danowitz/chipgen/ChipGen/TileTest/TileGenTest
