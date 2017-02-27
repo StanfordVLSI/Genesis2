@@ -8,12 +8,21 @@ use strict;
 #      - do we have an update for this parm?  yes => overwrite, no => ignore
 ############################################################################
 
+##############################################################################
+# Need a header for the output file, so browser knows what's going on.
+# This REALLY has to be the first thing, otherwise e.g. 
+# don't see errors from include_files.
+
+my $standalone = $ENV{GUI_STANDALONE};
+if (! $standalone) {
+    print "Content-type: text/html\n\n";
+    print "<title>Genesis GUI \"Submit Changes\" Debug/Info page</title>\n\n";
+}
+
 my %CLONE_LIST;
 my %DELETE_LIST;
 
 my $testtype = "";;
-
-my $standalone = $ENV{GUI_STANDALONE};
 
 my $incdir = $standalone ? mydir() : ".";
 include_file("$incdir/utils.pl");                                   #  get_system_dependences(), mydir()
@@ -29,14 +38,6 @@ include_file("$incdir/updatedesign.dir/build_xml_change_file.pl");  #  build_xml
 
 my $DBG9 = 0; # Set to 1 for low-level debug
 my $SDBG = 0; # debug standalone mode
-
-##############################################################################
-# Need a header for the output file, so browser knows what's going on.
-
-if (! $standalone) {
-    print "Content-type: text/html\n\n";
-    print "<title>Genesis GUI \"Submit Changes\" Debug/Info page</title>\n\n";
-}
 
 ##########################################################################################
 # Called from Button_SubmitChanges.js with QUERY_STRING e.g.
