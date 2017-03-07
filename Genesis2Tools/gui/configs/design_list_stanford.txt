@@ -29,3 +29,6 @@ FloatingPointGen	      /home/shacham/projects/smart_memories/design/ChipGen/FP-G
 #######################################################################################################
 # AD designs
 # tile_official                 /home/danowitz/chipgen/ChipGen/TileTest/TileGenTest
+#CGRA                           /home/steveri/tmpdir/gui-designs/generator_z
+CGRA                           /home/steveri/tmpdir/gui-designs/generator_z/top
+demo                           NONE
