@@ -1,4 +1,4 @@
-genesis2
+Genesis2
 ========
 
 The Genesis2 Chip Generator (CG) is a design system and meta-programming language for automatically producing custom hardware.
@@ -14,7 +14,7 @@ To install in e.g. /home/mydir/Genesis2:
  setenv GENESIS_HOME $destdir/Genesis2Tools
  set path=(. $GENESIS_HOME/bin $GENESIS_HOME/gui/bin $path)
  setenv PERL5LIB $GENESIS_HOME/PerlLibs/ExtrasForOldPerlDistributions
-</preL
+</pre>
 
 If you get an error like this:
 
