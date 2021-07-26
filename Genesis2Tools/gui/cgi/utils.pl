@@ -341,7 +341,7 @@ sub deal_with_empty_file {
     
     if ($DBG) {
         print embed_alert_script
-            ("Calling updatedesign to create \"$newdesfname\" =? \"$curdesign_xml\"\n");
+            ("utils.deal_with_empty_file: Calling updatedesign to create \"$newdesfname\" =? \"$curdesign_xml\"\n");
     }
     
     # Given the right arguments, updatedesign() should create valid *.xml and *.js files.

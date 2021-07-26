@@ -38,9 +38,14 @@
         var title = stewie ? "Stewie the Standalone GUI" : "Stanford Edition";
         document.title += title;
 
-        // If we are (a) Stewie, we point to our own FFT generator.
-        // Otherwise, we point to Stewie 8080 on vlsiweb.
-        var stewie_url = stewie ? lo : "http://vlsiweb.stanford.edu:8080";
+// why? no!
+//        // If we are (a) Stewie, we point to our own FFT generator.
+//        // Otherwise, we point to Stewie 8080 on vlsiweb.
+//        var stewie_url = stewie ? lo : "http://vlsiweb.stanford.edu:8080";
+        var stewie_url = lo;
+
+
+
         if (document.getElementById("a_fftgen")) {
           document.getElementById("a_fftgen").href = stewie_url + "/configs/fftgen_gateway.htm";
         }
@@ -105,7 +110,9 @@
 
 	    <hr><!--==================================================================-->
 	    <h3>
-	      <a href = 'http://vlsiweb.stanford.edu/genesis/configs/fftgen_gateway.htm'>
+	      <!-- <a href = 'http://vlsiweb.stanford.edu/genesis/configs/fftgen_gateway.htm'> -->
+	      <a href = 'configs/fftgen_gateway.htm'>
+
 		  FFT generator
               </a>
               <!-- <br><small><i>Generates Verilog but cannot run or verify it.</i></small> -->

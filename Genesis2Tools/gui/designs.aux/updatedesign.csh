@@ -123,6 +123,8 @@ if (! -e $setup) then
     echo "ERROR: updatedesign.csh could not find setup file '$setup'."
     exit -1
 endif
+
+echo "Sourcing $setup..."
 source $setup
 
 # Check to see that we can find Genesis2.
