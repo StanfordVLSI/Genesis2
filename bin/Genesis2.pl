@@ -1,9 +1,9 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 #line 2 "/usr/bin/par-archive"
 
-eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}'
+eval 'exec /usr/bin/env perl  -S $0 ${1+"$@"}'
     if 0; # not running under some shell
-eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}'
+eval 'exec /usr/bin/env perl  -S $0 ${1+"$@"}'
     if 0; # not running under some shell
 
 package __par_pl;

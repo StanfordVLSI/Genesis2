@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 print "SEE welcome.pl instead\n\n";
 exit;

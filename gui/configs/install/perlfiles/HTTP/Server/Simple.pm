@@ -72,7 +72,7 @@ could kill the server.
 
 =head1 EXAMPLE
  
- #!/usr/bin/perl
+ #!/usr/bin/env perl
  {
  package MyWebServer;
  

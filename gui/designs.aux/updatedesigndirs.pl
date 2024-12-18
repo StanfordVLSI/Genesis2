@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 use strict;
 use File::Glob ':glob';  # To turn e.g. "~steveri" into "/home/steveri"
 use Cwd;
