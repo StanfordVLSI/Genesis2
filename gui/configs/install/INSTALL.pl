@@ -1,8 +1,8 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # This script (INSTALL.pl) should only be called from its wrapper
 # INSTALL.sh, which basically 
-# 1. makes sure that /usr/bin/perl exists and
+# 1. makes sure that /usr/bin/env perl exists and
 # 2. makes sure that INSTALL.pl was called from the correct directory.
 
 use strict;
