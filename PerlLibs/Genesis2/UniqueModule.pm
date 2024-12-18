@@ -126,6 +126,7 @@ sub new {
   $self->{UniqueModuleName} = $package;		# default uniquified name
   $self->{CloneOf} = undef;			# If cloned, where from?
   $self->{SynonymFor} = $package->get_SynonymFor; # If synonym, what is the (absolute) source?
+  $self->{InstancePath} = undef;                # Path to this instance (set by get_instance_path)
 
 
   $self->{CfgHandler} = $manager->{CfgHandler};		# An agent to handle all parameters IO
@@ -192,6 +193,7 @@ sub new_as_son {
       $self->{SynonymFor} = $tmp;
       $tmp = $tmp->get_SynonymFor();
   }
+  $self->{InstancePath} = undef;                        # Path to this instance (set by get_instance_path)
 
   $self->{OutputFileName} = undef;			# Where to place the output
   $self->{OutfileHandle} = undef;
@@ -254,6 +256,7 @@ sub new_as_clone {
   $self->{UniqueModuleName} = $src_inst->get_module_name;		
   $self->{CloneOf} = $src_inst;
   $self->{SynonymFor} = $src_inst->{SynonymFor};# If synonym, what is the (absolute) source?
+  $self->{InstancePath} = undef;                # Path to this instance (set by get_instance_path)
 
   $self->{OutputFileName} = $src_inst->{OutputFileName};		# Where the output WAS placed
   $self->{OutfileHandle} = $src_inst->{OutfileHandle};
@@ -868,6 +871,10 @@ sub get_instance_path{
   my $self = shift;
   my $name = $self->{BaseModuleName}."->get_instance_path";
 
+  if (defined $self->{InstancePath}) {
+    return $self->{InstancePath};
+  }
+
   my $string = '';
   if (defined $self->{Parent}){
     $string = ($self->{Parent})->get_instance_path(). ".";
@@ -876,6 +883,8 @@ sub get_instance_path{
   #  $string = "INSTANCE_PATH:";
   #}
   $string .= $self->get_instance_name();
+
+  $self->{InstancePath} = $string;
 
   return $string;
 }
