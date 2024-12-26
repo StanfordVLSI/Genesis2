@@ -108,6 +108,10 @@ sub new{
     $self->{InXmlDB} = undef;		# Database after processing xml config file
     $self->{InCfgDB} = undef;		# Database after processing "simple" config file
     $self->{PrmOverrides} = undef;	# List of parameter override defintions
+    $self->{UnqStyle} = undef;          # Uniquification style - used when
+                                        # generate is called instead of one of the
+                                        # specializations.
+                                        # Numeric value to speed up comparisons.
 
  
     # Bless this package
@@ -360,6 +364,22 @@ sub SetPrmOverrides{
 	$self->{PrmOverrides}->{$path}->{$prm}->{Val} = $val; 
 	$self->{PrmOverrides}->{$path}->{$prm}->{State} = 'NeverUsed'; 
     }
+    1;
+}
+
+## SetUnqStyle
+## API for Genesis2::Manager
+## Set the preferred uniquification style
+## Uniquification style is not validated -- it should be one of the known styles
+## defined in UniqueModule.pm
+sub SetUnqStyle {
+    my $self = shift;
+    my $name = __PACKAGE__ . "->setUnqStyle";
+    caller eq __PACKAGE__ || caller eq 'Genesis2::Manager'
+	or $self->error("$name: access restricted to ".__PACKAGE__." or Genesis2::Manager");
+
+    $self->{UnqStyle} = shift;
+    print STDERR "$name: Setting preferred uniquification style: $self->{UnqStyle}\n";
     1;
 }
 

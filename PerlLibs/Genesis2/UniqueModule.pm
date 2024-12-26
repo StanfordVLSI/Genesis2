@@ -52,12 +52,14 @@
 package Genesis2::UniqueModule;
 use warnings;
 use strict;
+use 5.010;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 use Carp qw(carp cluck confess croak); $Carp::MaxArgLen =16; $Carp::MaxArgNums = 1;
 use Exporter;
 use Cwd 'abs_path';
 use File::Copy;
 use File::Spec::Functions;
+use List::Util qw(min max);
 
 use FileHandle;
 use Env; # Make environment variables available
@@ -87,18 +89,42 @@ use constant GENESIS2_PRIORITY =>  qw(_GENESIS2_ZERO_PRIORITY_
 use Term::ANSIColor;
 
 @ISA = qw(Exporter);
-@EXPORT = qw(mname iname bname sname generate generate_base clone parameter synonym error warning);
+@EXPORT = qw(mname iname bname sname generate generate_base
+             generate_unq_numeric generate_unq_param
+             clone parameter synonym error warning
+            );
 @EXPORT_OK = qw(GENESIS2_ZERO_PRIORITY 
 		GENESIS2_DECLARATION_PRIORITY 
 		GENESIS2_EXTERNAL_CONFIG_PRIORITY
 		GENESIS2_EXTERNAL_XML_PRIORITY
 		GENESIS2_CMD_LINE_PRIORITY
 		GENESIS2_INHERITANCE_PRIORITY
-		GENESIS2_IMMUTABLE_PRIORITY);
+		GENESIS2_IMMUTABLE_PRIORITY
+                get_unq_styles
+                default_unq_style
+                str_to_unq_style
+               );
 $VERSION = '1.0';
 
 use Genesis2::Manager;# 1.00;
 
+use constant {
+    PARAM_UNQ_STR => '_PARAM_UNQ',
+    DEFAULT_UNQ_STYLE => 'param',
+};
+
+# Uniquification styles
+#  - numeric: add a unique number to the end of the module name
+#  - param: concatenate the parameters to the module name
+use constant {
+    GENESIS2_UNQ_NUMERIC => 0,
+    GENESIS2_UNQ_PARAM => 1,
+};
+
+my %UNQ_STYLES = (
+    'numeric' => GENESIS2_UNQ_NUMERIC,
+    'param' => GENESIS2_UNQ_PARAM,
+);
 
 
 ################################################################################
@@ -1072,6 +1098,159 @@ sub unique_inst{
 }
 
 
+## unique_inst_param
+## The main function call for instantiating a new module with module
+## uniquification based on the parameters.
+## Usage: my $unique_inst_param = $self->unique_inst_param(base_module_name, inst_name [, prm1 => val1, prm2 => val2, ...]);
+sub unique_inst_param{
+  my $self = shift;
+  my $name = $self->{BaseModuleName}."->unique_inst_param";
+  my ($base_module_name, $inst_name, $instance);
+  my ($other_module, $other_file);
+  state $idx = 0;
+  my $match = 0;
+  my @params = ();
+  my $usage = "Usage:\n".
+    $self->{PrlEsc}.
+      " my \$newObj = \$self->unique_inst_param(base_module_name, inst_name [, prm1 => val1, prm2 => val2, ...]);";
+
+  #####################
+  # make sure the sub instance don't mess with our parameters!
+  my $prev_priority = $self->{ParametersPriority};
+  $self->{ParametersPriority} = GENESIS2_ZERO_PRIORITY;
+
+  # flush the buffer to be safe for comparisons (important for recursion)
+  $self->{OutfileHandle}->flush;
+
+  #####################
+  # Parse Inputs: module base name
+  if (@_){
+    $base_module_name = shift;
+  }else{
+    $self->error("$name: Missing base module name.\n".$usage);
+  }
+  # Parse Inputs: instance name
+  if (@_){
+    $inst_name = shift;
+    $self->error("$name: Instance -->$inst_name<-- already exists in module -->".caller()."<--\n".$usage)
+      if defined $self->{SubInstance_InstanceObj}{$inst_name};
+  }else{
+    $self->error("$name: Missing instance name.\n".$usage);
+  }
+
+  # Parse Inputs: parameters
+  @params = @_ if @_;
+
+  # debug print:
+  print STDERR "$name: Called for base module -->$base_module_name<-- and instance -->$inst_name<--\n"
+    if $self->{Debug} & 4;
+
+  #####################
+  # Analyze Inputs:
+  # module must exists and be imported:
+  my $load_module_msg = $self->load_base_module($base_module_name);
+  $self->error("$name: Failed to instantiate \"$inst_name\". Cannot locate/compile module \"${base_module_name}\".\n".
+               "Error Message: $load_module_msg")
+             unless $load_module_msg eq '';
+
+  # make an instance:
+  $instance = $base_module_name->new_as_son($self);
+  $self->{SubInstance_InstanceObj}{$inst_name} = $instance;
+  push(@{$self->{SubInstanceList}}, $inst_name);
+
+  #####################
+  # Decide what the new submodule name and the generated filename will be
+  $idx++;
+  $instance->{InstanceName} = $inst_name;
+  $instance->{UniqueModuleName} = $base_module_name.PARAM_UNQ_STR."_tmp".$idx;
+  $instance->{OutputFileName} = $instance->{UniqueModuleName}.$instance->{OutfileSuffix};
+
+
+  #####################
+  # Set the values for the sub-pre-processor based on instantiation line
+  $instance->{ParametersPriority} = GENESIS2_INHERITANCE_PRIORITY;
+  $instance->set_param(@params) if @params;
+  $instance->{ParametersPriority} = GENESIS2_DECLARATION_PRIORITY;
+
+  # FIXME: Avoid regenerating the same module multiple times
+
+  #####################
+  # Now, generate the verilog file, with the new init conditions
+  $instance->execute;
+
+  # no more parameter changes allowed
+  $instance->{ParametersPriority} = GENESIS2_ZERO_PRIORITY;
+
+
+  #####################
+  # Compare against previously generated files
+  my $instance_param_list = $instance->get_mod_param_list();
+  my $tgt_module_name = $base_module_name . $instance_param_list;
+  my $tgt_file_name = $tgt_module_name . $instance->{OutfileSuffix};
+  if (defined($self->{OutfileName_ContentCache}{$tgt_file_name})) {
+    $match = $self->compare_generated_files(
+              $instance->{OutputFileName},      # newly generated file
+              $tgt_file_name,                   # existing file
+              $instance->{UniqueModuleName} =>  # new instance name
+              $tgt_module_name                  # existing instance name
+          );
+    # The files should match -- we've got a problem if they don't
+    $self->error(
+      "$name: Newly generated parameter-uniquified $base_module_name does not\n".
+      "match previous parameter-uniquified generation!\n".
+      "Compare $instance->{OutputFileName} and previously generated $tgt_file_name")
+        unless $match;
+
+    # Use the existing file since they match and delete
+    # the newly generated file
+    $instance->{UniqueModuleName} = $tgt_module_name;
+    unlink(catfile($instance->{RawDir}, $instance->{OutputFileName}));
+    delete $self->{OutfileName_ContentCache}{$instance->{OutputFileName}};
+    $instance->{OutputFileName} = $tgt_file_name;
+  } else {
+    # This is the only copy of the module
+    my $orig_file_path = catfile($instance->{RawDir}, $instance->{OutputFileName});
+    my $new_file_path = catfile($instance->{RawDir}, $tgt_file_name);
+
+    my ($fhi, $fho);
+    open($fhi, "<$orig_file_path") ||
+        $self->error("$name: Couldn't open input file $orig_file_path: $!");
+    open($fho, ">$new_file_path") ||
+        $self->error("$name: Couldn't open output file $new_file_path: $!");
+
+    # Read the file and replace the temporary module name
+    my $inpat = $instance->{UniqueModuleName};
+    my @content = map { s/$inpat/$tgt_module_name/g; $_; } <$fhi>;
+
+    # Write the output file
+    map { print $fho $_; } @content;
+
+    close($fhi) or
+      $self->error("$name: Can not close file \"$orig_file_path\"");
+    close($fho) or
+      $self->error("$name: Can not close file \"$new_file_path\"");
+
+    $self->{OutfileName_ContentCache}{$tgt_file_name} = \@content;
+    unlink($orig_file_path);     # remove the newly created file
+    delete $self->{OutfileName_ContentCache}{$instance->{OutputFileName}}; # Clean the file from the cache
+
+    $instance->{UniqueModuleName} = $tgt_module_name; # Update the module name
+    $instance->{OutputFileName} = $tgt_file_name;     # Update the module filename
+  }
+
+  if (!defined $self->{ModuleCache}{$instance->{UniqueModuleName}}){
+    $self->{ModuleCache}{$instance->{UniqueModuleName}} = $instance;
+  }
+
+
+  #####################
+  # Reassign the parameter priority
+  $self->{ParametersPriority} = $prev_priority;
+
+  return $instance;
+}
+
+
 ## clone_inst
 ## An API method for instantiating a new module based on an existing one
 ## Usage: my $clone_inst = $self->clone_inst(src_inst, new_inst_name);
@@ -1386,10 +1565,43 @@ sub generate {
 						  "generate: Called without arguments");
     if (check_if_self($arg1)){
 	# This was a "method call" of this object, that's good.
+	if ($arg1->{CfgHandler}->{UnqStyle} == GENESIS2_UNQ_NUMERIC) {
+	    return $arg1->generate_unq_numeric(@_);
+	} else {
+	    return $arg1->generate_unq_param(@_);
+	}
+	return $arg1->unique_inst(@_);
+    }else{
+	# this was a "function call" (pass all arguments forward to the method)
+        return $Genesis2::UniqueModule::myself->generate($arg1, @_);
+    }
+}
+
+# Syntactic sugar for $self->unique_inst
+sub generate_unq_numeric {
+    my $arg1 = shift
+	or $Genesis2::UniqueModule::myself->error($Genesis2::UniqueModule::myself->{BaseModuleName}.
+						  "generate_unq_numeric: Called without arguments");
+    if (check_if_self($arg1)){
+	# This was a "method call" of this object, that's good.
 	return $arg1->unique_inst(@_);
     }else{
 	# this was a "function call" (pass all arguments forward to the method)
 	return $Genesis2::UniqueModule::myself->unique_inst($arg1, @_);
+    }
+}
+
+# Syntactic sugar for $self->unique_inst_param
+sub generate_unq_param {
+    my $arg1 = shift
+	or $Genesis2::UniqueModule::myself->error($Genesis2::UniqueModule::myself->{BaseModuleName}.
+						  "generate_unq_param Called without arguments");
+    if (check_if_self($arg1)){
+	# This was a "method call" of this object, that's good.
+	return $arg1->unique_inst_param(@_);
+    }else{
+	# this was a "function call" (pass all arguments forward to the method)
+	return $Genesis2::UniqueModule::myself->unique_inst_param($arg1, @_);
     }
 }
 
@@ -1629,6 +1841,37 @@ sub get_out_file_name{
 	or $self->error("$name: access restricted to ".__PACKAGE__." or Genesis2::Manager");
     return $self->{OutputFileName};
 }
+
+## get_unq_styles
+## Get the uniquification styles
+sub get_unq_styles {
+  my $name = __PACKAGE__."->get_unq_styles";
+  caller eq __PACKAGE__ || caller eq 'Genesis2::Manager'
+      or error("$name: access restricted to ".__PACKAGE__." or Genesis2::Manager");
+  return keys(%UNQ_STYLES);
+}
+
+## default_unq_style
+## Get the default uniquification style
+sub default_unq_style {
+  my $name = __PACKAGE__."->default_unq_style";
+  caller eq __PACKAGE__ || caller eq 'Genesis2::Manager'
+      or error("$name: access restricted to ".__PACKAGE__." or Genesis2::Manager");
+  return DEFAULT_UNQ_STYLE;
+}
+
+## str_to_unq_style
+## Parse the uniquification style
+sub str_to_unq_style {
+  my $name = __PACKAGE__."->str_to_unq_style";
+  caller eq __PACKAGE__ || caller eq 'Genesis2::Manager'
+      or error("$name: access restricted to ".__PACKAGE__." or Genesis2::Manager");
+
+  my $style = shift;
+  return $UNQ_STYLES{$style} if defined($UNQ_STYLES{$style});
+  return undef;
+}
+
 ################################################################################
 ############################## Auxiliary Functions #############################
 ################################################################################
@@ -1793,6 +2036,273 @@ sub set_param{
     }
   }
   1;
+}
+
+## split_param_name
+## Usage: split_param_name($prm_name);
+## Split a parameter name into words. Word starts are:
+##  - lowercase to uppercase transition
+##  - character following underscore
+##  - alpha -> number or number -> alpha
+sub split_param_name {
+  my $name = "split_param_name";
+  caller eq __PACKAGE__
+    or error("$name: Call to a base class private method is not allowed");
+
+  my $param = shift;
+
+  my $words = [];
+  my $curr = "";
+  my $prev_uscore = 1;
+  my $prev_num = 0;
+  my $prev_uc = 0;
+  foreach my $c (split//, $param) {
+    my $is_uscore = $c eq "_";
+    my $is_num = $c =~ /[0-9]/;
+    my $is_uc = $c =~ /[A-Z]/;
+
+    if (!$is_uscore) {
+      # Transitions: lowercase to uppercase, alpha to number, number to alpha
+      if (!$prev_uscore &&
+           ($is_num && !$prev_num ||
+            !$is_num && $prev_num ||
+            !$prev_num && $is_uc && !$prev_uc)) {
+        push @$words, uc($curr) if $curr ne "";
+        $curr = $c;
+      } else {
+        $curr .= $c;
+      }
+    } else {
+      push @$words, uc($curr) if $curr ne "";
+      $curr = "";
+    }
+
+    $prev_uscore = $is_uscore;
+    $prev_num = $is_num;
+    $prev_uc = $is_uc;
+  }
+
+  push @$words, uc($curr) if $curr ne "";
+
+  return $words;
+}
+
+## get_initial_regions
+## Usage: get_initial_regions($words);
+## Get the initial regions for a list of words to include in an abbreviation.
+## The initial region is 1 for non-numeric words and the length of the word for
+## numeric words.
+sub get_initial_regions {
+  my $name = "get_initial_regions";
+  caller eq __PACKAGE__
+    or error("$name: Call to a base class private method is not allowed");
+
+  my $words = shift;
+
+  my $regions = [];
+  foreach my $word (@$words) {
+    if ($word =~ /^[0-9]/) {
+      push @$regions, length($word);
+    } else {
+      push @$regions, 1;
+    }
+  }
+
+  return $regions;
+}
+
+## get_abbrev_from_regions
+## Usage: get_abbrev_from_regions($words, $regions);
+## Get an abbreviation from a list of words and their regions.
+## The $words and $region lists are the same length. The region value indicates
+## the number of characters to include in the abbreviation from the corresponding
+## word.
+sub get_abbrev_from_regions {
+  my $name = "get_initial_regions";
+  caller eq __PACKAGE__
+    or error("$name: Call to a base class private method is not allowed");
+
+  my $words = shift;
+  my $regions = shift;
+
+  if (scalar(@$words) != scalar(@$regions)) {
+    error("$name: words/regions are different lengths\n");
+  }
+
+  my $abbrev = "";
+  for (my $i = 0; $i < scalar(@$words); $i++) {
+    $abbrev .= substr($words->[$i], 0, $regions->[$i]);
+  }
+
+  return $abbrev;
+}
+
+## Abbreivation cache to potentially eliminate having to do the
+## abbreviation calculation multiple times.
+my %abbrev_cache;
+
+## gen_param_abbrevs
+## Usage: gen_param_abbrevs(@params);
+## Generate abbreviations for the ParameterList.
+sub gen_param_abbrevs {
+  my $self = shift;
+  my $name = $self->{BaseModuleName}."->get_param_abbrevs";
+  caller eq __PACKAGE__
+    or $self->error("$name: Call to a base class private method is not allowed");
+
+  # Check if we already have the abbreviation cached
+  if (!exists $self->{SortedParameterString}) {
+    $self->{SortedParameterString} = join(' ', sort @{$self->{ParametersList}});
+  }
+
+  if (exists $abbrev_cache{$self->{SortedParameterString}}) {
+    return $abbrev_cache{$self->{SortedParameterString}};
+  }
+
+  # Calculate the starting word/region pairs
+  my %wr_pairs;
+  foreach my $param (@{$self->{ParametersList}}) {
+    my $words = split_param_name($param);
+    my $regions = get_initial_regions($words);
+
+    $wr_pairs{$param} = [$words, $regions];
+  }
+
+  # Repeatedly generate the abbreviations and adjust the regions until we have
+  # no conflicts.
+  # FIXME: Should only need to regenerate the abbreviations that change.
+  my %abbrevs;
+  my $done = 0;
+  my $iter = 0;
+  while (!$done) {
+    $done = 1;
+    $iter++;
+    print STDERR "$name: Iteration $iter:\n" if $self->{Debug} & 2;
+
+    print STDERR "  Abbreviations:\n" if $self->{Debug} & 2;
+    my %abbrev_srcs;
+    map { delete $abbrevs{$_} } keys %abbrevs;
+    foreach my $param (@{$self->{ParametersList}}) {
+      my ($words, $regions) = @{$wr_pairs{$param}};
+      my $abbrev = get_abbrev_from_regions($words, $regions);
+      print "    $param -> $abbrev\n" if $self->{Debug} & 2;
+      $abbrevs{$param} = $abbrev;
+      if (!exists $abbrev_srcs{$abbrev}) {
+        $abbrev_srcs{$abbrev} = [];
+      }
+      push @{$abbrev_srcs{$abbrev}}, $param;
+    }
+
+    while (my ($abbrev, $params) = each(%abbrev_srcs)) {
+      next if (scalar(@$params) <= 1);
+
+      print "  Conflicting parameters: " . join(' ', @$params) . "\n"
+        if $self->{Debug} & 2;
+      $done = 0;
+      my $i_idx = each @$params;
+      my $i_param = $params->[$i_idx];
+      my $i_abbrev = $abbrevs{$i_param};
+      my ($i_words, $i_regions) = @{$wr_pairs{$i_param}};
+      while (my $j_idx = each @$params) {
+        my $j_param = $params->[$j_idx];
+        print "  Disabmiguating $i_param and $j_param\n"
+          if $self->{Debug} & 2;
+
+        my $j_abbrev = $abbrevs{$j_param};
+        my ($j_words, $j_regions) = @{$wr_pairs{$j_param}};
+
+        my $w_max = min(scalar(@$i_words), scalar(@$j_words));
+        my $updated = 0;
+        for (my $w_num = 0; $w_num < $w_max; $w_num++) {
+          my $i_word = $i_words->[$w_num];
+          my $j_word = $j_words->[$w_num];
+
+          if ($i_word ne $j_word) {
+            for (my $w_idx = 0; $w_idx < length($i_word); $w_idx++) {
+              if (substr($i_word, $w_idx, 1) ne substr($j_word, $w_idx, 1)) {
+                my $i_region = $i_regions->[$w_num];
+                my $j_region = $j_regions->[$w_num];
+
+                if ($w_idx + 1 > $i_region) {
+                  $i_regions->[$w_num] = $w_idx + 1;
+                  $updated = 1;
+                  print "  $i_param: $w_num set to " . ($w_idx + 1) . "\n"
+                    if $self->{Debug} & 2;
+                }
+                if ($w_idx + 1 > $j_region) {
+                  $j_regions->[$w_num] = $w_idx + 1;
+                  $updated = 1;
+                  print "  $j_param: $w_num set to " . ($w_idx + 1) . "\n"
+                    if $self->{Debug} & 2;
+                }
+
+                last;
+              }
+            }
+          }
+          last if ($updated);
+        }
+        if (!$updated) {
+          error("$name: could not disambiguate abbreviations for $i_param and $j_param\n");
+        }
+      }
+    }
+  }
+
+  return \%abbrevs;
+}
+
+
+## private: get_mod_param_list
+## Usage: $self->get_mod_param_list();
+## Generates a string of parameters that have been changed from their defaults.
+## The parameter names are abbreviated to reduce the size of the string.
+##
+## This string can be appended to the module name to create a unique module
+## name.
+sub get_mod_param_list{
+  my $self = shift;
+  my $name = $self->{BaseModuleName}."->get_mod_param_list";
+  caller eq __PACKAGE__
+    or $self->error("$name: Call to a base class private method is not allowed");
+
+  print STDERR "$name: Creating instance parameter list for \"" . $self->get_instance_path . "\"\n"
+      if $self->{Debug} & 4;
+
+
+  my $abbrevs = $self->gen_param_abbrevs();
+
+  # Create a list of non-default parameters
+  my @nondef_params;
+  foreach my $param (@{$self->{ParametersList}}) {
+    push @nondef_params, $param
+      if ($self->get_param_priority($param) > GENESIS2_DECLARATION_PRIORITY);
+  }
+
+  # Generate the parameter list string
+  my $ret = "";
+  foreach my $param (sort(@nondef_params)) {
+    next if $param =~ /^__/;
+    my $abbrev = $abbrevs->{$param};
+    my $val = $self->internal_get_param($param);
+
+    if (defined $val) {
+      $val =~ s/\./_/g;
+      $val =~ s/\'/_/g;
+      $val = 'FALSE_OR_EMPTY' if $val eq "";
+      $ret .= "_${abbrev}_${val}";
+    }
+    else {
+      $ret .= "_${abbrev}";
+    }
+  }
+
+  print STDERR "$name: Returning instance parameter list \"$ret\" for " .
+      "instance \"" . $self->get_instance_path . "\"\n"
+      if $self->{Debug} & 4;
+
+
+  return $ret;
 }
 
 #################################################################
