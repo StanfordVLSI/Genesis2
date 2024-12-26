@@ -67,6 +67,8 @@ use Carp; $Carp::MaxArgLen =16; $Carp::MaxArgNums = 1;
 use Env; # Make environment variables available
 use Term::ANSIColor;
 use File::Tee qw(tee);
+use Genesis2::UniqueModule qw(get_unq_styles default_unq_style
+                              str_to_unq_style);
 #use IO::Tee; # Used to tee stderr to a file
 
 
@@ -147,6 +149,11 @@ sub new {
   $self->{ModuleTail} = [];
 
   $self->{PRLESC} = quotemeta $self->{PrlEsc};
+
+  $self->{UnqStyle} = undef;            # Module uniquification style
+                                        # Use when 'generate' is called rather
+                                        # than 'generate_unq_numeric' or
+                                        # 'generate_unq_param'
 
   # what kind of work should we do?
   $self->{ParseMode} = 0;		# should we parse input file to generate perl modules?
@@ -316,6 +323,7 @@ sub parse_command_line {
      "xml=s" => \$self->{XmlInFileName},		# Input XML representation of definitions
      "cfg=s{,}" => $self->{CfgInFileNames},		# Input config file with more parameter definitions
      "parameter=s{,}" => $self->{PrmOverrides},		# List of parameter override defintions
+     "unqstyle=s" => \$self->{UnqStyle},                # Set preferred module uniquification style
 
      "log=s" => \$self->{LogFileName},			# Name of log file for genesis2 and user stderr messages
      "debug=i" => \$self->{Debug},			# Set the (initial) debug level
@@ -334,6 +342,12 @@ sub parse_command_line {
       if (scalar(@{$self->{InputFileLists}})==1 && ${$self->{InputFileLists}}[0] =~ /^\s*$/);
   $self->error("$name: '-parameter' flag used but no parameter is specified") 
       if (scalar(@{$self->{PrmOverrides}})==1 && ${$self->{PrmOverrides}}[0] =~ /^\s*$/);
+
+  $self->{UnqStyle} = default_unq_style() if !defined($self->{UnqStyle});
+  my @unq_styles = get_unq_styles();
+  $self->error("$name: Invalid module uniquification style specified: " .
+      "'$self->{UnqStyle}'. Valid styles: " . join(', ', @unq_styles))
+      if (!grep {$_ eq $self->{UnqStyle}} @unq_styles);
 
   # Special cases:
   $self->usage() if !$res || $help;
@@ -691,6 +705,7 @@ sub gen_verilog{
   # Set some back and forth pointers
   $self->{TopObj} = $module->new($self);
   $self->{CfgHandler}->SetTopObj($self->{TopObj});
+  $self->{CfgHandler}->SetUnqStyle(str_to_unq_style($self->{UnqStyle}));
 
   # Start working from the top level
   print STDERR "$name: Starting code generation from module $module\n";
