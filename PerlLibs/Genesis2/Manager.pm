@@ -96,8 +96,8 @@ sub new {
   $self->{VersionInfo} = [];
   $self->{LicenseFileName} = 
       "$ENV{GENESIS_HOME}/Info/Genesis2.lic"; # License file
-  $self->{LicenseInfo} = ["  !! THIS VERSION OF GENESIS2 IS NOT FOR ANY COMMERCIAL USE !!\n",
-			  "   FOR COMMERCIAL LICENSE CONTACT SHACHAM\@ALUMNI.STANFORD.EDU\n"];
+  $self->{LicenseInfo} = ["  Genesis2 is free software as governed by a BSD-style license,\n",
+			  "  see LICENSE.txt for specific terms and conditions.\n"];
 
   $self->{OutputFileName} = 'STDOUT';	# Where to place the output
   $self->{OutfileHandle} = *STDOUT;
