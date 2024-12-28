@@ -253,6 +253,7 @@ sub execute{
 
 sub usage {
   my $self = shift;
+  my $unq_styles = join(' ', get_unq_styles());
   print <<END_OF_MESSAGE;
 Usage:	
 	$0 [-option value, ...]
@@ -277,6 +278,7 @@ Generating Options:
 	[-parameter path.to.param1=value1 .. path.to.other.param2=value2]
 					# List of parameter override defintions
 
+	[-unqstyle style]		# Preferred module uniquification style [$unq_styles]
 Help and Debuging Options:
 	[-log filename]			# Name of log file for genesis2 and user stderr messages
 	[-debug level]			# Set debug level. Same as the inline debug directive.
