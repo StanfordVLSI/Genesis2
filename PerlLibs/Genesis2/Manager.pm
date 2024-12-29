@@ -375,19 +375,17 @@ sub parse_files{
   my ($infile, $suffix, $target, $directories);
   local (*FILE);
 
-  # First, lets consolidate all the file lists:
-  foreach my $filelist (@{$self->{InputFileLists}}){
-      open(FILE, $filelist) or
-	  $self->error("$name: Cannot open input filelist '$filelist'. $!\n");
-      while ($infile = <FILE>) {
-	  chomp $infile;
-	  next if $infile =~ /\s*\#/; # ignore "#" comments
-	  next if $infile =~ /^\s*$/; # ignore empty lines
-	  $infile =~ s/\s//g; # get rid of spaces
-	  print STDERR "$name: Adding $filelist:$infile to parse list\n" if $self->{Debug};
-	  push (@{$self->{InputFileNames}}, $infile);
-      }
-      close FILE;
+  # First, process all the inputlist files
+  if (scalar(@{$self->{InputFileLists}})) {
+    $self->{UnprocessedInputLists} = [];
+    $self->{ProcessedInputLists} = [];    # absolute paths of processed inputlists
+                                          # to avoid processing the same inputlist twice
+
+    @{$self->{UnprocessedInputLists}} = @{$self->{InputFileLists}};
+
+    while (scalar(@{$self->{UnprocessedInputLists}})) {
+      $self->parse_inputlist(shift @{$self->{UnprocessedInputLists}});
+    }
   }
 
   # create and move into work directory
@@ -440,6 +438,144 @@ sub parse_files{
   chdir $self->{CallDir} or $self->error("Cannot cd back to $self->{CallDir} from $self->{WorkDir}");
 
   1;
+}
+
+## Parse an inputlist file.
+##
+## inputlist file can contain -incpath, -srcpath, -input, and -inputlist
+## commands, in addition to files to process.
+##
+## Args: inputlist filename (string)
+## Returns: none
+## Modifies: $self->{InputFileLists}
+##           $self->{InputFileNames}
+##           $self->{SourcesPath}
+##           $self->{IncludesPath}
+sub parse_inputlist{
+    my $self = shift;
+    my $filename = shift;
+
+    my $name = __PACKAGE__."->parse_inputlist";
+
+    my ($infile, $suffix, $target, $directories);
+
+    print STDERR "--- Processing inputlist file $filename...\n"
+        if $self->{Debug};
+
+    # Check whether we've already processed this file
+    my $il_path = abs_path($filename);
+    foreach my $p (@{$self->{ProcessedInputLists}}) {
+        if ($il_path eq $p) {
+            print STDERR "   --- Info: Already processed $il_path; skipping.\n"
+                if $self->{Debug};
+            return;
+        }
+    }
+    push @{$self->{ProcessedInputLists}}, $il_path;
+
+    # Save current directory for this file so that we can
+    # use it for subsequent files and directories.
+
+    my $dir = dirname($il_path);
+
+    my $IL_FILE;
+    open $IL_FILE, '<', $il_path or
+        $self->error("$name: Cannot open inputlist file '$il_path'. $!\n");
+
+    my $line;
+    while ($line = <$IL_FILE>) {
+        # Strip comments and trailing whitespace
+        $line =~ s/#.*//;
+        chomp $line;
+
+        next if $line eq "";
+
+        $line =~ s/^\s+//;
+
+        # Match command with args: -cmd <arg1> <arg2> ...
+        if ($line =~ m{^(-\w+)\s+(.*)}) { # -cmd <file or dir list>
+            my $cmd = $1;
+            my @paths = split ' ', $2;
+
+
+            # Convert relative paths to absolute paths and expand env vars
+            my @new_paths = ();
+            foreach my $path (@paths) {
+                my $orig = $path;
+
+                # Expand environment variables
+                while ($path =~ m/\$\{?(\w+)\}?/) {
+                    my $env_var = $1;
+                    if (defined $ENV{$env_var}) {
+                        $path =~ s/\$\{?(\w+)\}?/$ENV{$env_var}/e;
+                    } else {
+                        print STDERR "   --- WARNING: ignoring path $orig: " .
+                            "environment var $env_var is undefined " .
+                            "at $il_path:$.\n";
+                        next;
+                    }
+                }
+
+                # Prepend current directory if path is not absolute
+                if (!file_name_is_absolute($path)) {
+                    $path = catfile($dir, $path);
+                }
+
+                # Convert to an absolute path
+                my $abspath = abs_path($path);
+                if (!$abspath) {
+                    print STDERR "   --- WARNING: ignoring path $path " .
+                        "(derived from $orig): non-existent path on " .
+                        "$il_path:$.\n";
+                    next;
+                }
+                push @new_paths, $abspath;
+            }
+            @paths = @new_paths;
+
+            if ($cmd eq '-input' or $cmd eq '-inputlist' or
+                $cmd eq '-incpath' or $cmd eq '-srcpath') {
+                my ($var, $comment, $addUnprocInputLists);
+                $addUnprocInputLists = 0;
+                if ($cmd eq '-input') {
+                    $var = 'InputFileNames';
+                    $comment = 'file';
+                } elsif ($cmd eq '-inputlist') {
+                    $var = 'InputFileLists';
+                    $comment = 'inputlist';
+                    $addUnprocInputLists = 1;
+                } elsif ($cmd eq '-incpath') {
+                    $var = 'IncludesPath';
+                    $comment = 'incpath';
+                } elsif ($cmd eq '-srcpath') {
+                    $var = 'SourcesPath';
+                    $comment = 'srcpath';
+                }
+                foreach my $file (@paths) {
+                    push @{$self->{$var}}, $file;
+                    print STDERR "   --- adding $comment $file.\n"
+                        if ($self->{Debug});
+                    push @{$self->{UnprocessedInputLists}}, $file
+                        if $addUnprocInputLists;
+
+                }
+            }
+        }
+
+        # Match file names (no leading hyphen)
+        elsif ($line =~ m{^([^-][^\s]*)$}) {
+            push @{$self->{InputFileNames}}, $1;
+            print STDERR "   --- adding file $1.\n" if ($self->{Debug});
+            next LINE;
+        }
+
+        else {
+            $self->error("$name: Syntax error in file $il_path at line $.\n");
+        }
+    }
+    close $IL_FILE;
+
+    1;
 }
 
 ## include:
