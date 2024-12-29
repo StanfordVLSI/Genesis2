@@ -89,7 +89,7 @@ use constant GENESIS2_PRIORITY =>  qw(_GENESIS2_ZERO_PRIORITY_
 use Term::ANSIColor;
 
 @ISA = qw(Exporter);
-@EXPORT = qw(mname iname bname sname generate generate_base
+@EXPORT = qw(mname iname bname sname generate generate_base generate_w_name
              generate_unq_numeric generate_unq_param
              clone parameter synonym error warning
             );
@@ -1637,6 +1637,32 @@ sub generate_base {
     }
 }
 
+## Create a module with a given name
+## Syntactic sugar for synonym + ununique_inst
+## Usage:
+## //; my $inst = $self->generate_w_name(base_module_name, gen_module_name,
+## //;                                   inst_name [, prm1 => val1,
+## //;                                                prm2 => val2, ...]);
+sub generate_w_name {
+    my $arg1 = shift
+        or $Genesis2::UniqueModule::myself->error($Genesis2::UniqueModule::myself->{BaseModuleName}.
+                                                  "generate_w_name: Called without arguments");
+    if (check_if_self($arg1)){
+        # This was a "method call" of this object, that's good.
+        my $base_module_name = shift
+            or $Genesis2::UniqueModule::myself->error($Genesis2::UniqueModule::myself->{BaseModuleName}.
+                                                      "generate_w_name: Called without base module name.");
+        my $gen_module_name = shift
+            or $Genesis2::UniqueModule::myself->error($Genesis2::UniqueModule::myself->{BaseModuleName}.
+                                                      "generate_w_name: Called without generated module name.");
+
+        synonym($base_module_name, $gen_module_name);
+        return $arg1->ununique_inst($gen_module_name, @_);
+    }else{
+        # this was a "function call" (pass all arguments forward to the method)
+        return $Genesis2::UniqueModule::myself->generate_w_name($arg1, @_);
+    }
+}
 
 ## sub parameter:
 ## Syntactic sugar for $self->define_param, $self->force_param, $self->doc_param, $self->param_range
