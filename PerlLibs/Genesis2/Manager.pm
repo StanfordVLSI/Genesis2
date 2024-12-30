@@ -916,6 +916,62 @@ sub gen_verilog{
 ############################## Auxiliary Functions##############################
 ################################################################################
 
+## find_file_safe:
+## This function receives a file name and a search path and returns
+## the absolute file name if found, or undef otherwise.
+## Usage: $self->find_file_safe(file_name, path_by_ref=[])
+my %ffs_dir_cache;
+sub find_file_safe{
+  my $self = shift;
+  my $file = shift;
+  my $name = __PACKAGE__."->find_file_safe";
+  my $path = [];
+  my ($dir, $filefound);
+  if (@_){
+    $path = shift;
+  }
+
+  # find the file:
+  $filefound = 0;
+  print STDERR "$name: Searching for file $file\n" if $self->{Debug} & 2;
+  if ($file =~ /^\//) {
+    # file is absolute path
+    $filefound = 1 if (-e $file);
+  }else {
+    foreach $dir ($self->{CallDir}, @{$path}) {
+	# if relative path, start it from the dir from which the script was called
+	unless ($dir =~ /^\//) { $dir = $self->{CallDir}."/".$dir;}
+
+        # Scan directory and cache contents
+        if (!defined($ffs_dir_cache{$dir})) {
+          $ffs_dir_cache{$dir} = {};
+          my @files = map {basename $_} glob("$dir/*");
+          foreach my $file (@files) {
+            $ffs_dir_cache{$dir}->{$file} = 1;
+          }
+        }
+
+        # Check if the file is in the directory
+        $filefound = defined($ffs_dir_cache{$dir}->{$file});
+        if ($filefound) {
+          # Change file path so it is now absolute.
+          $file = "${dir}/${file}";
+          last; # got one, so exit the loop
+        }
+    }
+  }
+
+  if ($filefound) {
+    $file = abs_path($file);
+    $ffs_dir_cache{$file} = dirname($file);
+    print STDERR "$name: found source: $file\n" if ($self->{Debug} & 2);
+  } else {
+    $file = undef;
+  }
+  return $file;
+}
+
+
 ## find_file:
 ## This function receives a file name and a search path and returns
 ## the absolute file name if found. Error and die otherwise.
@@ -925,35 +981,13 @@ sub find_file{
   my $file = shift;
   my $name = __PACKAGE__."->find_file";
   my $path = [];
-  my ($dir, $filefound);
   if (@_){
     $path = shift;
   }
 
-  # find the file:
-  $filefound = 0;
-  print "$name: Searching for file $file\n" if $self->{Debug} & 2;
-  if ($file =~ /^\//) {
-    # file is absolute path
-    $filefound = 1 if (-e $file);
-  }else {
-    foreach $dir ($self->{CallDir}, @{$path}) {
-	# if relative path, start it from the dir from which the script was called
-	unless ($dir =~ /^\//) { $dir = $self->{CallDir}."/".$dir;}
-
-	$filefound = 1 if (-e "${dir}/${file}");
-	if ($filefound) {
-	    # Change file path so it is now absolute.
-	    $file = "${dir}/${file}";
-	    last; # got one, so exit the loop
-	}
-    }
-  }
-
-  $file = abs_path($file) if $filefound;
-  print "$name: found source: $file\n" if ($filefound && ($self->{Debug} & 2));
-  $self->error("$name: Can not find file $file \n Search Path: @{$path}") unless $filefound;
-  return $file;
+  my $filefound = $self->find_file_safe($file, $path);
+  $self->error("$name: Can not find file $file \n Search Path: @{$path}") unless defined $filefound;
+  return $filefound;
 }
 
 
