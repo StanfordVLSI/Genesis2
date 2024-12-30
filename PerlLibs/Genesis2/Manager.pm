@@ -991,6 +991,29 @@ sub find_file{
 }
 
 
+## add_suffix:
+## Add one of the infile suffixes to the file name to match a file in the
+## search path. No suffix is added if the file name already matches an existing
+## file.
+## Usage: $self->add_suffix(file_name)
+sub add_suffix{
+  my $self = shift;
+  my $file = shift;
+  my $name = __PACKAGE__."->add_suffix";
+
+  foreach my $suffix ('', @{$self->{InfileSuffixes}}) {
+    my $file_w_suffix = $file . $suffix;
+    my $foundfile = $self->find_file_safe($file_w_suffix, $self->{SourcesPath});
+    if (defined $foundfile) {
+      return $file_w_suffix;
+    }
+  }
+  $self->error("$name: Can not find suffix for file $file\n" .
+               "Search path: @{$self->{SourcesPath}}");
+  return undef;
+}
+
+
 ## sub error
 ## usage: $self->error("error message");
 sub error {
