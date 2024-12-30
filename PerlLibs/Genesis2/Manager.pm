@@ -397,6 +397,10 @@ sub parse_files{
   
   # Now work those file baby
   foreach $infile (@{$self->{InputFileNames}}){
+    # Don't re-parse files that have already been parsed.
+    next if defined($self->{DependHistogram}{$infile});
+
+    # Parse the file
     $self->parse_file_core($infile);
   }
   
