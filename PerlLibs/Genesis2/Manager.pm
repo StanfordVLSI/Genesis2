@@ -440,6 +440,66 @@ sub parse_files{
   1;
 }
 
+## parse_unprocessed_file:
+## parse_unprocessed_file parses a single file and dumps the coresponding perl
+## module file only if the file has not been parsed yet.
+sub parse_unprocessed_file {
+  my $self = shift;
+  my $infile = shift;
+  my $name = __PACKAGE__."->parse_unprocessed_file";
+
+  # Don't re-parse files that have already been parsed.
+  return if defined($self->{DependHistogram}{$infile});
+
+  # create and move into work directory
+  unless (-e $self->{WorkDir} && -d $self->{WorkDir}) {
+      mkdir $self->{WorkDir} or
+	  $self->error("Cannot find and cannot create work folder \"".$self->{WorkDir}."\"");
+  }
+  chdir $self->{WorkDir} or $self->error("Cannot cd into $self->{WorkDir}");
+
+  $self->{ModuleHead} = [];
+  $self->{ModuleBody} = [];
+  $self->{ModuleTail} = [];
+  print STDERR "$name: Now parsing file $infile\n";
+
+  # make an output file
+  my ($target, $directories) = fileparse($infile);
+  foreach my $suffix (@{$self->{InfileSuffixes}}) {
+      $self->{CurInfileSuffix} = $suffix;
+      last if ($target =~ s/\Q$suffix\E$//); # remove the input suffix
+  }
+  $self->{OutputFileName} = $target . $self->{OutfileSuffix};
+  $self->{OutfileHandle} = new FileHandle;
+  open($self->{OutfileHandle}, ">$self->{OutputFileName}") ||
+    $self->error("$name: Couldn't open output file $self->{OutputFileName}: $!");
+
+  # save the name for your records
+  if (defined $self->{DependHistogram}{$infile}){
+    $self->{DependHistogram}{$infile} = $self->{DependHistogram}{$infile}+1
+  }else{
+    print {$self->{DependHandle}} "src $infile\n" if defined $self->{DependHandle};
+    $self->{DependHistogram}{$infile} = 1;
+  }
+
+  #initialize output file
+  $self->init_perl_module($target);
+
+  # parse the input
+  $self->parse_file($infile, $self->{SourcesPath}, "src");
+
+  # finalize output file
+  $self->finish_perl_module;
+
+  # clean up
+  close($self->{OutfileHandle});
+
+  # move back to home folder
+  chdir $self->{CallDir} or $self->error("Cannot cd back to $self->{CallDir} from $self->{WorkDir}");
+
+  1;
+}
+
 ## Parse an inputlist file.
 ##
 ## inputlist file can contain -incpath, -srcpath, -input, and -inputlist
