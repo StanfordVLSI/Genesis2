@@ -397,41 +397,7 @@ sub parse_files{
   
   # Now work those file baby
   foreach $infile (@{$self->{InputFileNames}}){
-    $self->{ModuleHead} = [];
-    $self->{ModuleBody} = [];
-    $self->{ModuleTail} = [];
-    print STDERR "$name: Now parsing file $infile\n";
-
-    # make an output file
-    ($target, $directories) = fileparse($infile);
-    foreach my $suffix (@{$self->{InfileSuffixes}}) {
-	$self->{CurInfileSuffix} = $suffix;
-	last if ($target =~ s/\Q$suffix\E$//); # remove the input suffix
-    }
-    $self->{OutputFileName} = $target . $self->{OutfileSuffix};
-    $self->{OutfileHandle} = new FileHandle;
-    open($self->{OutfileHandle}, ">$self->{OutputFileName}") || 
-      $self->error("$name: Couldn't open output file $self->{OutputFileName}: $!");
-
-    # save the name for your records
-    if (defined $self->{DependHistogram}{$infile}){
-      $self->{DependHistogram}{$infile} = $self->{DependHistogram}{$infile}+1
-    }else{
-      print {$self->{DependHandle}} "src $infile\n" if defined $self->{DependHandle};
-      $self->{DependHistogram}{$infile} = 1;
-    }
-
-    #initialize output file
-    $self->init_perl_module($target);
-
-    # parse the input
-    $self->parse_file($infile, $self->{SourcesPath}, "src");
-
-    # finalize output file
-    $self->finish_perl_module;
-
-    # clean up
-    close($self->{OutfileHandle});
+    $self->parse_file_core($infile);
   }
   
   # move back to home folder
@@ -457,6 +423,22 @@ sub parse_unprocessed_file {
 	  $self->error("Cannot find and cannot create work folder \"".$self->{WorkDir}."\"");
   }
   chdir $self->{WorkDir} or $self->error("Cannot cd into $self->{WorkDir}");
+
+  $self->parse_file_core($infile);
+
+  # move back to home folder
+  chdir $self->{CallDir} or $self->error("Cannot cd back to $self->{CallDir} from $self->{WorkDir}");
+
+  1;
+}
+
+# parse_file_core:
+# parse_file_core parses a file and dumps the coresponding perl
+# module file. Used by both parse_files and parse_unprocessed_file.
+sub parse_file_core{
+  my $self = shift;
+  my $infile = shift;
+  my $name = __PACKAGE__."->parse_file_core";
 
   $self->{ModuleHead} = [];
   $self->{ModuleBody} = [];
@@ -493,9 +475,6 @@ sub parse_unprocessed_file {
 
   # clean up
   close($self->{OutfileHandle});
-
-  # move back to home folder
-  chdir $self->{CallDir} or $self->error("Cannot cd back to $self->{CallDir} from $self->{WorkDir}");
 
   1;
 }
