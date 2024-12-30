@@ -2734,6 +2734,9 @@ sub load_base_module{
       return $err_msg;
   }
   else{
+      my $base_module_name_adj =
+          $self->{Manager}->add_suffix($base_module_name);
+      $self->{Manager}->parse_unprocessed_file($base_module_name_adj);
       eval {require $base_module_file};
       # Check for errors
       if ($@){
