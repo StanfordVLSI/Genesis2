@@ -51,7 +51,7 @@ setup(
     author='Keyi Zhang',
     author_email='keyi@cs.stanford.edu',
     description='Python wrapper for Genesis2',
-    url="https://github.com/Kuree/genesis2",
+    url="https://github.com/StanfordVLSI/Genesis2/pip/genesis2",
     ext_modules=[Genesis2Extension('genesis2')],
     scripts=["bin/Genesis2.pl"],
     cmdclass=dict(build_ext=Genesis2Build),
