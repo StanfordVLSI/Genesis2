@@ -35,16 +35,24 @@ class Genesis2Build(build_ext):
         extdir = os.path.join(extdir, "Genesis2-src")
         if os.path.isdir(extdir):
             shutil.rmtree(extdir)
+
+        # delete large/unnecessary gui folder---it used to be
+        # 'Genesis2Tools/gui', soon it will be just './gui'
+
+        gui_folder_old = os.path.join(GENESIS2_PATH, "Genesis2Tools", "gui")
+        if os.path.isdir(gui_folder_old): shutil.rmtree(gui_folder_old)
+
+        gui_folder_new = os.path.join(GENESIS2_PATH, "gui")
+        if os.path.isdir(gui_folder_new): shutil.rmtree(gui_folder_new)
+
         # copy everything over
+
         assert os.path.isdir(GENESIS2_PATH)
-        gui_folder = os.path.join(GENESIS2_PATH, "Genesis2Tools", "gui")
-        if os.path.isdir(gui_folder):
-            shutil.rmtree(gui_folder)
         shutil.copytree(GENESIS2_PATH, extdir)
 
 setup(
     name='genesis2',
-    version='0.0.6',
+    version='0.0.7',
     packages=[
         "genesis2"
     ],
