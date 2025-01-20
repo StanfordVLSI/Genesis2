@@ -1,6 +1,10 @@
 #!/usr/bin/perl
 #line 2 "/usr/bin/par-archive"
 
+hello hello surely this will break things
+echo "BREAK BREAK BREAK"; exit 13:wq
+
+
 eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}'
     if 0; # not running under some shell
 eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}'
