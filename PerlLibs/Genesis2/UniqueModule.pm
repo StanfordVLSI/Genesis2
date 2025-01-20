@@ -1914,7 +1914,7 @@ sub to_verilog{
     $self->error("$name: Call to a protected method is not allowed");
   my $srcfile = shift;
 
-  print STDERR "$name: Generating".$self->get_instance_path()."\n"
+  print STDERR "$name: Generating ".$self->get_instance_path()."\n"
       if $self->{Debug};
   print STDERR "$name: Started printing to ".catfile($self->{RawDir},$self->{OutputFileName})."\n"
     if $self->{Debug} & 1;

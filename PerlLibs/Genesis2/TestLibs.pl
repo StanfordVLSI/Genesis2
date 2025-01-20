@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # add the genesis folder to the @INC path:
 use lib "$ENV{GENESIS_LIBS}";
