@@ -11,8 +11,11 @@ for each step.
 Optionally, can do it all manually:
 ```
   # BUILD AND INSTALL
-  version=0.0.8
+  version=0.0.9
+  ls dist
+  mv dist/* archives
   python3 setup.py sdist |& tee sdist-$version.log
+  ls dist
   twine upload dist/* |& tee twine-$version.log
 
   # CLEANUP
@@ -20,3 +23,8 @@ Optionally, can do it all manually:
   for p in Genesis2/ build/ genesis2.egg-info/ dist/; do test -e $p && echo mv $p $d; done
   # (cut'n'paste commands resulting from above)
 ```
+
+Try it out:
+  source /nobackup/steveri/garnet_venv/bin/activate
+  pip uninstall genesis2
+  pip install genesis2 |& tee tmp.log
