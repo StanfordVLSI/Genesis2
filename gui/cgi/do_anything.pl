@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 use strict;
 do './utils.pl'; #  includes get_system_dependences(), get_input_parms()
 my $LDBG = 0;

@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 #
 # This file is used to generate lib/XML/SAX/Base.pm.  There is a pre-generated
 # Base.pm file included in the distribution so you don't need to run this
