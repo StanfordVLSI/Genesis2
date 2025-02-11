@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # Useful shortcuts:
 #  alias stfind="ps x | egrep '[/]stew' | awk '{print \$1}'"
