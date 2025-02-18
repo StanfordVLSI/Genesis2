@@ -38,6 +38,8 @@ jobs:
     - name: Echo Foo
       run: |
         echo FOOOOOO
+        yes | head -1000 | cat -n
+        echo FOOOOOO
         exit 13
 
     - name: Echo Bar
