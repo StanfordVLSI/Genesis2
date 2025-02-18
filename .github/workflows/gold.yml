@@ -21,13 +21,13 @@ jobs:
     steps:
 
     - name: Action, branch, and repo information.
-      run: echo Action = ${{ github.event_name }}, branch = ${{ github.ref }}
-      # run: printf "\n\n    Action = ${{ github.event_name }}, branch = ${{ github.ref }}\n\n"
+      # run: echo Action = ${{ github.event_name }}, branch = ${{ github.ref }}
+      run: printf "\n\n    Action = ${{ github.event_name }}, branch = ${{ github.ref }}\n\n"
       #  : echo "Branch '${{ github.ref }}' in repo '${{ github.repository }}'."
 
     - name: Check out repository code
       uses: actions/checkout@v2
-      run: printf '\n\n\n'
+#       run: printf '\n\n\n'
 #       with:
 #         submodules: recursive
 
