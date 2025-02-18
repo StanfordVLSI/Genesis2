@@ -26,9 +26,9 @@ jobs:
 
     - name: Check out repository code
       uses: actions/checkout@v2
+      run: printf '\n\n\n'
 #       with:
 #         submodules: recursive
-      run: printf '\n\n\n'
 
 
 
