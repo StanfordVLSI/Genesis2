@@ -40,7 +40,7 @@ jobs:
         echo FOOOOOO
         yes | head -1000 | cat -n
         echo FOOOOOO
-        pause 1000
+        sleep 1000
         exit 13
 
     - name: Echo Bar
