@@ -49,45 +49,34 @@ function dexec { docker exec $container /bin/bash -c "$*"; }
 aha_garnet_cmd="aha garnet --width 4 --height 2 --verilog --use_sim_sram"
 build_garnet="source /aha/bin/activate && $aha_garnet_cmd"
 
-# Trap and kill docker container on exit
+# TRAPPER KILLER: Trap and kill docker container on exit
 function cleanup { set -x; docker kill $container; }
 trap cleanup EXIT
 
-# Update pip package for latest version of Genesis2
+# UPDATE PIP package for latest version of Genesis2
 dexec "source /aha/bin/activate && pip uninstall -y genesis2 && pip install genesis2"
 
 ##############################################################################
-# Build gold using Genesis2 branch "master"
-printf "\nINFO Build gold using Genesis2 branch 'master'"
+# GOLD-BUILD (master)
+printf "\nINFO Build gold-model verilog using Genesis2 branch 'master'"
 dexec "$build_garnet"
-
-# Cleanup gold
-printf "\nINFO Clean up gold model detritus\n"
 docker cp ${container}:/aha/garnet/garnet.v tmp-garnet.v0
-dexec 'cd /aha/garnet; make clean'
+dexec 'cd /aha/garnet; make clean'  # Clean up your mess
 
+# Can do this if want to accommodate commits like e.g. 'pull/9/head'
+# if $commit ~ '^pull/'; then git fetch origin $commit:TEST; commit=TEST; fi
 
 ##############################################################################
-# Build target using Genesis2 branch "$commit"
-printf "\nINFO Build target using Genesis2 branch '$commit'\n"
-# dexec "cd /aha/lib/python3.8/site-packages/Genesis2-src; git fetch origin" || exit 13
-# dexec "cd /aha/lib/python3.8/site-packages/Genesis2-src; git checkout -q $commit" || exit 13
-# dexec "cd /aha/lib/python3.8/site-packages/Genesis2-src; git branch -v"
-
+# TEST-BUILD ($commit)
+printf "\nINFO Build test-model verilog using Genesis2 branch '$commit'\n"
 REPO=/aha/lib/python3.8/site-packages/Genesis2-src
-dexec "cd $REPO; git fetch origin $commit:TEST" || exit 13
-dexec "cd $REPO; git checkout -q TEST" || exit 13
-dexec "cd $REPO; git branch -v"
+dexec "cd $REPO; git pull; checkout -q $commit" || exit 13
 dexec "$build_garnet"
-
-# Cleanup target
-printf "\nINFO Clean up test model detritus\n"
 docker cp ${container}:/aha/garnet/garnet.v tmp-garnet.v1
-dexec 'cd /aha/garnet; make clean'
-
+dexec 'cd /aha/garnet; make clean'  # Clean up
 
 ##############################################################################
-# Compare gold and target; use vcompare from aha repo
+# COMPARE "gold" and "test"; use vcompare utility from aha repo
 ls -l tmp-garnet.v[01]
 if ! test -e tmp-vcompare.sh; then
     docker cp ${container}:/aha/.buildkite/bin/vcompare.sh tmp-vcompare.sh
@@ -124,3 +113,12 @@ else
     # TEST PASSED
     echo "Test PASSED"
 fi
+
+
+# THE TRASH
+
+# dexec "cd /aha/lib/python3.8/site-packages/Genesis2-src; git fetch origin" || exit 13
+# dexec "cd /aha/lib/python3.8/site-packages/Genesis2-src; git checkout -q $commit" || exit 13
+# dexec "cd /aha/lib/python3.8/site-packages/Genesis2-src; git branch -v"
+
+# dexec "cd $REPO; git branch -v"
