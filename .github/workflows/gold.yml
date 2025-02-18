@@ -20,37 +20,41 @@ jobs:
 
     steps:
 
-    # Action, branch, and repo information.
-    - name: INFO
-      run: echo Action = ${{ github.event_name }}, branch = ${{ github.ref }}
+    - name: Action, branch, and repo information.
+      run: printf "\n\n    Action = ${{ github.event_name }}, branch = ${{ github.ref }}\n\n"
       #  : echo "Branch '${{ github.ref }}' in repo '${{ github.repository }}'."
 
     - name: Check out repository code
       uses: actions/checkout@v2
 #       with:
 #         submodules: recursive
+      run: printf '\n\n\n'
+
+
 
 
 #     - uses: actions/checkout@v1
 #       with:
 #         submodules: recursive
-
-    - name: Echo Foo
-      run: |
-        echo FOOOOOO
-        yes | head -1000 | cat -n
-        echo FOOOOOO
-        sleep 1000
-        exit 13
-
-    - name: Echo Bar
-      run: |
-        echo BARRRRR
-        exit 0
+# 
+#     - name: Echo Foo
+#       run: |
+#         echo FOOOOOO
+#         yes | head -1000 | cat -n
+#         echo FOOOOOO
+#         sleep 1000
+#         exit 13
+# 
+#     - name: Echo Bar
+#       run: |
+#         echo BARRRRR
+#         exit 0
 
     - name: Gold Test
       run: |
+        printf '\n\n\n'
         pwd
         ls -l test
         echo test/genesis-ci.sh master ${{ github.ref }}
         test/genesis-ci.sh master ${{ github.ref }}
+        printf '\n\n\n'
