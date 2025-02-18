@@ -70,7 +70,7 @@ dexec 'cd /aha/garnet; make clean'  # Clean up your mess
 # TEST-BUILD ($commit)
 printf "\nINFO Build test-model verilog using Genesis2 branch '$commit'\n"
 REPO=/aha/lib/python3.8/site-packages/Genesis2-src
-dexec "cd $REPO; git pull; checkout -q $commit" || exit 13
+dexec "cd $REPO; git pull; git checkout -q $commit" || exit 13
 dexec "$build_garnet"
 docker cp ${container}:/aha/garnet/garnet.v tmp-garnet.v1
 dexec 'cd /aha/garnet; make clean'  # Clean up
@@ -113,6 +113,12 @@ else
     # TEST PASSED
     echo "Test PASSED"
 fi
+
+# ...but what if master got corrupted and test-branch preserves that?
+# ...test will pass but answer is wrong??
+# ...need a functional test?
+# TODO functional test i.e. maybe like 'aha regress fast' or some such...?
+# NOTE once we have a functional test...probably don't need comparison test no more...?
 
 
 # THE TRASH

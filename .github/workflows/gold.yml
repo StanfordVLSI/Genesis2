@@ -1,0 +1,53 @@
+# % (cd /nobackup/steveri/github; less */.github/workflows/*.yml)
+
+
+name: Gold Compare
+
+# on:
+#   push:
+#     branches:
+#       - master
+#   pull_request:
+#     branches:
+#       - master
+
+# Runs on every push. Note (I think) PR triggers at least one push?
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    # Action, branch, and repo information.
+    - name: INFO
+      run: echo Action = ${{ github.event_name }}, branch = ${{ github.ref }}
+      #  : echo "Branch '${{ github.ref }}' in repo '${{ github.repository }}'."
+
+    - name: Check out repository code
+      uses: actions/checkout@v2
+#       with:
+#         submodules: recursive
+
+
+#     - uses: actions/checkout@v1
+#       with:
+#         submodules: recursive
+
+    - name: Echo Foo
+      run: |
+        echo FOOOOOO
+        exit 13
+
+    - name: Echo Bar
+      run: |
+        echo BARRRRR
+        exit 0
+
+    - name: Gold Test
+      run: |
+        pwd
+        ls -l test
+        echo test/genesis-ci.sh master ${{ github.ref }}
+        test/genesis-ci.sh master ${{ github.ref }}
