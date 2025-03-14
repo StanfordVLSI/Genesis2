@@ -1,15 +1,4 @@
-# % (cd /nobackup/steveri/github; less */.github/workflows/*.yml)
-
-
 name: Gold Compare
-
-# on:
-#   push:
-#     branches:
-#       - master
-#   pull_request:
-#     branches:
-#       - master
 
 # Runs on every push. Note (I think) PR triggers at least one push?
 on: [push]
@@ -17,7 +6,7 @@ on: [push]
 # StackOverflow 58033366
 env:
   BRANCH_NAME: ${{ github.head_ref || github.ref_name}}
-  SHOW_ACTION: Action = ${{ github.event_name }}
+  SHOW_ACTION: "    Action = ${{ github.event_name }}"
   SHOW_BRANCH: branch = ${{ github.ref }}
   SHOW_BNAME:  BRANCH_NAME = $$BRANCH_NAME
   SHOW_SHA:    sha = ${{ github.sha }}
@@ -29,7 +18,7 @@ jobs:
     steps:
     - name: Action, branch, and repo information.
       run: |
-        printf "\n    $SHOW_ACTION\n    $SHOW_BRANCH\n    $SHOW_BNAME\n    $SHOW_SHA\n"
+        printf "\n$SHOW_ACTION\n    $SHOW_BRANCH\n    $SHOW_BNAME\n    $SHOW_SHA\n"
 
     - name: Check out repository code
       uses: actions/checkout@v2

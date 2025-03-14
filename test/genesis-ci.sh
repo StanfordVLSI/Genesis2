@@ -3,9 +3,11 @@
 USAGE="
   $0 <commit>
 
+  DESCRIPTION: Builds garnet using both master and <commit>, verifies both get same answer.
+
   EXAMPLES:
-    $0 master
     $0 pull/9/head  # Test pull-request #9
+    $0 fixbugs      # Test branch 'fixbugs'
     $0 59a8c39a4    # fails maybe?
     $0 7c941e7c1    # good maybe?
 "
@@ -13,7 +15,7 @@ if [ "$1" == "--help" ]; then echo "$USAGE"; exit; fi
 
 # What does this script do?
 # - verifies that tmp-garnet.v[01] does not exist already
-# - builds a garnet:latest docker container
+# - launches a container based on garnet:latest
 # -- installs latest genesis2 (maybe not necessary no more?)
 # -- builds gold verilog tmp-garnet.v0 using master branch
 # -- builds target verilog tmp-garnet.v1 using target branch
@@ -36,8 +38,6 @@ if test -f $f2; then echo ERROR $f2 exists already; exit 13; fi
 # set -x
 
 # Unpack the arg
-# broken maybe: 59a8c39a464ce29fa9313ba6b892482fdcd62dca
-# good maybe:   7c941e7c1da5195178016ff0afec402650819702
 if ! [ "$1" ]; then echo oops you forgot to specify a commit hash; exit 13; fi
 commit=$1
 
