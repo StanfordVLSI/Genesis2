@@ -21,9 +21,7 @@ jobs:
     steps:
 
     - name: Action, branch, and repo information.
-      # run: echo Action = ${{ github.event_name }}, branch = ${{ github.ref }}
-      run: printf "\n\n    Action = ${{ github.event_name }}, branch = ${{ github.ref }}\n\n"
-      #  echo "Branch '${{ github.ref }}' in repo '${{ github.repository }}'."
+      run: printf "\n    Action = ${{ github.event_name }}, branch = ${{ github.ref }}, sha = ${{ github.sh }}\n"
 
     - name: Check out repository code
       uses: actions/checkout@v2
@@ -31,5 +29,5 @@ jobs:
     - name: Gold Test
       run: |
         printf '\n\n\n    GOLD TEST\n\n\n'
-        test/genesis-ci.sh ${{ github.ref }}
+        test/genesis-ci.sh ${{ github.sha }}
         printf '\n\n\n'
