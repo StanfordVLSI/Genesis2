@@ -41,8 +41,8 @@ set -x
 if ! [ "$1" ]; then echo oops you forgot to specify a commit hash; exit 13; fi
 commit=$1
 
-function GROUP    { sleep 1; printf "%s%s[group]%s\n"  "#" "#" "$1"; sleep 1; set -x; }
-function ENDGROUP { sleep 1; printf "%s%s[endgroup]\n" "#" "#";      sleep 1; set -x; }
+function GROUP    { set +x; sleep 1; printf "%s%s[group]%s\n"  "#" "#" "$*"; sleep 1; set -x; }
+function ENDGROUP { set +x; sleep 1; printf "%s%s[endgroup]\n" "#" "#";      sleep 1; set -x; }
 
 GROUP Docker image and container
 image=stanfordaha/garnet:latest
@@ -60,27 +60,30 @@ build_garnet="source /aha/bin/activate && $aha_garnet_cmd"
 function cleanup { set -x; docker kill $container; }
 trap cleanup EXIT
 
-# UPDATE PIP package for latest version of Genesis2
+GROUP UPDATE PIP package for latest version of Genesis2
 dexec "source /aha/bin/activate && pip uninstall -y genesis2 && pip install genesis2"
+ENDGROUP
 
 ##############################################################################
-# GOLD-BUILD (master)
+GROUP 'GOLD-BUILD (master)'
 printf "\nINFO Build gold-model verilog using Genesis2 branch 'master'"
 dexec "$build_garnet"
 docker cp ${container}:/aha/garnet/garnet.v tmp-garnet.v0
 dexec 'cd /aha/garnet; make clean' >& /dev/null  # Clean up your mess, ignore errors :(
+ENDGROUP
 
 # Can do this if want to accommodate commits like e.g. 'pull/9/head'
 # if $commit ~ '^pull/'; then git fetch origin $commit:TEST; commit=TEST; fi
 
 ##############################################################################
-# TEST-BUILD ($commit)
+GROUP "TEST-BUILD ($commit)"
 printf "\nINFO Build test-model verilog using Genesis2 branch '$commit'\n"
 REPO=/aha/lib/python3.8/site-packages/Genesis2-src
 dexec "cd $REPO; git pull; git checkout -q $commit" || exit 13
 dexec "$build_garnet"
 docker cp ${container}:/aha/garnet/garnet.v tmp-garnet.v1
 dexec 'cd /aha/garnet; make clean' >& /dev/null  # Clean up your mess, ignore errors :(
+ENDGROUP
 
 ##############################################################################
 # COMPARE "gold" and "test"; use vcompare utility from aha repo
