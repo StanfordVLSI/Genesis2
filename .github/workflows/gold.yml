@@ -17,23 +17,23 @@ on: [push]
 # StackOverflow 58033366
 env:
   BRANCH_NAME: ${{ github.head_ref || github.ref_name}}
-  ACTION: Action = ${{ github.event_name }}
+  SHOW_ACTION: Action = ${{ github.event_name }}
+  SHOW_BRANCH: branch = ${{ github.ref }}
+  SHOW_BNAME:  BRANCH_NAME = $$BRANCH_NAME
+  SHOW_SHA:    sha = ${{ github.sha }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-
     - name: Action, branch, and repo information.
-      run: printf "\n    $ACTION\n    branch = ${{ github.ref }}\n    BRANCH_NAME = $BRANCH_NAME\n    sha = ${{ github.sha }}\n"
+      run: |
+        printf "\n    $SHOW_ACTION\n    $SHOW_BRANCH\n    $SHOW_BNAME\n    $SHOW_SHA\n"
 
     - name: Check out repository code
       uses: actions/checkout@v2
 
     - name: Gold Test
       run: |
-        printf '\n\n\n    GOLD TEST\n\n\n'
-        # test/genesis-ci.sh ${{ github.sha }}
         test/genesis-ci.sh $BRANCH_NAME
-        printf '\n\n\n'
