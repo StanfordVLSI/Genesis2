@@ -22,6 +22,9 @@ if [ "$1" == "--help" ]; then echo "$USAGE"; exit; fi
 # How to use it?
 # - I mean, it's container based...I think you just run
 #   the script from any machine that has docker installed
+# - AND. This script takes care of launching the image/container
+# - SO. Maybe it's just like...run the script I dunno, like maybe
+#      genesis-ci.sh origin/`git branch --show-current` |& tee genesis-ci.log | less -r
 
 # Make sure the coast is clear
 f1=tmp-garnet.v0
@@ -39,10 +42,12 @@ if ! [ "$1" ]; then echo oops you forgot to specify a commit hash; exit 13; fi
 commit=$1
 
 # Docker image and container
+echo '##[group]Docker image and container'
 image=stanfordaha/garnet:latest
 docker pull $image
 container=DELETEME-$USER-genci$$
 docker run -id --name $container --rm $image bash
+echo '##[endgroup]'
 
 # Setup
 function dexec { docker exec $container /bin/bash -c "$*"; }
@@ -61,7 +66,7 @@ dexec "source /aha/bin/activate && pip uninstall -y genesis2 && pip install gene
 printf "\nINFO Build gold-model verilog using Genesis2 branch 'master'"
 dexec "$build_garnet"
 docker cp ${container}:/aha/garnet/garnet.v tmp-garnet.v0
-dexec 'cd /aha/garnet; make clean'  # Clean up your mess
+dexec 'cd /aha/garnet; make clean' >& /dev/null  # Clean up your mess, ignore errors :(
 
 # Can do this if want to accommodate commits like e.g. 'pull/9/head'
 # if $commit ~ '^pull/'; then git fetch origin $commit:TEST; commit=TEST; fi
@@ -73,7 +78,7 @@ REPO=/aha/lib/python3.8/site-packages/Genesis2-src
 dexec "cd $REPO; git pull; git checkout -q $commit" || exit 13
 dexec "$build_garnet"
 docker cp ${container}:/aha/garnet/garnet.v tmp-garnet.v1
-dexec 'cd /aha/garnet; make clean'  # Clean up
+dexec 'cd /aha/garnet; make clean' >& /dev/null  # Clean up your mess, ignore errors :(
 
 ##############################################################################
 # COMPARE "gold" and "test"; use vcompare utility from aha repo
