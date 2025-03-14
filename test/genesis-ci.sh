@@ -70,19 +70,8 @@ GROUP UPDATE PIP package for latest version of Genesis2
 dexec "source /aha/bin/activate && pip uninstall -y genesis2 && pip install genesis2"
 ENDGROUP
 
-
-
-
-REPO=/aha/lib/python3.8/site-packages/Genesis2-src
-dexec "set -x; cd $REPO; git branch; git pull; git branch"
-
-
-
-
-
-
 ##############################################################################
-GROUP 'GOLD-BUILD (master)'
+GROUP 'GOLD-BUILD (master) > tmp-garnet.v0'
 printf "\nINFO Build gold-model verilog using Genesis2 branch 'master'"
 dexec "$build_garnet"
 docker cp ${container}:/aha/garnet/garnet.v tmp-garnet.v0
@@ -93,7 +82,7 @@ ENDGROUP
 # if $commit ~ '^pull/'; then git fetch origin $commit:TEST; commit=TEST; fi
 
 ##############################################################################
-GROUP "TEST-BUILD ($commit)"
+GROUP "TEST-BUILD ($commit) > tmp-garnet.v1"
 printf "\nINFO Build test-model verilog using Genesis2 branch '$commit'\n"
 REPO=/aha/lib/python3.8/site-packages/Genesis2-src
 dexec "set -x; cd $REPO; git pull; git checkout -q $commit" || exit 13
@@ -138,7 +127,7 @@ if [ "$ndiffs" != "0" ]; then
 else
     # ------------------------------------------------------------------------
     # TEST PASSED
-    echo "Test PASSED"
+    printf "\n\nTest PASSED\nTest PASSED\nTest PASSED\n\n"
 fi
 
 # ...but what if master got corrupted and test-branch preserves that?

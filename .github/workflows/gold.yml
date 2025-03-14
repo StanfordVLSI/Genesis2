@@ -17,6 +17,7 @@ on: [push]
 # StackOverflow 58033366
 env:
   BRANCH_NAME: ${{ github.head_ref || github.ref_name}}
+  ACTION: Action = ${{ github.event_name }}
 
 jobs:
   build:
@@ -25,7 +26,7 @@ jobs:
     steps:
 
     - name: Action, branch, and repo information.
-      run: printf "\n    Action = ${{ github.event_name }}, branch = ${{ github.ref }}, sha = ${{ github.sha }}, BRANCH_NAME = $BRANCH_NAME\n"
+      run: printf "\n    $ACTION\n    branch = ${{ github.ref }}\n    BRANCH_NAME = $BRANCH_NAME\n    sha = ${{ github.sha }}\n"
 
     - name: Check out repository code
       uses: actions/checkout@v2
