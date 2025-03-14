@@ -21,7 +21,7 @@ jobs:
     steps:
 
     - name: Action, branch, and repo information.
-      run: printf "\n    Action = ${{ github.event_name }}, branch = ${{ github.ref }}, sha = ${{ github.sh }}\n"
+      run: printf "\n    Action = ${{ github.event_name }}, branch = ${{ github.ref }}, sha = ${{ github.sha }}\n"
 
     - name: Check out repository code
       uses: actions/checkout@v2
