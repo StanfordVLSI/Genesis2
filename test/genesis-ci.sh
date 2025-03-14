@@ -117,17 +117,18 @@ ndiffs=`vcompare $f1 $f2 | wc -l`
 if [ "$ndiffs" != "0" ]; then
     # ------------------------------------------------------------------------
     # TEST FAILED
+    printf ".\n.\n  Test FAILED\n  Test FAILED\n  Test FAILED\n.\n"
     printf "Test FAILED with $ndiffs diffs\n"
     printf '(To update gold verilog, see $GARNET_REPO/bin/rtl-goldfetch.sh --help)'
     printf "\n"
     printf "Top 40 diffs:"
     vcompare $f1 $f2 | head -40
-    echo; echo "Test FAILED"
+    printf ".\n.\n  Test FAILED\n  Test FAILED\n  Test FAILED\n.\n"
     exit 13
 else
     # ------------------------------------------------------------------------
     # TEST PASSED
-    printf "\n\nTest PASSED\nTest PASSED\nTest PASSED\n\n"
+    printf ".\n.\n  Test PASSED\n  Test PASSED\n  Test PASSED\n.\n"
 fi
 
 # ...but what if master got corrupted and test-branch preserves that?
@@ -135,12 +136,3 @@ fi
 # ...need a functional test?
 # TODO functional test i.e. maybe like 'aha regress fast' or some such...?
 # NOTE once we have a functional test...probably don't need comparison test no more...?
-
-
-# THE TRASH
-
-# dexec "cd /aha/lib/python3.8/site-packages/Genesis2-src; git fetch origin" || exit 13
-# dexec "cd /aha/lib/python3.8/site-packages/Genesis2-src; git checkout -q $commit" || exit 13
-# dexec "cd /aha/lib/python3.8/site-packages/Genesis2-src; git branch -v"
-
-# dexec "cd $REPO; git branch -v"

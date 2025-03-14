@@ -25,4 +25,5 @@ jobs:
 
     - name: Gold Test
       run: |
-        test/genesis-ci.sh $BRANCH_NAME
+        # test/genesis-ci.sh $BRANCH_NAME
+        test/genesis-ci.sh 59a8c39a4  # Failure test?
