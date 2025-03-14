@@ -33,7 +33,7 @@ if test -f $f1; then echo ERROR $f1 exists already; exit 13; fi
 if test -f $f2; then echo ERROR $f2 exists already; exit 13; fi
 
 # Debugging
-set -x
+# set -x
 
 # Unpack the arg
 # broken maybe: 59a8c39a464ce29fa9313ba6b892482fdcd62dca
@@ -41,9 +41,15 @@ set -x
 if ! [ "$1" ]; then echo oops you forgot to specify a commit hash; exit 13; fi
 commit=$1
 
-function GROUP    { set +x; sleep 1; printf "%s%s[group]%s\n"  "#" "#" "$*"; sleep 1; set -x; }
-function ENDGROUP { set +x; sleep 1; printf "%s%s[endgroup]\n" "#" "#";      sleep 1; set -x; }
+# Debugging
+# function GROUP    { set +x; sleep 1; printf "%s%s[group]%s\n"  "#" "#" "$*"; sleep 1; set -x; }
+# function ENDGROUP { set +x; sleep 1; printf "%s%s[endgroup]\n" "#" "#";      sleep 1; set -x; }
 
+# Not debugging
+function GROUP    { sleep 1; printf "%s%s[group]%s\n"  "#" "#" "$*"; sleep 1; }
+function ENDGROUP { sleep 1; printf "%s%s[endgroup]\n" "#" "#";      sleep 1; }
+
+##############################################################################
 GROUP Docker image and container
 image=stanfordaha/garnet:latest
 docker pull $image

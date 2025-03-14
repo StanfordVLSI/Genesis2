@@ -31,5 +31,5 @@ jobs:
     - name: Gold Test
       run: |
         printf '\n\n\n    GOLD TEST\n\n\n'
-        test/genesis-ci.sh master ${{ github.ref }}
+        test/genesis-ci.sh ${{ github.ref }}
         printf '\n\n\n'
