@@ -7,9 +7,9 @@ on: [push]
 env:
   BRANCH_NAME: ${{ github.head_ref || github.ref_name}}
   SHOW_ACTION: "    Action = ${{ github.event_name }}"
-  SHOW_BRANCH: branch = ${{ github.ref }}
-  SHOW_BNAME:  BRANCH_NAME = $$BRANCH_NAME
-  SHOW_SHA:    sha = ${{ github.sha }}
+  SHOW_BRANCH: "    branch = ${{ github.ref }}"
+  SHOW_BNAME:  "    BRANCH_NAME = $$BRANCH_NAME"
+  SHOW_SHA:    "    sha = ${{ github.sha }}"
 
 jobs:
   build:
@@ -18,7 +18,7 @@ jobs:
     steps:
     - name: Action, branch, and repo information.
       run: |
-        printf "\n$SHOW_ACTION\n    $SHOW_BRANCH\n    $SHOW_BNAME\n    $SHOW_SHA\n"
+        printf "$SHOW_ACTION\n$SHOW_BRANCH\n$SHOW_BNAME\n$SHOW_SHA\n"
 
     - name: Check out repository code
       uses: actions/checkout@v2
