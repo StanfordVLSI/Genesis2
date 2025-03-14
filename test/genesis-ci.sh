@@ -41,13 +41,15 @@ set -x
 if ! [ "$1" ]; then echo oops you forgot to specify a commit hash; exit 13; fi
 commit=$1
 
-# Docker image and container
-echo '##[group]Docker image and container'
+function GROUP    { sleep 1; printf "%s%s[group]%s\n"  "#" "#" "$1"; sleep 1; set -x; }
+function ENDGROUP { sleep 1; printf "%s%s[endgroup]\n" "#" "#";      sleep 1; set -x; }
+
+GROUP Docker image and container
 image=stanfordaha/garnet:latest
 docker pull $image
 container=DELETEME-$USER-genci$$
 docker run -id --name $container --rm $image bash
-echo '##[endgroup]'
+ENDGROUP
 
 # Setup
 function dexec { docker exec $container /bin/bash -c "$*"; }
