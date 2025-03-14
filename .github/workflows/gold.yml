@@ -14,6 +14,10 @@ name: Gold Compare
 # Runs on every push. Note (I think) PR triggers at least one push?
 on: [push]
 
+# StackOverflow 58033366
+env:
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name}}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,7 +25,7 @@ jobs:
     steps:
 
     - name: Action, branch, and repo information.
-      run: printf "\n    Action = ${{ github.event_name }}, branch = ${{ github.ref }}, sha = ${{ github.sha }}\n"
+      run: printf "\n    Action = ${{ github.event_name }}, branch = ${{ github.ref }}, sha = ${{ github.sha }}, BRANCH_NAME = $BRANCH_NAME\n"
 
     - name: Check out repository code
       uses: actions/checkout@v2
@@ -29,5 +33,6 @@ jobs:
     - name: Gold Test
       run: |
         printf '\n\n\n    GOLD TEST\n\n\n'
-        test/genesis-ci.sh ${{ github.sha }}
+        # test/genesis-ci.sh ${{ github.sha }}
+        test/genesis-ci.sh $BRANCH_NAME
         printf '\n\n\n'
