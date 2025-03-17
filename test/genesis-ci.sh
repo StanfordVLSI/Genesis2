@@ -3,7 +3,7 @@
 USAGE="
   $0 <commit>
 
-  DESCRIPTION: Builds garnet using both master and <commit>, verifies both get same answer.
+  DESCRIPTION: Builds garnet <commit> build vs. a master build, verifies both get same answer.
 
   EXAMPLES:
     $0 pull/9/head  # Test pull-request #9
@@ -16,7 +16,7 @@ if [ "$1" == "--help" ]; then echo "$USAGE"; exit; fi
 # What does this script do?
 # - verifies that tmp-garnet.v[01] does not exist already
 # - launches a container based on garnet:latest
-# -- installs latest genesis2 (maybe not necessary no more?)
+# -- pip-installs latest genesis2 (maybe not necessary no more?)
 # -- builds gold verilog tmp-garnet.v0 using master branch
 # -- builds target verilog tmp-garnet.v1 using target branch
 # -- compares the two
