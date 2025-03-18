@@ -117,6 +117,7 @@ ENDGROUP
 
 ##############################################################################
 # COMPARE "gold" and "test"; use vcompare utility from aha repo
+GROUP COMPARE gold and test models
 printf ".\nCOMPARE gold and test models\n.\n"
 echo .; ls -l tmp-gverif.d0/ | sed 's/^/  /'
 if ! test -e tmp-vcompare.sh; then
@@ -141,6 +142,7 @@ for f in $files; do
     echo "  $f..."
     ndiffs=`vcompare $f1 $f2 | wc -l`
     if [ "$ndiffs" != "0" ]; then
+        ENDGROUP
         # ------------------------------------------------------------------------
         # TEST FAILED
         printf ".\nTest of $f FAILED with $ndiffs diff lines\n"
