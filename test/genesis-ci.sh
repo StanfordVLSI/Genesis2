@@ -119,6 +119,7 @@ ENDGROUP
 
 ##############################################################################
 # COMPARE "gold" and "test"; use vcompare utility from aha repo
+printf ".\nCOMPARE gold and test models\n.\n"
 ls -l tmp-garnet.v[01]
 if ! test -e tmp-vcompare.sh; then
     docker cp ${container}:/aha/.buildkite/bin/vcompare.sh tmp-vcompare.sh
@@ -148,19 +149,16 @@ ndiffs=`vcompare $f1 $f2 | wc -l`
 if [ "$ndiffs" != "0" ]; then
     # ------------------------------------------------------------------------
     # TEST FAILED
-    printf ".\n.\n  Test FAILED\n  Test FAILED\n  Test FAILED\n.\n"
     printf "Test FAILED with $ndiffs diffs\n"
-    printf '(To update gold verilog, see $GARNET_REPO/bin/rtl-goldfetch.sh --help)'
     printf "\n"
     printf "Top 40 diffs:"
     vcompare $f1 $f2 | head -40
     printf ".\n.\n  Test FAILED\n  Test FAILED\n  Test FAILED\n.\n"
     exit 13
-else
-    # ------------------------------------------------------------------------
-    # TEST PASSED
-    printf ".\n.\n  Test PASSED\n  Test PASSED\n  Test PASSED\n.\n"
 fi
+# ------------------------------------------------------------------------
+# TEST PASSED
+printf ".\n.\n  Test PASSED\n  Test PASSED\n  Test PASSED\n.\n"
 
 # ...but what if master got corrupted and test-branch preserves that?
 # ...test will pass but answer is wrong??
