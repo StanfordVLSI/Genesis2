@@ -76,7 +76,7 @@ ENDGROUP
 ##############################################################################
 GROUP 'GOLD-BUILD (master) > tmp-garnet.v0'
 printf "\nINFO Build gold-model verilog using Genesis2 branch 'master'"
-dexec "$build_garnet"
+dexec "$build_garnet" || exit 13
 docker cp ${container}:/aha/garnet/garnet.v tmp-garnet.v0
 dexec 'cd /aha/garnet; make clean' >& /dev/null  # Clean up your mess, ignore errors :(
 ENDGROUP
@@ -106,7 +106,7 @@ if [ "$TEST_FAILURE_PATH" ]; then
     dexec "cat /tmp/tmp$$ >> /aha/bin/Genesis2.pl"
     dexec "diff /aha/bin/Genesis2.pl0 /aha/bin/Genesis2.pl"
 fi
-dexec "$build_garnet"
+dexec "$build_garnet" || exit 13
 if [ "$TEST_FAILURE_PATH" ]; then
     set -x  # Show injected fault
     dexec 'set -x; ls -l /aha/garnet/genesis_verif/'
