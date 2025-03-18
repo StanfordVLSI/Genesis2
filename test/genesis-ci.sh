@@ -115,6 +115,7 @@ docker cp ${container}:/aha/garnet/genesis_verif tmp-gverif.d1/
 dexec 'cd /aha/garnet; make clean' >& /dev/null  # Clean up your mess, ignore errors :(
 ENDGROUP
 
+
 ##############################################################################
 # COMPARE "gold" and "test"; use vcompare utility from aha repo
 GROUP COMPARE gold and test models
@@ -156,7 +157,7 @@ done
 ENDGROUP
 # ------------------------------------------------------------------------
 # TEST PASSED
-printf ".\n.\n  Test PASSED\n  Test PASSED\n  Test PASSED\n.\n"
+printf ".\n  Test PASSED\n  Test PASSED\n  Test PASSED\n.\n"
 
 
 # ...but what if master got corrupted and test-branch preserves that?
