@@ -17,12 +17,12 @@ USAGE="
 if [ "$1" == "--help" ]; then echo "$USAGE"; exit; fi
 
 # What does this script do?
-# - verifies that compare-dirs tmp-garnet.d[01] do not exist already
+# - verifies that compare-dirs tmp-gverif.d[01] do not exist already
 # - launches a container based on garnet:latest
 # -- pip-installs latest genesis2 (maybe not necessary no more?)
-# -- builds gold verilog tmp-garnet.v0 using master branch
-# -- builds target verilog tmp-garnet.v1 using target branch
-# -- compares the two
+# -- builds gold verilog files tmp-gverif.d0/*.sv using master branch
+# -- builds target verilog tmp-gverif.d1/*.sv using target branch
+# -- compares each target file *.sv against gold
 
 # How to use it?
 # - I mean, it's container based...I think you just run
@@ -32,10 +32,8 @@ if [ "$1" == "--help" ]; then echo "$USAGE"; exit; fi
 #      genesis-ci.sh origin/`git branch --show-current` |& tee genesis-ci.log | less -r
 
 # Make sure the coast is clear
-f1=tmp-garnet.v0
-f2=tmp-garnet.v1
-if test -f $f1; then echo ERROR $f1 exists already; exit 13; fi
-if test -f $f2; then echo ERROR $f2 exists already; exit 13; fi
+d1=tmp-gverif.d0; if test -e $d1; then echo ERROR $d1 exists already; exit 13; fi
+d2=tmp-gverif.d1; if test -e $d2; then echo ERROR $d2 exists already; exit 13; fi
 
 # Debugging
 # set -x
@@ -74,10 +72,10 @@ dexec "source /aha/bin/activate && pip uninstall -y genesis2 && pip install gene
 ENDGROUP
 
 ##############################################################################
-GROUP 'GOLD-BUILD (master) > tmp-garnet.v0'
+GROUP 'GOLD-BUILD (master) > tmp-gverif.d0/*.sv'
 printf "\nINFO Build gold-model verilog using Genesis2 branch 'master'"
 dexec "$build_garnet" || exit 13
-docker cp ${container}:/aha/garnet/garnet.v tmp-garnet.v0
+docker cp ${container}:/aha/garnet/genesis_verif tmp-gverif.d0/
 dexec 'cd /aha/garnet; make clean' >& /dev/null  # Clean up your mess, ignore errors :(
 ENDGROUP
 
@@ -85,7 +83,7 @@ ENDGROUP
 # if $commit ~ '^pull/'; then git fetch origin $commit:TEST; commit=TEST; fi
 
 ##############################################################################
-GROUP "TEST-BUILD ($commit) > tmp-garnet.v1"
+GROUP "TEST-BUILD ($commit) > tmp-gverif.d1/*.sv"
 printf "\nINFO Build test-model verilog using Genesis2 branch '$commit'\n"
 REPO=/aha/lib/python3.8/site-packages/Genesis2-src
 dexec "set -x; cd $REPO; git pull; git checkout -fq $commit" || exit 13
@@ -113,14 +111,14 @@ if [ "$TEST_FAILURE_PATH" ]; then
     dexec 'set -x; diff /aha/garnet/genesis_verif/jtag.{sv.bak,sv}'
     set +x
 fi
-docker cp ${container}:/aha/garnet/garnet.v tmp-garnet.v1
+docker cp ${container}:/aha/garnet/genesis_verif tmp-gverif.d1/
 dexec 'cd /aha/garnet; make clean' >& /dev/null  # Clean up your mess, ignore errors :(
 ENDGROUP
 
 ##############################################################################
 # COMPARE "gold" and "test"; use vcompare utility from aha repo
 printf ".\nCOMPARE gold and test models\n.\n"
-ls -l tmp-garnet.v[01]
+echo .; ls -l tmp-gverif.d0/ | sed 's/^/  /'
 if ! test -e tmp-vcompare.sh; then
     docker cp ${container}:/aha/.buildkite/bin/vcompare.sh tmp-vcompare.sh
 fi
@@ -132,30 +130,32 @@ function vcompare { ./tmp-vcompare.sh <(delcomms $1) <(delcomms $2); }
 # docker kill $container  # Don't need this anymore because of TRAP
 
 set +x
-f1=tmp-garnet.v0
-f2=tmp-garnet.v1
+d1=tmp-gverif.d0
+d2=tmp-gverif.d1
 
-# Copied from aha/.buildkite/bin/rtl-goldcheck.sh
-printf "\n"
-echo "Comparing `vcompare $f1 | wc -l` lines of $f1"
-echo "versus    `vcompare $f2 | wc -l` lines of $f2"
-printf "\n"
-
-ndiffs=`vcompare $f1 $f2 | wc -l`
-
-if [ "$ndiffs" != "0" ]; then
-    # ------------------------------------------------------------------------
-    # TEST FAILED
-    printf "Test FAILED with $ndiffs diffs\n"
-    printf "\n"
-    printf "Top 40 diffs:"
-    vcompare $f1 $f2 | head -40
-    printf ".\n.\n  Test FAILED\n  Test FAILED\n  Test FAILED\n.\n"
-    exit 13
-fi
+echo .
+files=$(cd $d1; echo *.sv)
+for f in $files; do
+    # E.g. f1=tmp-gverif.d0/jtag.sv, f2=tmp-gverif.d1/jtag.sv
+    f1=$d1/$f; f2=$d2/$f
+    echo "  $f..."
+    ndiffs=`vcompare $f1 $f2 | wc -l`
+    if [ "$ndiffs" != "0" ]; then
+        # ------------------------------------------------------------------------
+        # TEST FAILED
+        printf ".\nTest of $f FAILED with $ndiffs diff lines\n"
+        printf "\n"
+        printf "Top 40 diff lines:"
+        vcompare $f1 $f2 | head -40
+        printf ".\n.\n  Test FAILED\n  Test FAILED\n  Test FAILED\n.\n"
+        exit 13
+    fi
+done
+ENDGROUP
 # ------------------------------------------------------------------------
 # TEST PASSED
 printf ".\n.\n  Test PASSED\n  Test PASSED\n  Test PASSED\n.\n"
+
 
 # ...but what if master got corrupted and test-branch preserves that?
 # ...test will pass but answer is wrong??
