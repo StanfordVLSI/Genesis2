@@ -95,7 +95,7 @@ if [ "$TEST_FAILURE_PATH" ]; then
     # FAULT INJECTION print("FOO Attempting fault injection")
     # FAULT INJECTION if os.path.isfile("/aha/garnet/genesis_verif/jtag.sv"):
     # FAULT INJECTION   print("FOO injecting error in /aha/garnet/genesis_verif/jtag.sv")
-    # FAULT INJECTION   r2 = os.system("set -x; bsed -i.bak 's/addr = 0/addr = 13/' /aha/garnet/genesis_verif/jtag.sv")
+    # FAULT INJECTION   r2 = os.system("set -x; sed -i.bak 's/addr = 0/addr = 13/' /aha/garnet/genesis_verif/jtag.sv")
     # FAULT INJECTION   print("FOO r2 = "); print (r2)
     # FAULT INJECTION   if r2 != 0: sys.exit(13)
     # FAULT INJECTION   print("FOO injection SUCCESSFULL...???")
