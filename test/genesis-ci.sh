@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Uncomment to test failure path
-TEST_FAILURE_PATH=true
+# TEST_FAILURE_PATH=true
 
 USAGE="
   $0 <commit>
