@@ -124,7 +124,10 @@ ls -l tmp-garnet.v[01]
 if ! test -e tmp-vcompare.sh; then
     docker cp ${container}:/aha/.buildkite/bin/vcompare.sh tmp-vcompare.sh
 fi
-function vcompare { ./tmp-vcompare.sh $*; }
+
+# Enhance vcompare with a prefilter to ignore comment lines :(
+function delcomms { egrep -v '^//' $1; }
+function vcompare { ./tmp-vcompare.sh <(delcomms $1) <(delcomms $2); }
 
 # docker kill $container  # Don't need this anymore because of TRAP
 
@@ -137,12 +140,6 @@ printf "\n"
 echo "Comparing `vcompare $f1 | wc -l` lines of $f1"
 echo "versus    `vcompare $f2 | wc -l` lines of $f2"
 printf "\n"
-
-echo "diff $f1 $f2"
-diff $f1 $f2
-
-
-
 
 ndiffs=`vcompare $f1 $f2 | wc -l`
 
