@@ -92,11 +92,16 @@ if [ "$TEST_FAILURE_PATH" ]; then
     # FAULT INJECTION 
     # FAULT INJECTION print("FOO Attempting fault injection")
     # FAULT INJECTION if os.path.isfile("/aha/garnet/genesis_verif/jtag.sv"):
-    # FAULT INJECTION   print("FOO injecting error in /aha/garnet/genesis_verif/jtag.sv")
-    # FAULT INJECTION   r2 = os.system("set -x; sed -i.bak 's/addr = 0/addr = 13/' /aha/garnet/genesis_verif/jtag.sv")
+    # FAULT INJECTION   from datetime import datetime
+    # FAULT INJECTION   HMS = datetime.now().strftime('%H%M%S')  # E.g. '125959'
+    # FAULT INJECTION   sedscript = "s/addr = 0/addr = 13/"
+    # FAULT INJECTION   failfile  = "/aha/garnet/genesis_verif/jtag.sv"
+    # FAULT INJECTION   print(f"FOO injecting error in {failfile}")
+    # FAULT INJECTION   r2 = os.system(f"set -x; sed -i.{HMS} '{sedscript}' {failfile}")
     # FAULT INJECTION   print("FOO r2 = "); print (r2)
     # FAULT INJECTION   if r2 != 0: sys.exit(13)
     # FAULT INJECTION   print("FOO injection SUCCESSFULL...???")
+    # FAULT INJECTION   exit()  # END AFTER FIRST INJECTION!!! (In case of attempted reuse.)
     # FAULT INJECTION 
     fault=$(egrep '^    # FAULT INJECTION' $0 | sed 's/.*INJECTION //' > /tmp/tmp$$)
     dexec "cp /aha/bin/Genesis2.pl /aha/bin/Genesis2.pl0"
@@ -108,7 +113,7 @@ dexec "$build_garnet" || exit 13
 if [ "$TEST_FAILURE_PATH" ]; then
     set -x  # Show injected fault
     dexec 'set -x; ls -l /aha/garnet/genesis_verif/'
-    dexec 'set -x; diff /aha/garnet/genesis_verif/jtag.{sv.bak,sv}'
+    dexec 'set -x; files=`ls /aha/garnet/genesis_verif/jtag.sv* | head -2`; diff $files'
     set +x
 fi
 docker cp ${container}:/aha/garnet/genesis_verif tmp-gverif.d1/
