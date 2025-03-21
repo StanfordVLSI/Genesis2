@@ -1,0 +1,53 @@
+name: Gold-Compare and Functional Tests
+
+# Runs on every push. Note (I think) PR triggers at least one push?
+on: [push]
+
+# StackOverflow 58033366
+env:
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name}}
+  SHOW_ACTION: "    Action = ${{ github.event_name }}"
+  SHOW_BRANCH: "    branch = ${{ github.ref }}"
+  SHOW_BNAME:  "    BRANCH_NAME = ${{ github.head_ref || github.ref_name}}"
+  SHOW_SHA:    "    sha = ${{ github.sha }}"
+
+# Jobs arranged in order of which is expected to finish first etc.
+jobs:
+
+#   id:
+#     runs-on: ubuntu-latest
+#     steps:
+#     - name: Action, branch, and repo information.
+#       run: printf "$SHOW_ACTION\n$SHOW_BRANCH\n$SHOW_BNAME\n$SHOW_SHA\n"
+
+  func_fail_1m:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository code
+      uses: actions/checkout@v2
+    - name: Run the test
+      run: test/copy_of_garnet_tests_test_app.sh --fail $BRANCH_NAME 4x2 apps/pointwise && exit 13 || echo FAILED SUCCESSFULLY
+
+  gold_fail_2m:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository code
+      uses: actions/checkout@v2
+    - name: Run the test
+      run: test/genesis-ci.sh --fail $BRANCH_NAME && exit 13 || echo FAILED SUCCESSFULLY
+
+  gold_pass_3m:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository code
+      uses: actions/checkout@v2
+    - name: Run the test
+      run: test/genesis-ci.sh $BRANCH_NAME
+
+  func_pass_6m:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository code
+      uses: actions/checkout@v2
+    - name: Run the test
+      run: test/copy_of_garnet_tests_test_app.sh $BRANCH_NAME 4x2 apps/pointwise
