@@ -952,7 +952,6 @@ sub find_file_safe{
 
   if ($filefound) {
     $file = abs_path($file);
-    $ffs_dir_cache{$file} = dirname($file);
     print STDERR "$name: found source: $file\n" if ($self->{Debug} & 2);
   } else {
     $file = undef;
