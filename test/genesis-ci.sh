@@ -69,6 +69,7 @@ trap cleanup EXIT
 
 GROUP UPDATE PIP package for latest version of Genesis2
 dexec "source /aha/bin/activate && pip uninstall -y genesis2 && pip install genesis2"
+desec "cat -n /aha/lib/python3.8/site-packages/Genesis2-src/PerlLibs/Genesis2/Manager.pm"
 ENDGROUP
 
 ##############################################################################
