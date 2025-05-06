@@ -263,6 +263,7 @@ Parsing Options:
 	[-sources|srcpath dir]		# Where to find source files
 	[-includes|incpath dir]		# Where to find included files
 	[-input file1 .. filen]		# List of files to process
+        [-safe]                         # Enforce rule that relative-path files must exist in top-level dir
 	[-inputlist filelist1 .. filelistn]	# List of files that each contain a list of files to process
 
 Generating Options:
@@ -308,6 +309,7 @@ sub parse_command_line {
   my %options =
     (
      "parse" => \$self->{ParseMode},			# should we parse input file to generate perl modules?
+     "safe" => \$self->{SafeMode},			# should rel-path input file(s) be limited to top-level dir?
      "top=s" => \$self->{Top},				# name of top module for generation phase
      "synthtop=s" => \$self->{SynthTop},		# Name of top module for synthesis
      "generate" => \$self->{GenMode},			# should we generate a verilog hierarchy?
@@ -899,9 +901,51 @@ sub gen_verilog{
 ############################## Auxiliary Functions##############################
 ################################################################################
 
+## find_file_unsafe:
+## This function receives a file name and a search path and returns
+## the absolute file name if found. Error and die otherwise.
+## Usage: $self->find_file(file_name, path_by_ref=[])
+sub find_file_unsafe{
+  my $self = shift;
+  my $file = shift;
+  my $name = __PACKAGE__."->find_file";
+  my $path = [];
+  my ($dir, $filefound);
+  if (@_){
+    $path = shift;
+  }
+
+  # find the file:
+  $filefound = 0;
+  print "$name: Searching for file $file\n" if $self->{Debug} & 2;
+  if ($file =~ /^\//) {
+    # file is absolute path
+    $filefound = 1 if (-e $file);
+  }else {
+    foreach $dir ($self->{CallDir}, @{$path}) {
+	# if relative path, start it from the dir from which the script was called
+	unless ($dir =~ /^\//) { $dir = $self->{CallDir}."/".$dir;}
+
+	$filefound = 1 if (-e "${dir}/${file}");
+	if ($filefound) {
+	    # Change file path so it is now absolute.
+	    $file = "${dir}/${file}";
+	    last; # got one, so exit the loop
+	}
+    }
+  }
+
+  $file = abs_path($file) if $filefound;
+  print "$name: found source: $file\n" if ($filefound && ($self->{Debug} & 2));
+  $self->error("$name: Can not find file $file \n Search Path: @{$path}") unless $filefound;
+  return $file;
+}
+
 ## find_file_safe:
 ## This function receives a file name and a search path and returns
 ## the absolute file name if found, or undef otherwise.
+## > NOTE find_file_safe fails if the desired file does not exist in top level dir,
+## > e.g. find_file_safe 'foo.v" works but find_file_safe "subdir/foo.v" fails.
 ## Usage: $self->find_file_safe(file_name, path_by_ref=[])
 my %ffs_dir_cache;
 sub find_file_safe{
@@ -968,7 +1012,15 @@ sub find_file{
     $path = shift;
   }
 
-  my $filefound = $self->find_file_safe($file, $path);
+  # my $filefound = $self->find_file_safe($file, $path);
+  # my $filefound = $self->find_file_unsafe($file, $path);
+  my $filefound;
+  if ($self->{SafeMode}){
+    $filefound = $self->find_file_safe($file, $path);
+  } else {
+    $filefound = $self->find_file_unsafe($file, $path);
+  }
+
   $self->error("$name: Can not find file $file \n Search Path: @{$path}") unless defined $filefound;
   return $filefound;
 }
