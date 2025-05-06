@@ -2726,17 +2726,24 @@ sub load_base_module{
     $self->error("$name: Call to a base class private method is not allowed");
 
   my $base_module_name = shift;
-  my $base_module_file = $base_module_name . $self->{InfileSuffix};
-  my $err_msg = '';
+  my $base_module_file = $base_module_name . $self->{InfileSuffix};  # E.g. 'jtag.pm' (right?)
+  my $err_msg = '';  # ?? what kind of err_msg is this??
 
   if ($INC{$base_module_file}) {
       return $err_msg;
   }
   else{
+    use Try::Tiny;
+    try {
+      # This is the original code for e.g. when jtag.pm already exists
+      eval {require $base_module_file};
+    } catch {
+      # New code searches for a file e.g. 'jtag.svp' and generates missing 'jtag.pm' (why?)
       my $base_module_name_adj =
           $self->{Manager}->add_suffix($base_module_name);
       $self->{Manager}->parse_unprocessed_file($base_module_name_adj);
       eval {require $base_module_file};
+    };
       # Check for errors
       if ($@){
 	  my @errs = split(/\n/, $@);

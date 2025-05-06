@@ -908,7 +908,7 @@ sub gen_verilog{
 sub find_file_unsafe{
   my $self = shift;
   my $file = shift;
-  my $name = __PACKAGE__."->find_file";
+  my $name = __PACKAGE__."->find_file_unsafe";
   my $path = [];
   my ($dir, $filefound);
   if (@_){
@@ -917,7 +917,7 @@ sub find_file_unsafe{
 
   # find the file:
   $filefound = 0;
-  print "$name: Searching for file $file\n" if $self->{Debug} & 2;
+  print STDERR "$name: Searching path '$self->{CallDir}:@$path' for file '$file'\n" if $self->{Debug} & 8;
   if ($file =~ /^\//) {
     # file is absolute path
     $filefound = 1 if (-e $file);
@@ -925,6 +925,7 @@ sub find_file_unsafe{
     foreach $dir ($self->{CallDir}, @{$path}) {
 	# if relative path, start it from the dir from which the script was called
 	unless ($dir =~ /^\//) { $dir = $self->{CallDir}."/".$dir;}
+        print STDERR "$name: Searching in dir '$dir'\n" if $self->{Debug} & 8;
 
 	$filefound = 1 if (-e "${dir}/${file}");
 	if ($filefound) {
@@ -1036,6 +1037,13 @@ sub add_suffix{
   my $file = shift;
   my $name = __PACKAGE__."->add_suffix";
 
+  # "No suffix is added if the file name already matches an existing file"
+  my $foundfile = $self->find_file($file, $self->{SourcesPath});
+  if (defined $foundfile) {
+    return $file;
+  }
+
+  # Note this only works in safe mode i.e. only finds top-level files :(
   foreach my $suffix ('', @{$self->{InfileSuffixes}}) {
     my $file_w_suffix = $file . $suffix;
     my $foundfile = $self->find_file_safe($file_w_suffix, $self->{SourcesPath});
