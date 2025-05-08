@@ -1046,7 +1046,17 @@ sub unique_inst{
   # no more parameter changes allowed
   $instance->{ParametersPriority} = GENESIS2_ZERO_PRIORITY;
 
+  #####################
+  # Show extensive debug info
+  if ($self->{Debug} & 8) {
+      foreach my $key (sort keys %{$instance}) {
+          print STDERR "- instance key '$key' = $instance->{$key}\n";
+      }
+  }
 
+  # TODO clean this up if no problems in a month or so...today is 8 May 2025
+  my ($OLD,$NEW); $OLD=0; $NEW=1;
+if ($OLD) {
   #####################
   # Compare against previously generated files
   $match = 0;
@@ -1080,6 +1090,63 @@ sub unique_inst{
       last if $match;
     }
   }
+}
+
+if ($NEW) {
+  #####################
+  # Find previously generated files e.g. 'flop_unq[123].sv'
+
+  my $splitfile = qr/(.*)(_unq[0-9]*\.[^.]*)/;
+  my $me = $instance->{OutputFileName};         # E.g. $me='flop_unq2.sv'
+  my ($root,$suffix) = $me =~ $splitfile;       # E.g. $root='flop'
+
+  # OutputFileName should be in the form <root>_unq<d>.<sfx> maybe
+  # If not, we get root=<null> and no uniquification maybe
+  $self->warning("OutputFileName '$me' != '<root>_unq<num>.<suffix>'") if ($root eq "");
+
+  # Find all files in genesis_raw that match 'root_*'
+  # e.g. root=flop  =>  rootfiles=( flop_unq2.sv, flop_D_0_T_RFlop_W_4.sv )
+  my $rootfiles = `cd genesis_raw; /bin/ls ${root}_*`;
+  print STDERR "Found rootfiles '$rootfiles' maybe\n" if ($self->{Debug} & 8);
+
+  my @rootfiles = split(/\n/, $rootfiles);
+
+  #####################
+  # Compare against previously generated files in dir 'genesis_raw'
+
+  # foreach my $other_file (@rootfiles) {
+  $match = 0;
+  foreach my $rf (@rootfiles) {
+
+      # Don't compare to self or there will be trouble!
+      if ($me eq $rf) { next; }
+
+      $other_file=$rf;
+
+      # Assume module name is just filename with extension stripped off
+      # E.g. other_file="flop_unq2.sv" => other_module="flop_unq2"
+      # my ($filename,$suffix) = $other_file =~ /(.*)[.]([^.]*)/;
+      my ($other_module, $suffix) = $other_file =~ /(.*)[.]([^.]*)/;
+      # my $other_module = $filename;
+
+      if ($self->{Debug} & 8) {
+          print STDERR "I am instance '$instance->{OutputFileName}'\n";
+          print STDERR "-- OutputFileName   = $instance->{OutputFileName}\n";
+          print STDERR "-- UniqueModuleName = $instance->{UniqueModuleName}\n";
+          print STDERR "-- other_file       = $other_file\n";
+          print STDERR "-- other_module     = $other_module\n";
+      }
+
+      $match = $self->compare_generated_files(
+          $instance->{OutputFileName},	                 # the file we just created
+          $other_file,			                 # previously created file
+          $instance->{UniqueModuleName} => $other_module # mapping of key words between files
+          );
+
+      last if $match;
+  }
+}
+
   # need to revert a bunch of values if there was a match to a nother unique module
   if ($match){
     $self->{ModuleName_NumDerivs}{$base_module_name}--;
@@ -1430,7 +1497,7 @@ sub ununique_inst{
   if (!defined $self->{UnUniquifiedModules}{$base_module_name}){
       $self->{UnUniquifiedModules}{$base_module_name} = 1;
   }
-  
+
 
   #####################
   # Reassign the parameter priority
