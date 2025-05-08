@@ -122,6 +122,18 @@ fi
 GROUP "make_verilator=$make_verilator"
 ENDGROUP
 
+DO_FULL_PR=True
+if [ "$DO_FULL_PR" ]; then
+  docker exec $container /bin/bash -c "
+      source /aha/bin/activate;
+      source /cad/modules/tcl/init/sh;
+      module load base incisive xcelium/19.03.003 vcs/Q-2020.03-SP2;
+      pwd; aha regress pr;
+  "
+  exit
+fi
+exit
+
 ########################################################################
 # TEST
 # size='--width 4 --height 2'
