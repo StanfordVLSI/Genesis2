@@ -1230,11 +1230,13 @@ sub create_product_lists{
     # Move files to final location; Print the  file lists
     foreach my $file (@product_list){
 	if ($seen{$file} eq 'verif'){
+            print STDERR "Move $file from $self->{RawDir} to $self->{VerifDir}\n" if \$self->{Debug} & 8;
 	    move(catfile($self->{RawDir}, $file), catfile($self->{VerifDir},$file)) or
 		$self->error("$name: Couldn't move $file from $self->{RawDir} to $self->{VerifDir}");
 	    print { $product_fh } catfile($self->{VerifDir},$file)."\n";
 	    print { $verif_product_fh } catfile($self->{VerifDir},$file)."\n";
 	}else{
+            print STDERR "Move $file from $self->{RawDir} to $self->{SynthDir}\n" if \$self->{Debug} & 8;
 	    move(catfile($self->{RawDir}, $file), catfile($self->{SynthDir},$file)) or
 		$self->error("$name: Couldn't move $file from $self->{RawDir} to $self->{SynthDir}");
 	    print { $product_fh } catfile($self->{SynthDir},$file)."\n";
