@@ -1080,8 +1080,9 @@ sub unique_inst{
       last if $match;
     }
   }
-  # need to revert a bunch of values if there was a match to a nother unique module
+  # need to revert a bunch of values if there was a match to another unique module
   if ($match){
+    # NumDerivs not used anymore, but that's okay, right?
     $self->{ModuleName_NumDerivs}{$base_module_name}--;
     $instance->{UniqueModuleName} = $other_module; # instead, use the previously created module
     unlink(catfile($instance->{RawDir}, $instance->{OutputFileName}));	# remove the newly created file
@@ -1089,6 +1090,13 @@ sub unique_inst{
     $instance->{OutputFileName} = $other_file;	# instead, use the previously created file
   }
 
+#   #####################
+#   # Show extensive debug info
+#   if ($self->{Debug} & 8) {
+#       foreach my $key (sort keys %{$instance}) {
+#           print STDERR "- instance key2 '$key' = $instance->{$key}\n";
+#       }
+#   }
 
   #####################
   # Reassign the parameter priority
@@ -2210,7 +2218,7 @@ sub gen_param_abbrevs {
     foreach my $param (@{$self->{ParametersList}}) {
       my ($words, $regions) = @{$wr_pairs{$param}};
       my $abbrev = get_abbrev_from_regions($words, $regions);
-      print "    $param -> $abbrev\n" if $self->{Debug} & 2;
+      print STDERR "    $param -> $abbrev\n" if $self->{Debug} & 2;
       $abbrevs{$param} = $abbrev;
       if (!exists $abbrev_srcs{$abbrev}) {
         $abbrev_srcs{$abbrev} = [];
@@ -2221,7 +2229,7 @@ sub gen_param_abbrevs {
     while (my ($abbrev, $params) = each(%abbrev_srcs)) {
       next if (scalar(@$params) <= 1);
 
-      print "  Conflicting parameters: " . join(' ', @$params) . "\n"
+      print STDERR "  Conflicting parameters: " . join(' ', @$params) . "\n"
         if $self->{Debug} & 2;
       $done = 0;
       my $i_idx = each @$params;
@@ -2230,7 +2238,7 @@ sub gen_param_abbrevs {
       my ($i_words, $i_regions) = @{$wr_pairs{$i_param}};
       while (my $j_idx = each @$params) {
         my $j_param = $params->[$j_idx];
-        print "  Disabmiguating $i_param and $j_param\n"
+        print STDERR "  Disabmiguating $i_param and $j_param\n"
           if $self->{Debug} & 2;
 
         my $j_abbrev = $abbrevs{$j_param};
@@ -2251,13 +2259,13 @@ sub gen_param_abbrevs {
                 if ($w_idx + 1 > $i_region) {
                   $i_regions->[$w_num] = $w_idx + 1;
                   $updated = 1;
-                  print "  $i_param: $w_num set to " . ($w_idx + 1) . "\n"
+                  print STDERR "  $i_param: $w_num set to " . ($w_idx + 1) . "\n"
                     if $self->{Debug} & 2;
                 }
                 if ($w_idx + 1 > $j_region) {
                   $j_regions->[$w_num] = $w_idx + 1;
                   $updated = 1;
-                  print "  $j_param: $w_num set to " . ($w_idx + 1) . "\n"
+                  print STDERR "  $j_param: $w_num set to " . ($w_idx + 1) . "\n"
                     if $self->{Debug} & 2;
                 }
 
