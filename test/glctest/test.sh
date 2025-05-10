@@ -15,12 +15,14 @@ USAGE="
 if [ "$1" == "--help" ]; then echo "$USAGE"; exit; fi
 
 # Clean up from any prior runs.
-genesis_clean.cmd || echo okay
+test -f genesis_clean.cmd && genesis_clean.cmd || echo okay
 
 # We should be here: Genesis2/test/glctest/
-GENESIS_HOME=$(cd ../..; pwd)
+set -x
+export GENESIS_HOME=$(cd ../..; pwd)
 export PATH=$GENESIS_HOME/bin:$GENESIS_HOME/gui/bin:$PATH
 export PERL5LIB=$GENESIS_HOME/PerlLibs:/$GENESIS_HOME/PerlLibs/ExtrasForOldPerlDistributions:$PERL5LIB
+exit
 
 # Build systemverilog *.sv files and put them in dir genesis_verif/
 printf '\n\nBUILD\n'
