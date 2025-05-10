@@ -82,3 +82,6 @@ for f in $(cd genesis_verif_gold/; /bin/ls -1); do
         result=FAIL
     fi
 done
+
+echo $result
+[ "$result" ] == "PASS" || exit 13
