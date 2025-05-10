@@ -43,7 +43,7 @@ Genesis2.pl -parse -generate -top global_controller -input \
   -parameter global_controller.cgra_width=4 \
   -parameter global_controller.cgra_width_including_io=4 \
   -parameter global_controller.glb_tile_mem_size=128 \
-  $*
+  $* || exit 13
   
 # Compare results to gold model
 printf '\n\\nCOMPARE\n'
