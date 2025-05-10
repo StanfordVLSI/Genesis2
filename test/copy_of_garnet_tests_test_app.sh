@@ -123,7 +123,7 @@ GROUP "make_verilator=$make_verilator"
 ENDGROUP
 
 # This will of course FAIL if target machine does not have vcs in the proper path /cad/...
-DO_FULL_PR=True
+DO_FULL_PR=
 if [ "$DO_FULL_PR" ]; then
   docker exec $container /bin/bash -c "
       source /aha/bin/activate;
