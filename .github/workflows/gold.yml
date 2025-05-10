@@ -26,7 +26,7 @@ jobs:
     - name: Check out repository code
       uses: actions/checkout@v2
     - name: Run the test
-      run: cd test/glctest; test.sh -debug 15
+      run: cd test/glctest; ./test.sh -debug 15
 
   func_fail_1m:
     runs-on: ubuntu-latest
