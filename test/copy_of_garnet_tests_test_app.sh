@@ -122,14 +122,15 @@ fi
 GROUP "make_verilator=$make_verilator"
 ENDGROUP
 
+# This will of course FAIL if target machine does not have vcs in the proper path /cad/...
 DO_FULL_PR=True
 if [ "$DO_FULL_PR" ]; then
   docker exec $container /bin/bash -c "
       source /aha/bin/activate;
-      source /cad/modules/tcl/init/sh;
-      module load base incisive xcelium/19.03.003 vcs/Q-2020.03-SP2;
+      source /cad/modules/tcl/init/sh || exit 13
+      module load base incisive xcelium/19.03.003 vcs/Q-2020.03-SP2
       pwd; aha regress pr;
-  "
+  " || exit 13
   exit
 fi
 exit
