@@ -22,7 +22,6 @@ set -x
 export GENESIS_HOME=$(cd ../..; pwd)
 export PATH=$GENESIS_HOME/bin:$GENESIS_HOME/gui/bin:$PATH
 export PERL5LIB=$GENESIS_HOME/PerlLibs:/$GENESIS_HOME/PerlLibs/ExtrasForOldPerlDistributions:$PERL5LIB
-exit
 
 # Build systemverilog *.sv files and put them in dir genesis_verif/
 printf '\n\nBUILD\n'
@@ -73,6 +72,7 @@ for f in $(cd genesis_verif/; /bin/ls -1); do
 done
 
 for f in $(cd genesis_verif_gold/; /bin/ls -1); do
+    printf "\n\nFILE $f\n"
     if ! test -e genesis_verif/$f; then
         echo ERROR: Only in genesis_verif_gold: $f
         result=FAIL
