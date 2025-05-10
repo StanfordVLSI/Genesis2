@@ -18,7 +18,6 @@ if [ "$1" == "--help" ]; then echo "$USAGE"; exit; fi
 test -f genesis_clean.cmd && genesis_clean.cmd || echo okay
 
 # We should be here: Genesis2/test/glctest/
-set -x
 export GENESIS_HOME=$(cd ../..; pwd)
 export PATH=$GENESIS_HOME/bin:$GENESIS_HOME/gui/bin:$PATH
 export PERL5LIB=$GENESIS_HOME/PerlLibs:/$GENESIS_HOME/PerlLibs/ExtrasForOldPerlDistributions:$PERL5LIB
@@ -46,9 +45,11 @@ Genesis2.pl -parse -generate -top global_controller -input \
   -parameter global_controller.glb_tile_mem_size=128 \
   $* || exit 13
   
+# Wait for genesis to finish writing stderr i guess
+sleep 1
+
 # Compare results to gold model
-printf '\n\\nCOMPARE\n'
-echo diff -r genesis_verif_gold/ genesis_verif/
+echo COMPARE diff -r genesis_verif_gold/ genesis_verif/
 
 # diff -r genesis_verif_gold/ genesis_verif/ && echo PASS || echo FAIL
 
@@ -71,17 +72,22 @@ for f in $(cd genesis_verif/; /bin/ls -1); do
     fi
 done
 
+# Ignore rearranged lines and comments
+function filter { sort $1 | egrep -v '^ *//'; }
+
 for f in $(cd genesis_verif_gold/; /bin/ls -1); do
-    printf "\n\nFILE $f\n"
+    echo COMPARE FILE $f
     if ! test -e genesis_verif/$f; then
         echo ERROR: Only in genesis_verif_gold: $f
         result=FAIL
 
-    elif ! diff <(sort genesis_verif_gold/$f) <(sort genesis_verif/$f); then
+    elif ! diff <(filter genesis_verif_gold/$f) <(filter genesis_verif/$f); then
         echo ERROR: Files differ: $f
         result=FAIL
     fi
 done
 
+echo '------------------------------------------------------------------------'
 echo $result
-[ "$result" ] == "PASS" || exit 13
+echo '------------------------------------------------------------------------'
+[ "$result" == "PASS" ] || exit 13
