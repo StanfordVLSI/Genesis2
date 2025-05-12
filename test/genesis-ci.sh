@@ -51,6 +51,22 @@ function GROUP    { sleep 1; printf "%s%s[group]%s\n"  "#" "#" "$*"; sleep 1; }
 function ENDGROUP { sleep 1; printf "%s%s[endgroup]\n" "#" "#";      sleep 1; }
 
 ##############################################################################
+GROUP $0 $* BEGIN
+# Skip test when/if merge is SUPPOSED to change master-branch behavior...
+skip="grg_param_uniquify"
+curbranch=`git branch --show-current`
+echo "Current branch name is '$curbranch'"
+for b in $skip; do
+  if [ "$curbranch" == "skip" ]; then
+    echo "------------------------------------------------------------------------"
+    echo "WARNING skipping this test because branch name = '$skip'"
+    echo "------------------------------------------------------------------------"
+    exit
+  fi
+done
+ENDGROUP
+
+##############################################################################
 GROUP Docker image and container
 image=stanfordaha/garnet:latest
 docker pull $image

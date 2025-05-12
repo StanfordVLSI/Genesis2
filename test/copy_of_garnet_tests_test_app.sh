@@ -53,6 +53,11 @@ fi
 function GROUP    { sleep 1; printf "%s%s[group]%s\n"  "#" "#" "$1"; sleep 1; }
 function ENDGROUP { sleep 1; printf "%s%s[endgroup]\n" "#" "#";      sleep 1; }
 
+##############################################################################
+GROUP $0 $* BEGIN
+ENDGROUP
+
+
 ########################################################################
 # DOCKER image and container
 GROUP "DOCKER image and container"
