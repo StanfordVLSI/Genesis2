@@ -9,7 +9,7 @@
 //  
 //	-----------------------------------------------
 //	|            Genesis Release Info             |
-//	|  $Change: 11905 $ --- $Date: 2025/05/06 $   |
+//	|  $Change: 11905 $ --- $Date: 2025/05/12 $   |
 //	-----------------------------------------------
 //	
 //
@@ -19,12 +19,12 @@
 // --------------- Begin Pre-Generation Parameters Status Report ---------------
 //
 //	From 'generate' statement (priority=5):
-// Parameter SC_CFG_OPCODES 	= Data structure of type HASH
-// Parameter sc_cfg_bus_width 	= 32
-// Parameter sc_cfg_op_width 	= 5
 // Parameter SC_CFG_BUS 	= yes
+// Parameter SC_CFG_OPCODES 	= Data structure of type HASH
 // Parameter TC_CFG_BUS 	= no
 // Parameter sc_cfg_addr_width 	= 32
+// Parameter sc_cfg_bus_width 	= 32
+// Parameter sc_cfg_op_width 	= 5
 //
 //		---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 //
@@ -246,7 +246,7 @@ module cfg_and_dbg_unq1
    wire [3:0] inst_update_qual;
    wire       inst_update_qualified;
    assign inst_update_qualified = ((sys_clk_activated & inst_update_qual==4'b1110) | (!sys_clk_activated & inst_update_qual[3]==1)) ? 1'b1:1'b0;
-   flop_D_0_T_RFlop_W_4 inst_update_reg 
+   flop_unq2 inst_update_reg 
      (.dout(inst_update_qual),	.din({sc_cfg_inst_update_dr, inst_update_qual[3:1]}),
       .Clk(Clk),	.Reset(Reset));
    
@@ -262,7 +262,7 @@ module cfg_and_dbg_unq1
    //*******
    // shift in/out the address
    wire [31:0] sc_addr;
-   flop_D_0_T_REFlop_W_32  sc_addr_reg 
+   flop_unq3  sc_addr_reg 
      (.dout(sc_addr),	.din({tdi, sc_addr[31:1]}),
       .Clk(tck),	.en(sc_cfg_addr_shift_dr),      .Reset(test_logic_reset));
 
@@ -278,7 +278,7 @@ module cfg_and_dbg_unq1
    wire 			   sc_data_rd_en;
    assign 			   sc_data_rd_en = (sc_cfgRep_op == 5'd3)? 
 						   1'b1: 1'b0;
-   flop_D_0_T_REFlop_W_32 sc_data_rd_reg 
+   flop_unq3 sc_data_rd_reg 
      (.dout(sc_data_rd),	.din(sc_cfgRep_data),
       .Clk(Clk),	.en(sc_data_rd_en),      
       .Reset(Reset));
@@ -292,7 +292,7 @@ module cfg_and_dbg_unq1
    assign 			     sc_data_nxt = (sc_cfg_data_capture_dr) ? 
 						    sc_data_rd : {tdi, sc_data[31:1]};
    
-   flop_D_0_T_REFlop_W_32 sc_data_reg 
+   flop_unq3 sc_data_reg 
      (.dout(sc_data),	.din(sc_data_nxt),
       .Clk(tck),	.en(sc_cfg_data_shift_dr | sc_cfg_data_capture_dr),      
       .Reset(test_logic_reset));

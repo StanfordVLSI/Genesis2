@@ -9,7 +9,7 @@
 //  
 //	-----------------------------------------------
 //	|            Genesis Release Info             |
-//	|  $Change: 11905 $ --- $Date: 2025/05/06 $   |
+//	|  $Change: 11905 $ --- $Date: 2025/05/12 $   |
 //	-----------------------------------------------
 //	
 //
@@ -19,14 +19,14 @@
 // --------------- Begin Pre-Generation Parameters Status Report ---------------
 //
 //	From 'generate' statement (priority=5):
-// Parameter num_glb_tiles 	= 2
-// Parameter cfg_op_width 	= 5
+// Parameter axi_data_width 	= 32
+// Parameter block_axi_addr_width 	= 12
 // Parameter cfg_addr_width 	= 32
 // Parameter cfg_data_width 	= 32
-// Parameter axi_data_width 	= 32
-// Parameter glb_addr_width 	= 18
+// Parameter cfg_op_width 	= 5
 // Parameter cgra_width 	= 4
-// Parameter block_axi_addr_width 	= 12
+// Parameter glb_addr_width 	= 18
+// Parameter num_glb_tiles 	= 2
 //
 //		---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 //
@@ -69,7 +69,6 @@
 //
 // cgra_width_including_io (_GENESIS2_DECLARATION_PRIORITY_) = 32
 //
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 20
 
 module glc_jtag_ctrl (
     input  logic                                clk_in,
@@ -80,7 +79,6 @@ module glc_jtag_ctrl (
     input  logic [31:0]        config_addr_jtag_out,
     input  logic [31:0]        config_data_jtag_out,
     input  logic [4:0]          op_jtag,
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 30
     output logic [31:0]        config_data_jtag_in,
 
     // cgra control signals
@@ -91,7 +89,6 @@ module glc_jtag_ctrl (
     output logic [1:0]         jtag_glb_clk_en_bank_master, 
     output logic [1:0]         jtag_glb_pcfg_broadcast_stall, 
     output logic [31:0]             jtag_cgra_stall, 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 40
 
     // global buffer configuration
     output logic                                jtag_glb_cfg_wr_en,
@@ -102,7 +99,6 @@ module glc_jtag_ctrl (
     output logic                                jtag_glb_cfg_rd_clk_en,
     output logic [11:0]  jtag_glb_cfg_rd_addr,
     input  logic [31:0]        jtag_glb_cfg_rd_data,
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 50
     input  logic                                jtag_glb_cfg_rd_data_valid,
 
     // global buffer sram configuration
@@ -113,7 +109,6 @@ module glc_jtag_ctrl (
     output logic [17:0]        jtag_sram_cfg_rd_addr,
     input  logic [31:0]        jtag_sram_cfg_rd_data,
     input  logic                                jtag_sram_cfg_rd_data_valid,
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 60
 
     // cgra configuration
     output logic                                jtag_cgra_cfg_read,
@@ -124,7 +119,6 @@ module glc_jtag_ctrl (
 
     // jtag to axi addressmap
     output logic                                jtag_axi_wr_en,
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 70
     output logic [11:0]  jtag_axi_wr_addr,
     output logic [31:0]        jtag_axi_wr_data,
     output logic                                jtag_axi_rd_en,
@@ -135,7 +129,6 @@ module glc_jtag_ctrl (
 
 //============================================================================//
 // logic declaration
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 80
 //============================================================================//
 // clk control signal
 logic clk;
@@ -146,7 +139,6 @@ logic [1:0] glb_clk_en_master;
 logic [1:0] glb_clk_en_bank_master;
 
 // cgra configuration
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 90
 logic                               write;
 logic                               read;
 logic [31:0]       cgra_config_addr_out;
@@ -157,7 +149,6 @@ logic [31:0]       cgra_config_data_in;
 logic                               glb_write;
 logic                               glb_read;
 logic [11:0] glb_config_addr_out;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 100
 logic [31:0]       glb_config_data_out;
 logic [31:0]       glb_config_data_in;
 
@@ -168,7 +159,6 @@ logic [17:0]       glb_sram_config_addr_out;
 logic [31:0]       glb_sram_config_data_out;
 logic [31:0]       glb_sram_config_data_in;
 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 110
 // axi
 logic                               axi_wr_en;
 logic                               axi_rd_en;
@@ -179,7 +169,6 @@ logic [31:0]       axi_rd_data;
 
 logic reset_out;
 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 120
 //============================================================================//
 // assigns
 //============================================================================//
@@ -190,7 +179,6 @@ assign jtag_cgra_cfg_addr = cgra_config_addr_out;
 assign jtag_cgra_cfg_wr_data = cgra_config_data_out;
 assign config_data_in = jtag_cgra_cfg_data_in;
 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 130
 // stall signals
 assign jtag_glb_clk_en_master = glb_clk_en_master;
 assign jtag_glb_clk_en_bank_master = glb_clk_en_bank_master;
@@ -201,7 +189,6 @@ assign jtag_cgra_stall = stall;
 assign jtag_global_reset = reset_out;
 
 //============================================================================//
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 140
 // JTAG op codes
 //============================================================================//
 parameter NOP = 5'd0;
@@ -212,7 +199,6 @@ parameter write_A050 = 5'd4;
 parameter write_TST = 5'd5;
 parameter read_TST = 5'd6;
 parameter global_reset = 5'd7;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 150
 parameter write_stall = 5'd9;
 parameter read_stall = 5'd10;
 parameter advance_clk = 5'd11;
@@ -223,7 +209,6 @@ parameter rd_rd_delay_reg = 5'd15;
 parameter wr_delay_sel_reg = 5'd16;
 parameter rd_delay_sel_reg = 5'd17;
 parameter glb_write_config = 5'd18;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 160
 parameter glb_read_config =5'd19;
 parameter glb_sram_write_config = 5'd20;
 parameter glb_sram_read_config =5'd21;
@@ -234,7 +219,6 @@ parameter read_glb_clk_en_master = 5'd25;
 parameter write_glb_clk_en_bank_master = 5'd26;
 parameter read_glb_clk_en_bank_master = 5'd27;
 parameter write_glb_pcfg_broadcast_stall = 5'd28;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 170
 parameter read_glb_pcfg_broadcast_stall = 5'd29;
 parameter write_sram_en_delay_reg = 5'd30;
 parameter read_sram_en_delay_reg = 5'd31;
@@ -245,7 +229,6 @@ parameter read_sram_en_delay_reg = 5'd31;
 logic [31:0] rd_delay_reg;
 logic [31:0] sram_en_delay_reg;
 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 180
 //============================================================================//
 // states
 // Incoming instructions are accepted only when global controller is in READY
@@ -256,7 +239,6 @@ parameter reading = 4'd1;
 parameter resetting = 4'd2;
 parameter advancing_clk = 4'd4;
 parameter switching_clk = 4'd5;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 190
 parameter glb_reading = 4'd6;
 parameter glb_sram_reading = 4'd7;
 parameter axi_reading = 4'd8;
@@ -267,7 +249,6 @@ parameter axi_reading = 4'd8;
 logic all_stalled_tck;
 logic all_stalled_tck_rise;
 logic all_stalled_tck_fall;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 200
 
 logic all_stalled_sys;
 logic all_stalled_sys_rise;
@@ -278,7 +259,6 @@ logic sys_clk_act_sync_1;
 logic sys_clk_act_sync_2;
 
 //delay_sel[1] specifies delay for all_stalled_tck
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 210
 //delay_sel[0] specifices delay for all_stalled_sys
 logic [1:0] delay_sel;
 
@@ -289,7 +269,6 @@ logic clk_switch_request_sync_1_tck;
 logic clk_switch_request_sync_2_tck;
 //for crossing from CLK -> SYS_CLK
 logic clk_switch_request_sync_1_sys;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 220
 logic clk_switch_request_sync_2_sys;
 
 logic [4:0] clk_switch_counter_tck;
@@ -300,7 +279,6 @@ always @ (*) begin
     all_stalled_sys = delay_sel[0] ? all_stalled_sys_fall : all_stalled_sys_rise;
     clk = ((all_stalled_tck & !sys_clk_activated) | (all_stalled_sys & sys_clk_activated )) ? 0 : clk_domain; //Are we stalling both GC and CGRA during clk domain switch?
     clk_out = clk;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 230
     reset_out = (state==resetting) ? 1 : reset_in;
 end
 
@@ -311,7 +289,6 @@ always @ (posedge tck or posedge reset_in) begin
         sys_clk_activated <= 1;
         all_stalled_tck_rise <= 1;
     end
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 240
     else if ((clk_switch_request_sync_2_tck != sys_clk_activated) & (clk_switch_counter_tck > 0)) begin
         all_stalled_tck_rise <= 1;//Deactivate clk to rest of GC
         clk_switch_counter_tck <= clk_switch_counter_tck - 1;   
@@ -322,7 +299,6 @@ always @ (posedge tck or posedge reset_in) begin
     end
     else if ((clk_switch_request_sync_2_tck == 0) && (sys_clk_activated == 0)) begin
         all_stalled_tck_rise <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 250
     end 
 end
 
@@ -333,7 +309,6 @@ always @ (negedge tck or posedge reset_in) begin
     else
         all_stalled_tck_fall <= all_stalled_tck_rise;
 end
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 260
 
 //IMPLEMENT 2 SYNC FLOPS TO CROSS CLK BOUNDARY (SLOW->FAST)
 //SYNC FLOPS FOR SYS_CLK_ACT
@@ -344,7 +319,6 @@ always @ (posedge clk_in or posedge reset_in) begin
     end
     else begin  
         sys_clk_act_sync_1 <= sys_clk_activated;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 270
         sys_clk_act_sync_2 <= sys_clk_act_sync_1;
     end
 end  
@@ -355,7 +329,6 @@ always @ (posedge tck or posedge reset_in) begin
         clk_switch_request_sync_1_tck <= 1;
         clk_switch_request_sync_2_tck <= 1;
     end
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 280
     else begin
         clk_switch_request_sync_1_tck <= clk_switch_request;
         clk_switch_request_sync_2_tck <= clk_switch_request_sync_1_tck;
@@ -366,7 +339,6 @@ end
 always @ (posedge clk_in or posedge reset_in) begin
     if(reset_in==1) begin
         clk_switch_request_sync_1_sys <= 1;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 290
         clk_switch_request_sync_2_sys <= 1;
     end
     else begin
@@ -377,7 +349,6 @@ end
 
 always @ (posedge clk_in or posedge reset_in) begin 
     if (reset_in==1) begin
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 300
         all_stalled_sys_rise <= 0;
     end
     else if (sys_clk_act_sync_2 != clk_switch_request_sync_2_sys) begin
@@ -388,7 +359,6 @@ always @ (posedge clk_in or posedge reset_in) begin
     end
 end
 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 310
 //FALLING EDGE SYS CLK. In case we need to delay the clock gating signal by an extra half cycle
 always @ (negedge clk_in or posedge reset_in) begin
     if (reset_in==1)
@@ -399,7 +369,6 @@ end
 
 
 //============================================================================//
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 320
 // Glb configuration with clk gating
 //============================================================================//
 // WRITE
@@ -410,7 +379,6 @@ always_ff @(posedge clk or posedge reset_in) begin
         jtag_glb_cfg_wr_data <= '0;
     end
     else begin
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 330
         if (glb_write) begin
             jtag_glb_cfg_wr_en <= 1;
             jtag_glb_cfg_wr_addr <= glb_config_addr_out;
@@ -421,7 +389,6 @@ always_ff @(posedge clk or posedge reset_in) begin
             jtag_glb_cfg_wr_addr <= '0;
             jtag_glb_cfg_wr_data <= '0;
         end
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 340
     end
 end
 
@@ -432,7 +399,6 @@ always_ff @(posedge clk or posedge reset_in) begin
         glb_cfg_wr_clk_en_cnt <= 0;
         glb_cfg_wr_clk_en <= 0;
     end else begin
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 350
         if (glb_write) begin
             glb_cfg_wr_clk_en_cnt <= 12;
             glb_cfg_wr_clk_en <= 1;
@@ -443,7 +409,6 @@ always_ff @(posedge clk or posedge reset_in) begin
                 glb_cfg_wr_clk_en_cnt <= glb_cfg_wr_clk_en_cnt - 1;
             end
         end
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 360
     end
 end
 assign jtag_glb_cfg_wr_clk_en = glb_write | glb_cfg_wr_clk_en;
@@ -454,7 +419,6 @@ always_ff @(posedge clk or posedge reset_in) begin
     if (reset_in) begin
         glb_read_d <= 0;
     end else begin
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 370
         glb_read_d <= glb_read;
     end
 end
@@ -465,7 +429,6 @@ always_ff @(posedge clk or posedge reset_in) begin
         jtag_glb_cfg_rd_addr <= '0;
     end
     else begin
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 380
         if (glb_read && !glb_read_d) begin
             jtag_glb_cfg_rd_en <= 1;
             jtag_glb_cfg_rd_addr <= glb_config_addr_out;
@@ -476,7 +439,6 @@ always_ff @(posedge clk or posedge reset_in) begin
         end
     end
 end
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 390
 
 always_ff @(posedge clk or posedge reset_in) begin
     if (reset_in) begin
@@ -487,7 +449,6 @@ always_ff @(posedge clk or posedge reset_in) begin
                 glb_config_data_in <= jtag_glb_cfg_rd_data;
             end
         end
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 400
     end
 end
 
@@ -498,7 +459,6 @@ assign jtag_glb_cfg_rd_clk_en = glb_read;
 //============================================================================//
 // WRITE
 logic [10:0] jtag_sram_wr_cnt;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 410
 
 always_ff @(posedge clk or posedge reset_in) begin
     if (reset_in) begin
@@ -509,7 +469,6 @@ always_ff @(posedge clk or posedge reset_in) begin
     end
     else begin
         if (glb_sram_write) begin
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 420
             jtag_sram_cfg_wr_en <= 1;
             jtag_sram_cfg_wr_addr <= glb_sram_config_addr_out;
             jtag_sram_cfg_wr_data <= glb_sram_config_data_out;
@@ -520,7 +479,6 @@ always_ff @(posedge clk or posedge reset_in) begin
                 jtag_sram_cfg_wr_en <= 0;
                 jtag_sram_cfg_wr_addr <= '0;
                 jtag_sram_cfg_wr_data <= '0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 430
             end
             else begin
                 jtag_sram_wr_cnt <= jtag_sram_wr_cnt - 1;
@@ -531,7 +489,6 @@ end
 
 // READ
 logic glb_sram_read_d;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 440
 logic [10:0] jtag_sram_rd_cnt;
 always_ff @(posedge clk or posedge reset_in) begin
     if (reset_in) begin
@@ -542,7 +499,6 @@ always_ff @(posedge clk or posedge reset_in) begin
 end
 
 always_ff @(posedge clk or posedge reset_in) begin
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 450
     if (reset_in) begin
         jtag_sram_cfg_rd_en <= 0;
         jtag_sram_cfg_rd_addr <= '0;
@@ -553,7 +509,6 @@ always_ff @(posedge clk or posedge reset_in) begin
             jtag_sram_cfg_rd_en <= 1;
             jtag_sram_cfg_rd_addr <= glb_sram_config_addr_out;
             jtag_sram_rd_cnt <= sram_en_delay_reg;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 460
         end
         else begin
             if (jtag_sram_rd_cnt == 0) begin
@@ -564,7 +519,6 @@ always_ff @(posedge clk or posedge reset_in) begin
             end
         end
     end
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 470
 end
 
 always_ff @(posedge clk or posedge reset_in) begin
@@ -575,7 +529,6 @@ always_ff @(posedge clk or posedge reset_in) begin
             if (jtag_sram_cfg_rd_data_valid) begin
                 glb_sram_config_data_in <= jtag_sram_cfg_rd_data;
             end
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 480
         end
     end
 end
@@ -586,7 +539,6 @@ end
 //============================================================================//
 always_ff @(posedge clk or posedge reset_in) begin
     if (reset_in) begin
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 490
         jtag_axi_wr_en <= 0;
         jtag_axi_wr_addr <= '0;
         jtag_axi_wr_addr <= '0;
@@ -597,7 +549,6 @@ always_ff @(posedge clk or posedge reset_in) begin
             jtag_axi_wr_addr <= axi_wr_addr;
             jtag_axi_wr_data <= axi_wr_data;
         end
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 500
         else begin
             jtag_axi_wr_en <= 0;
             jtag_axi_wr_addr <= '0;
@@ -608,7 +559,6 @@ end
 
 always_ff @(posedge clk or posedge reset_in) begin
     if (reset_in) begin
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 510
         jtag_axi_rd_en <= 0;
         jtag_axi_rd_addr <= '0;
         axi_rd_data <= '0;
@@ -619,7 +569,6 @@ always_ff @(posedge clk or posedge reset_in) begin
             jtag_axi_rd_addr <= axi_rd_addr;
             if (jtag_axi_rd_data_valid) begin
                 axi_rd_data <= jtag_axi_rd_data;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 520
             end
         end
         else begin
@@ -630,7 +579,6 @@ always_ff @(posedge clk or posedge reset_in) begin
 end
 
 //============================================================================//
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 530
 // FSM of global controller
 //============================================================================//
 logic [31:0] TST;
@@ -641,7 +589,6 @@ always @ (posedge clk or posedge reset_in) begin
         // axi
         axi_wr_en <= 0;
         axi_wr_addr <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 540
         axi_wr_data <= 0;
         axi_rd_en <= 0;
         axi_rd_addr <= 0;
@@ -652,7 +599,6 @@ always @ (posedge clk or posedge reset_in) begin
         read <= 0;
         write <= 0;
 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 550
         // debug read register for jtag
         config_data_jtag_in <= 0;
 
@@ -663,7 +609,6 @@ always @ (posedge clk or posedge reset_in) begin
         glb_config_data_out <= 0;
         
         // glb sram config registers
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 560
         glb_sram_read <= 0;
         glb_sram_write <= 0;
         glb_sram_config_addr_out <= 0;
@@ -674,7 +619,6 @@ always @ (posedge clk or posedge reset_in) begin
         glb_clk_en_master <= '0;
         glb_clk_en_bank_master <= '0;
         stall <= '0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 570
         stall_bak <= '0;
         clk_switch_request <= 1;
         rd_delay_reg <= 2;
@@ -685,7 +629,6 @@ always @ (posedge clk or posedge reset_in) begin
 
         // state
         state <= ready;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 580
     end
     else begin
         if (state==ready) begin
@@ -696,7 +639,6 @@ always @ (posedge clk or posedge reset_in) begin
                 axi_wr_addr <= 0;
                 axi_wr_data <= 0;
                 axi_rd_en <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 590
                 axi_rd_addr <= 0;
 
                 // cgra config
@@ -707,7 +649,6 @@ always @ (posedge clk or posedge reset_in) begin
 
                 // debug read register
                 config_data_jtag_in <= config_data_jtag_in; 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 600
 
                 // glb config
                 glb_write <= 0;
@@ -718,7 +659,6 @@ always @ (posedge clk or posedge reset_in) begin
                 // glb sram config registers
                 glb_sram_read <= 0;
                 glb_sram_write <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 610
                 glb_sram_config_addr_out <= glb_sram_config_addr_out;
                 glb_sram_config_data_out <= glb_sram_config_data_out;
 
@@ -729,7 +669,6 @@ always @ (posedge clk or posedge reset_in) begin
                 read <= 0;
                 write <= 1;
                 glb_write <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 620
                 glb_read <= 0;
                 glb_sram_read <= 0;
                 glb_sram_write <= 0;
@@ -740,7 +679,6 @@ always @ (posedge clk or posedge reset_in) begin
                 glb_config_addr_out <= config_addr_jtag_out;
                 glb_config_data_out <= config_data_jtag_out; 
                 read <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 630
                 write <= 0;
                 glb_read <= 0;
                 glb_write <= 1;
@@ -751,7 +689,6 @@ always @ (posedge clk or posedge reset_in) begin
             end
             glb_sram_write_config: begin
                 glb_sram_config_addr_out <= config_addr_jtag_out;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 640
                 glb_sram_config_data_out <= config_data_jtag_out; 
                 read <= 0;
                 write <= 0;
@@ -762,7 +699,6 @@ always @ (posedge clk or posedge reset_in) begin
                 axi_wr_en <= 0;
                 axi_rd_en <= 0;
             end
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 650
             read_config: begin
                 cgra_config_addr_out <= config_addr_jtag_out;
                 cgra_config_data_out <= '0; 
@@ -773,7 +709,6 @@ always @ (posedge clk or posedge reset_in) begin
                 glb_write <= 0;
                 glb_read <= 0;
                 glb_sram_read <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 660
                 glb_sram_write <= 0;
                 axi_wr_en <= 0;
                 axi_rd_en <= 0;
@@ -784,7 +719,6 @@ always @ (posedge clk or posedge reset_in) begin
                 counter <= rd_delay_reg;
                 state <= glb_reading;
                 read <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 670
                 write <= 0;
                 glb_read <= 1;
                 glb_write <= 0;
@@ -795,7 +729,6 @@ always @ (posedge clk or posedge reset_in) begin
             end
             glb_sram_read_config: begin
                 glb_sram_config_addr_out <= config_addr_jtag_out;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 680
                 glb_sram_config_data_out <= '0; 
                 counter <= rd_delay_reg;
                 state <= glb_sram_reading;
@@ -806,7 +739,6 @@ always @ (posedge clk or posedge reset_in) begin
                 glb_sram_read <= 1;
                 glb_sram_write <= 0;
                 axi_wr_en <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 690
                 axi_rd_en <= 0;
             end
             write_A050: begin
@@ -817,7 +749,6 @@ always @ (posedge clk or posedge reset_in) begin
                 glb_read <= 0;
                 glb_sram_read <= 0;
                 glb_sram_write <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 700
                 axi_wr_en <= 0;
                 axi_rd_en <= 0;
             end
@@ -828,7 +759,6 @@ always @ (posedge clk or posedge reset_in) begin
                 glb_write <= 0;
                 glb_read <= 0;
                 glb_sram_read <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 710
                 glb_sram_write <= 0;
                 axi_wr_en <= 0;
                 axi_rd_en <= 0;
@@ -839,7 +769,6 @@ always @ (posedge clk or posedge reset_in) begin
                 write <= 0;
                 glb_write <= 0;
                 glb_read <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 720
                 glb_sram_read <= 0;
                 glb_sram_write <= 0;
                 axi_wr_en <= 0;
@@ -850,7 +779,6 @@ always @ (posedge clk or posedge reset_in) begin
                 counter <= (config_data_jtag_out > 0) ? config_data_jtag_out-1 : 32'd19;
                 read <= 0;
                 write <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 730
                 glb_write <= 0;
                 glb_read <= 0;
                 glb_sram_read <= 0;
@@ -861,7 +789,6 @@ always @ (posedge clk or posedge reset_in) begin
             read_stall: begin
                 config_data_jtag_in <= stall;
                 read <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 740
                 write <= 0;
                 glb_write <= 0;
                 glb_read <= 0;
@@ -872,7 +799,6 @@ always @ (posedge clk or posedge reset_in) begin
             end
             write_stall: begin
                 stall <= config_data_jtag_out[31:0];
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 750
                 read <= 0;
                 write <= 0;
                 glb_write <= 0;
@@ -883,7 +809,6 @@ always @ (posedge clk or posedge reset_in) begin
                 axi_rd_en <= 0;
             end         
             read_glb_pcfg_broadcast_stall: begin
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 760
                 config_data_jtag_in <= glb_pcfg_broadcast_stall;
                 read <= 0;
                 write <= 0;
@@ -894,7 +819,6 @@ always @ (posedge clk or posedge reset_in) begin
                 axi_wr_en <= 0;
                 axi_rd_en <= 0;
             end
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 770
             write_glb_pcfg_broadcast_stall: begin
                 glb_pcfg_broadcast_stall <= config_data_jtag_out[1:0];
                 read <= 0;
@@ -905,7 +829,6 @@ always @ (posedge clk or posedge reset_in) begin
                 glb_sram_write <= 0;
                 axi_wr_en <= 0;
                 axi_rd_en <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 780
             end         
             read_glb_clk_en_master: begin
                 config_data_jtag_in <= glb_clk_en_master;
@@ -916,7 +839,6 @@ always @ (posedge clk or posedge reset_in) begin
                 glb_sram_read <= 0;
                 glb_sram_write <= 0;
                 axi_wr_en <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 790
                 axi_rd_en <= 0;
             end
             write_glb_clk_en_master: begin
@@ -927,7 +849,6 @@ always @ (posedge clk or posedge reset_in) begin
                 glb_read <= 0;
                 glb_sram_read <= 0;
                 glb_sram_write <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 800
                 axi_wr_en <= 0;
                 axi_rd_en <= 0;
             end         
@@ -938,7 +859,6 @@ always @ (posedge clk or posedge reset_in) begin
                 glb_write <= 0;
                 glb_read <= 0;
                 glb_sram_read <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 810
                 glb_sram_write <= 0;
                 axi_wr_en <= 0;
                 axi_rd_en <= 0;
@@ -949,7 +869,6 @@ always @ (posedge clk or posedge reset_in) begin
                 write <= 0;
                 glb_write <= 0;
                 glb_read <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 820
                 glb_sram_read <= 0;
                 glb_sram_write <= 0;
                 axi_wr_en <= 0;
@@ -960,7 +879,6 @@ always @ (posedge clk or posedge reset_in) begin
                     if (|stall) begin
                         counter <= config_data_jtag_out-1;
                         state <= advancing_clk; 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 830
                         stall <= '0;
                         stall_bak <= stall;
                     end
@@ -971,7 +889,6 @@ always @ (posedge clk or posedge reset_in) begin
                 glb_read <= 0;
                 glb_sram_read <= 0;
                 glb_sram_write <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 840
                 axi_wr_en <= 0;
                 axi_rd_en <= 0;
             end
@@ -982,7 +899,6 @@ always @ (posedge clk or posedge reset_in) begin
                 glb_write <= 0;
                 glb_read <= 0;
                 glb_sram_read <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 850
                 glb_sram_write <= 0;
                 axi_wr_en <= 0;
                 axi_rd_en <= 0;
@@ -993,7 +909,6 @@ always @ (posedge clk or posedge reset_in) begin
                     state <= switching_clk;
                     counter <= 32'd20; 
                 end
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 860
                 read <= 0;
                 write <= 0;
                 glb_write <= 0;
@@ -1004,7 +919,6 @@ always @ (posedge clk or posedge reset_in) begin
                 axi_rd_en <= 0;
             end
             wr_rd_delay_reg: begin
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 870
                 //Prevent underflow by setting this to 1 if the input data is 0.
                 rd_delay_reg <= (config_data_jtag_out > 0) ? config_data_jtag_out : 1;
                 read <= 0;
@@ -1015,7 +929,6 @@ always @ (posedge clk or posedge reset_in) begin
                 glb_sram_write <= 0;
                 axi_wr_en <= 0;
                 axi_rd_en <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 880
             end
             rd_rd_delay_reg: begin
                 config_data_jtag_in <= rd_delay_reg;
@@ -1026,7 +939,6 @@ always @ (posedge clk or posedge reset_in) begin
                 glb_sram_read <= 0;
                 glb_sram_write <= 0;
                 axi_wr_en <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 890
                 axi_rd_en <= 0;
             end
             wr_delay_sel_reg: begin
@@ -1037,7 +949,6 @@ always @ (posedge clk or posedge reset_in) begin
                 glb_read <= 0;
                 glb_sram_read <= 0;
                 glb_sram_write <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 900
                 axi_wr_en <= 0;
                 axi_rd_en <= 0;
             end
@@ -1048,7 +959,6 @@ always @ (posedge clk or posedge reset_in) begin
                 glb_write <= 0;
                 glb_read <= 0;
                 glb_sram_read <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 910
                 glb_sram_write <= 0;
                 axi_wr_en <= 0;
                 axi_rd_en <= 0;
@@ -1059,7 +969,6 @@ always @ (posedge clk or posedge reset_in) begin
                 write <= 0;
                 glb_write <= 0;
                 glb_read <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 920
                 glb_sram_read <= 0;
                 glb_sram_write <= 0;
                 axi_wr_en <= 0;
@@ -1070,7 +979,6 @@ always @ (posedge clk or posedge reset_in) begin
                 read <= 0;
                 write <= 0;
                 glb_write <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 930
                 glb_read <= 0;
                 glb_sram_read <= 0;
                 glb_sram_write <= 0;
@@ -1081,7 +989,6 @@ always @ (posedge clk or posedge reset_in) begin
                 axi_wr_en <= 1;
                 axi_rd_en <= 0;
                 axi_wr_addr <= config_addr_jtag_out[11:0];
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 940
                 axi_wr_data <= config_data_jtag_out;
                 read <= 0;
                 write <= 0;
@@ -1092,7 +999,6 @@ always @ (posedge clk or posedge reset_in) begin
             end
             axi_read: begin
                 axi_wr_en <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 950
                 axi_rd_en <= 1;
                 axi_rd_addr <= config_addr_jtag_out[11:0];
                 read <= 0;
@@ -1103,7 +1009,6 @@ always @ (posedge clk or posedge reset_in) begin
                 glb_write <= 0;
                 glb_read <= 0;
                 glb_sram_read <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 960
                 glb_sram_write <= 0;
             end
             default: begin
@@ -1114,7 +1019,6 @@ always @ (posedge clk or posedge reset_in) begin
                 axi_wr_data <= axi_wr_data;
                 axi_rd_addr <= axi_rd_addr;
 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 970
                 // cgra config control
                 cgra_config_addr_out <= 0;
                 cgra_config_data_out <= 0;
@@ -1125,7 +1029,6 @@ always @ (posedge clk or posedge reset_in) begin
                 // glb conifg control
                 glb_config_addr_out <= glb_config_addr_out;
                 glb_config_data_out <= glb_config_data_out; 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 980
                 glb_sram_config_addr_out <= glb_sram_config_addr_out;
                 glb_sram_config_data_out <= glb_sram_config_data_out;
                 glb_write <= 0;
@@ -1136,7 +1039,6 @@ always @ (posedge clk or posedge reset_in) begin
             endcase
         end
         //Counter for any state that needs to block incoming instructions
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 990
         else begin
             cgra_config_addr_out <= cgra_config_addr_out;
             glb_config_addr_out <= glb_config_addr_out;
@@ -1147,7 +1049,6 @@ always @ (posedge clk or posedge reset_in) begin
             end
             else begin
                 state <= ready;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 1000
                 if (state == reading) begin 
                     config_data_jtag_in <= config_data_in;
                     cgra_config_addr_out <= 0;
@@ -1158,7 +1059,6 @@ always @ (posedge clk or posedge reset_in) begin
                     config_data_jtag_in <= glb_config_data_in;
                     glb_read <= 0;
                 end
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 1010
                 else if (state == glb_sram_reading) begin 
                     config_data_jtag_in <= glb_sram_config_data_in;
                     glb_sram_read <= 0;
@@ -1169,7 +1069,6 @@ always @ (posedge clk or posedge reset_in) begin
                 end
                 else if (state == advancing_clk) begin
                     stall <= stall_bak;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_jtag_ctrl.svp line 1020
                 end
             end
         end     
