@@ -62,8 +62,8 @@ for b in $skip; do
     echo "------------------------------------------------------------------------"
     echo "WARNING skipping this test because branch name = '$b'"
     echo "------------------------------------------------------------------------"
-    [ "$TEST_FAILURE_PATH" ] && exit 13  # Failure path fails to succeed, see?
-    exit
+    [ "$TEST_FAILURE_PATH" ] && exit 13  # Failure path "fails" to succeed, see?
+    exit 0  # Mst specify exit code PASS else will inherit FAIL from prev cmd :(
   fi
 done
 ENDGROUP
