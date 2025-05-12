@@ -15,6 +15,7 @@ USAGE="
     $0 7c941e7c1    # good maybe?
 "
 if [ "$1" == "--help" ]; then echo "$USAGE"; exit; fi
+if [ "$1" == "--fail" ]; then TEST_FAILURE_PATH=true; shift; fi
 
 # What does this script do?
 # - verifies that compare-dirs tmp-gverif.d[01] do not exist already
@@ -49,6 +50,23 @@ commit=$1
 # Not debugging
 function GROUP    { sleep 1; printf "%s%s[group]%s\n"  "#" "#" "$*"; sleep 1; }
 function ENDGROUP { sleep 1; printf "%s%s[endgroup]\n" "#" "#";      sleep 1; }
+
+##############################################################################
+GROUP $0 $* BEGIN
+# Skip test when/if merge is SUPPOSED to change master-branch behavior...
+skip="grg_param_uniquify"
+curbranch=`git branch --show-current`
+echo "Current branch name is '$curbranch'"
+for b in $skip; do
+  if [ "$curbranch" == "$b" ]; then
+    echo "------------------------------------------------------------------------"
+    echo "WARNING skipping this test because branch name = '$b'"
+    echo "------------------------------------------------------------------------"
+    [ "$TEST_FAILURE_PATH" ] && exit 13  # Failure path "fails" to succeed, see?
+    exit 0  # Mst specify exit code PASS else will inherit FAIL from prev cmd :(
+  fi
+done
+ENDGROUP
 
 ##############################################################################
 GROUP Docker image and container

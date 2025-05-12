@@ -20,6 +20,14 @@ jobs:
 #     - name: Action, branch, and repo information.
 #       run: printf "$SHOW_ACTION\n$SHOW_BRANCH\n$SHOW_BNAME\n$SHOW_SHA\n"
 
+  quick_local_test_5s:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository code
+      uses: actions/checkout@v2
+    - name: Run the test
+      run: cd test/glctest; ./test.sh -debug 15
+
   func_fail_1m:
     runs-on: ubuntu-latest
     steps:

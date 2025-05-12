@@ -53,6 +53,11 @@ fi
 function GROUP    { sleep 1; printf "%s%s[group]%s\n"  "#" "#" "$1"; sleep 1; }
 function ENDGROUP { sleep 1; printf "%s%s[endgroup]\n" "#" "#";      sleep 1; }
 
+##############################################################################
+GROUP $0 $* BEGIN
+ENDGROUP
+
+
 ########################################################################
 # DOCKER image and container
 GROUP "DOCKER image and container"
@@ -121,6 +126,18 @@ else
 fi
 GROUP "make_verilator=$make_verilator"
 ENDGROUP
+
+# This will of course FAIL if target machine does not have vcs in the proper path /cad/...
+DO_FULL_PR=
+if [ "$DO_FULL_PR" ]; then
+  docker exec $container /bin/bash -c "
+      source /aha/bin/activate;
+      source /cad/modules/tcl/init/sh || exit 13
+      module load base incisive xcelium/19.03.003 vcs/Q-2020.03-SP2
+      pwd; aha regress pr;
+  " || exit 13
+  exit
+fi
 
 ########################################################################
 # TEST
