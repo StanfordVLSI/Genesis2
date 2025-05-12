@@ -57,9 +57,9 @@ skip="grg_param_uniquify"
 curbranch=`git branch --show-current`
 echo "Current branch name is '$curbranch'"
 for b in $skip; do
-  if [ "$curbranch" == "skip" ]; then
+  if [ "$curbranch" == "$b" ]; then
     echo "------------------------------------------------------------------------"
-    echo "WARNING skipping this test because branch name = '$skip'"
+    echo "WARNING skipping this test because branch name = '$b'"
     echo "------------------------------------------------------------------------"
     exit
   fi
