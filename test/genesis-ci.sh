@@ -15,6 +15,7 @@ USAGE="
     $0 7c941e7c1    # good maybe?
 "
 if [ "$1" == "--help" ]; then echo "$USAGE"; exit; fi
+if [ "$1" == "--fail" ]; then TEST_FAILURE_PATH=true; shift; fi
 
 # What does this script do?
 # - verifies that compare-dirs tmp-gverif.d[01] do not exist already
@@ -61,6 +62,7 @@ for b in $skip; do
     echo "------------------------------------------------------------------------"
     echo "WARNING skipping this test because branch name = '$b'"
     echo "------------------------------------------------------------------------"
+    [ "$TEST_FAILURE_PATH" ] && exit 13  # Failure path fails to succeed, see?
     exit
   fi
 done
