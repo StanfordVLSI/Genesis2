@@ -19,9 +19,9 @@
 // --------------- Begin Pre-Generation Parameters Status Report ---------------
 //
 //	From 'generate' statement (priority=5):
+// Parameter Default 	= 0
 // Parameter Type 	= REFlop
 // Parameter Width 	= 32
-// Parameter Default 	= 0
 //
 //		---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 //

@@ -20,8 +20,8 @@
 //
 //	From 'generate' statement (priority=5):
 // Parameter Default 	= 0
-// Parameter Width 	= 4
 // Parameter Type 	= RFlop
+// Parameter Width 	= 4
 //
 //		---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 //
