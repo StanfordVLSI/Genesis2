@@ -49,7 +49,6 @@
  * tap as well as controllers for the boundary scan register and optionally
  * controllers for a reg-file chain which can be either on system clock or/and 
  * on JTAG clock.
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/cfg_and_dbg.svp line 10
  * 
  * The cfg and dbg module assumes that upon reads, the user knows that he/she
  * needs to wait for the data to arrive from the reg-file array, and would
@@ -60,7 +59,6 @@
  * ----------------------------
  * For the sys-clock domain ports
  * * SC_CFG_IFC_REF - An instance of the cfg_ifc (used as reference)
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/cfg_and_dbg.svp line 20
  * * SC_CFG_BUS - on/off or yes/no switch for the system clock domain config bus
  * * SC_CFG_OPCODES - Interpretation of the opcode. Must contain the following feilds:
  *    * nop - value of cfg2rf_op for a no-op (default is 0)
@@ -71,7 +69,6 @@
  * For the tck domain ports
  * * TC_CFG_IFC_REF - An instance of the cfg_ifc (used as reference)
  * * TC_CFG_BUS - on/off or yes/no switch for the jtag tck domain config bus
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/cfg_and_dbg.svp line 30
  * * TC_CFG_OPCODES - Interpretation of the opcode. Must contain the following feilds:
  *    * nop - value of cfg2rf_op for a no-op (default is 0)
  *    * read - value of cfg2rf_op for a read operation (default is 1)
@@ -82,7 +79,6 @@
  * Inputs:
  * -------
  * 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/cfg_and_dbg.svp line 40
  * Outputs:
  * --------
  * 
@@ -93,7 +89,6 @@
  * May 24, 2010  shacham  Replaced config bus signals and parameters with an 
  *			  interface. 
  * Apr 18, 2012  shacham  clean up of names and genesis syntactic sugar
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/cfg_and_dbg.svp line 50
  * May 20, 2014  jingpu   fixed legacy verilog syntax and fix idcode
  * ****************************************************************************/
 
@@ -129,7 +124,6 @@ module cfg_and_dbg_unq1
   (
    // Signals for a system clked configuration bus
    output [31:0] sc_cfgReq_addr,
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/cfg_and_dbg.svp line 110
    output [31:0] sc_cfgReq_data,
    output [4:0] sc_cfgReq_op,
    
@@ -148,7 +142,6 @@ module cfg_and_dbg_unq1
     output 				logic bsr_sample,
     output 				logic bsr_intest,
     output 				logic bsr_extest,
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/cfg_and_dbg.svp line 140
     output 				logic bsr_update_en,
     output 				logic bsr_capture_en,
     output 				logic bsr_shift_dr,
@@ -159,7 +152,6 @@ module cfg_and_dbg_unq1
 
 
     input        tms,          	// JTAG Test Mode Select
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/cfg_and_dbg.svp line 150
     input        tck,          	// JTAG Test Clock
     input        trst_n,         // JTAG Test Reset
     input        tdi,          	// JTAG Test Data Input
@@ -168,10 +160,8 @@ module cfg_and_dbg_unq1
     );
 
    // reset signal for jtag domain registers
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/cfg_and_dbg.svp line 160
    wire 	  test_logic_reset;
    
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/cfg_and_dbg.svp line 180
 
    // Signals comming from the tap for the special instructions
    // for the sys-clock config bus
@@ -181,7 +171,6 @@ module cfg_and_dbg_unq1
    wire 	  sc_cfg_data_update_dr;		
    wire 	  sc_cfg_data_tdo;
    // sc_cfg_inst				
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/cfg_and_dbg.svp line 190
    wire 	  sc_cfg_inst_capture_dr;		
    wire 	  sc_cfg_inst_shift_dr;			
    wire 	  sc_cfg_inst_update_dr;		
@@ -191,11 +180,9 @@ module cfg_and_dbg_unq1
    wire 	  sc_cfg_addr_shift_dr;			
    wire 	  sc_cfg_addr_update_dr;		
    wire 	  sc_cfg_addr_tdo;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/cfg_and_dbg.svp line 200
 
    // for the jtag-clock config bus
 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/cfg_and_dbg.svp line 220
    // Instantiate the Test Access Port (TAP)
    tap_unq1 tap 
      (
@@ -205,7 +192,6 @@ module cfg_and_dbg_unq1
       .trst_n(trst_n),
       .tdi(tdi),
       .tdo(tdo),
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/cfg_and_dbg.svp line 230
       .tdo_en(tdo_en),
       
       // sc_cfg_data
@@ -215,7 +201,6 @@ module cfg_and_dbg_unq1
       .sc_cfg_data_tdo(sc_cfg_data_tdo),
 				
       // sc_cfg_inst				
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/cfg_and_dbg.svp line 240
       .sc_cfg_inst_capture_dr(sc_cfg_inst_capture_dr),		
       .sc_cfg_inst_shift_dr(sc_cfg_inst_shift_dr),			
       .sc_cfg_inst_update_dr(sc_cfg_inst_update_dr),		
@@ -235,7 +220,6 @@ module cfg_and_dbg_unq1
       .bsr_intest(bsr_intest),
       .bsr_sample(bsr_sample),
       .bsr_capture_en(bsr_capture_en),
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/cfg_and_dbg.svp line 280
       .bsr_shift_dr(bsr_shift_dr),
       .bsr_update_en(bsr_update_en),
       .bsr_tdo(bsr_tdo)
@@ -245,7 +229,6 @@ module cfg_and_dbg_unq1
 
    /************ Logic for controlling the system-clock config bus ************/
    // Since this cfg interface is all on the system clock, life is more
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/cfg_and_dbg.svp line 290
    // interesting. We need to cross domains by qualifying the output signals.
    // * Since outputs are only considered when the instruction is meanningful--
    //   we'll qualify the sc_cfgReq.op by creating a qualified update signal.
@@ -262,14 +245,12 @@ module cfg_and_dbg_unq1
    // Qualify the instruction
    wire [3:0] inst_update_qual;
    wire       inst_update_qualified;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/cfg_and_dbg.svp line 310
    assign inst_update_qualified = ((sys_clk_activated & inst_update_qual==4'b1110) | (!sys_clk_activated & inst_update_qual[3]==1)) ? 1'b1:1'b0;
    flop_D_0_T_RFlop_W_4 inst_update_reg 
      (.dout(inst_update_qual),	.din({sc_cfg_inst_update_dr, inst_update_qual[3:1]}),
       .Clk(Clk),	.Reset(Reset));
    
 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/cfg_and_dbg.svp line 320
    // assign transaction to the bus on update (pulse)
    assign 			   sc_cfgReq_op = (inst_update_qualified) ? 
 						   sc_inst : 5'd0;
@@ -286,7 +267,6 @@ module cfg_and_dbg_unq1
       .Clk(tck),	.en(sc_cfg_addr_shift_dr),      .Reset(test_logic_reset));
 
    // assign bus / tdo with address (always)
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/cfg_and_dbg.svp line 340
    assign 			     sc_cfgReq_addr = sc_addr;
    assign 			     sc_cfg_addr_tdo = sc_addr[0];
    //*******
@@ -303,14 +283,12 @@ module cfg_and_dbg_unq1
       .Clk(Clk),	.en(sc_data_rd_en),      
       .Reset(Reset));
    //*******
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/cfg_and_dbg.svp line 360
 
    
    //*******
    // shift in/out the data
    wire [31:0] sc_data;
    wire [31:0] sc_data_nxt;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/cfg_and_dbg.svp line 370
    assign 			     sc_data_nxt = (sc_cfg_data_capture_dr) ? 
 						    sc_data_rd : {tdi, sc_data[31:1]};
    
@@ -321,7 +299,6 @@ module cfg_and_dbg_unq1
 
    // assign bus / tdo with data (always)
    assign 			     sc_cfgReq_data = sc_data;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/cfg_and_dbg.svp line 380
    assign sc_cfg_data_tdo = sc_data[0];
    //*******
 
