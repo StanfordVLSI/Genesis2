@@ -19,9 +19,9 @@
 // --------------- Begin Pre-Generation Parameters Status Report ---------------
 //
 //	From 'generate' statement (priority=5):
-// Parameter Default 	= 0
-// Parameter Width 	= 32
 // Parameter Type 	= REFlop
+// Parameter Width 	= 32
+// Parameter Default 	= 0
 //
 //		---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 //
@@ -46,7 +46,6 @@
  * Required Genesis2 Controlable Parameters:
  * * Type		- Constant, Flop, RFlop, EFlop, or REFlop
  * * Width		- integer value specifying register width
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/flop.svp line 10
  * * Default		- default value for the flop 
  *			 (only applies when flop_type=constant|rflop|reflop)
  * * SyncMode		- Sync or ASync flop * Change bar:
@@ -57,7 +56,6 @@
  * Mar 30, 2010  shacham  init version  --  
  * May 20, 2014  jingpu   Add Async mode, change to active low reset
  * Feb 20, 2018  ajcars   Change back to active high reset 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/flop.svp line 20
  * ****************************************************************************/
 
 
@@ -79,7 +77,6 @@ module flop_D_0_T_REFlop_W_32(
 	       input [31:0]  din,
 	       input 		   Reset,
 	       input 		   en,
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/flop.svp line 50
 
 	       //outputs
 	       output reg [31:0] dout
@@ -93,9 +90,7 @@ module flop_D_0_T_REFlop_W_32(
       if (Reset) 
 	dout <= 32'h0;
       else if (en)
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/flop.svp line 80
 	dout <= din;
    end
 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/flop.svp line 90
 endmodule
