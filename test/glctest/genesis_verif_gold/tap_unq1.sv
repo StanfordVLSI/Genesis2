@@ -9,7 +9,7 @@
 //  
 //	-----------------------------------------------
 //	|            Genesis Release Info             |
-//	|  $Change: 11905 $ --- $Date: 2025/05/06 $   |
+//	|  $Change: 11905 $ --- $Date: 2025/05/12 $   |
 //	-----------------------------------------------
 //	
 //
@@ -44,7 +44,6 @@
  * the IEEE Standard 1149.1
  * See DW here: /cad/synopsys/syn/P-2019.03/dw/sim_ver/DW_tap.v
  * 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/tap.svp line 10
  * 
  * REQUIRED GENESIS PARAMETERS:
  * ----------------------------
@@ -55,7 +54,6 @@
  * 
  * Outputs:
  * -------- 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/tap.svp line 20
  * 
  * Change bar:
  * -----------
@@ -81,7 +79,6 @@
 
 // This module implements the following JTAG commands (a '+' marks a user defiend instruction):
 // IDCODE 5'd1
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/tap.svp line 70
 // BYPASS 5'd31 (all ones)
 // EXTEST 5'd0
 // SAMPLE 5'd2
@@ -92,7 +89,6 @@
 module tap_unq1
   (
    // Specific usefule states
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/tap.svp line 80
    output logic test_logic_reset, // TAP FSM in Test Logic Reset (time to reset data register)
 
    // Required commands by the IEEE Standard 1149.1 for a synchronous boundary scan register
@@ -103,7 +99,6 @@ module tap_unq1
    output bsr_sample, // Test Sellect Data Reg: SAMPLE
    output bsr_capture_en, // required by bsr cells
    output bsr_shift_dr, // required by bsr cells	  
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/tap.svp line 90
    output bsr_update_en, // required by bsr cells
    input 	bsr_tdo, // data from the boundary scan register
   
@@ -118,7 +113,6 @@ module tap_unq1
    output sc_cfg_addr_shift_dr, // Test Sellect Data Reg: sc_cfg_addr
    output sc_cfg_addr_update_dr, // Test Sellect Data Reg: sc_cfg_addr
 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/tap.svp line 100
    // Special TDOs
    input 	sc_cfg_data_tdo, // serial data out from DATA register sc_cfg_data
    input 	sc_cfg_inst_tdo, // serial data out from DATA register sc_cfg_inst
@@ -129,7 +123,6 @@ module tap_unq1
    input 	tck, // JTAG Test Clock
    input 	trst_n, // JTAG Test Reset
    input 	tdi, // JTAG Test Data Input
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/tap.svp line 110
    output logic tdo, // JTAG Test Data Output
    output logic tdo_en	        // JTAG Test Data Output
    );
@@ -140,7 +133,6 @@ module tap_unq1
    wire [4:0] instruction;
    wire [15:0] 	tap_state;
 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/tap.svp line 120
    wire 		shift_dr; 
    wire 		sync_capture_en; // active low
    wire 		sync_update_dr;
@@ -151,7 +143,6 @@ module tap_unq1
    // ==========================================================================
    //    Parameters:       Valid Values
    //    ==========        ============
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/tap.svp line 130
    //    width             [2 to 32]
    //    id                [0 = not present, 1 = present]
    //    version           [0 to 15]
@@ -162,7 +153,6 @@ module tap_unq1
    //			   0 = asynchronous, 1 = synchronous
    //
    //
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/tap.svp line 140
    //  Input Ports:    Size        Description
    //  ===========     ====        ===========
    //  tck              1 bit      Test clock
@@ -173,7 +163,6 @@ module tap_unq1
    //                                register and data registers
    //  bypass_sel       1 bit      Selects the bypass register
    //
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/tap.svp line 150
    //  sentinel_val    width - 1   User-defined status bits
    //
    //  Output Ports    Size        Description
@@ -184,7 +173,6 @@ module tap_unq1
    //  tdo              1 bit      Test data out
    //  tdo_en           1 bit      Enable for tdo output buffer
    //  tap_state       16 bit      Current state of the TAP
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/tap.svp line 160
    //                              finite state machine
    //  extest           1 bit      EXTEST decoded instruction
    //  samp_load        1 bit      SAMPLE/PRELOAD decoded instruction
@@ -195,7 +183,6 @@ module tap_unq1
 
    //Signals not used in sync mode. Only included to supress warnings
    wire clock_dr, update_dr;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/tap.svp line 170
 
    CW_tap #(
 	    // system verilog parameterization:
@@ -206,7 +193,6 @@ module tap_unq1
 	    .man_num(325),
 	    .sync_mode(1) // we are always sync with respect to TCK (i.e., we rather use TCK than clock_dr)
 	    ) tap (
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/tap.svp line 180
 		   // inputs
 		   .tck(tck),
 		   .trst_n(trst_n),
@@ -217,7 +203,6 @@ module tap_unq1
 		   .sentinel_val(4'b0),
 		   .test(1'b0),
 		   
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/tap.svp line 190
 		   //outputs
 		   .clock_dr(clock_dr/*not used in sync mode*/),
 		   .shift_dr(shift_dr),
@@ -228,7 +213,6 @@ module tap_unq1
 		   .extest(bsr_extest),
 		   .samp_load(bsr_sample),
 		   .instructions(instruction),
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/tap.svp line 200
 		   .sync_capture_en(sync_capture_en),
 		   .sync_update_dr(sync_update_dr)
 		   );
@@ -239,7 +223,6 @@ module tap_unq1
       unique case(instruction)
 	5'd3: muxed_tdo = bsr_tdo; // for INTEST
 	5'd0: muxed_tdo = bsr_tdo; // for EXTEST
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/tap.svp line 210
 	5'd2: muxed_tdo = bsr_tdo; // for SAMPLE
 	5'd8: muxed_tdo = sc_cfg_data_tdo; // serial data out from DATA register sc_cfg_data
 	5'd9: muxed_tdo = sc_cfg_inst_tdo; // serial data out from DATA register sc_cfg_inst
@@ -250,7 +233,6 @@ module tap_unq1
 
    // Qualifiers for the various jtag stages
    // OS: unfortunatelly, this is hard coded based on the DW_tap documentation 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/tap.svp line 220
    //     and implementation. Not very robust though...
    assign test_logic_reset  = tap_state[0];
    wire  at_capture_dr;
@@ -279,7 +261,6 @@ module tap_unq1
 
 
    wire  bsr_update_dr; //I think this signal should in the port -- Jing
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/tap.svp line 240
    
    // output signal for intest (optional in the standard but I think it's important)
    assign bsr_intest = (instruction==5'd3) ? 1'b1 : 1'b0;

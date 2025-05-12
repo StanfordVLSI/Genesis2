@@ -9,7 +9,7 @@
 //  
 //	-----------------------------------------------
 //	|            Genesis Release Info             |
-//	|  $Change: 11905 $ --- $Date: 2025/05/06 $   |
+//	|  $Change: 11905 $ --- $Date: 2025/05/12 $   |
 //	-----------------------------------------------
 //	
 //
@@ -23,16 +23,16 @@
 //		---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 //
 //	From Command Line input (priority=4):
-// Parameter cfg_op_width 	= 5
-// Parameter num_glb_tiles 	= 2
+// Parameter axi_addr_width 	= 13
+// Parameter axi_data_width 	= 32
+// Parameter block_axi_addr_width 	= 12
 // Parameter cfg_addr_width 	= 32
 // Parameter cfg_data_width 	= 32
-// Parameter axi_data_width 	= 32
-// Parameter axi_addr_width 	= 13
+// Parameter cfg_op_width 	= 5
 // Parameter cgra_width 	= 4
-// Parameter block_axi_addr_width 	= 12
 // Parameter cgra_width_including_io 	= 4
 // Parameter glb_tile_mem_size 	= 128
+// Parameter num_glb_tiles 	= 2
 //
 //		---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 //
@@ -53,7 +53,6 @@
 **===========================================================================*/
 
 //============================================================================//
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 10
 // Genesis parameter declaration
 //============================================================================//
 // cfg_data_width (_GENESIS2_CMD_LINE_PRIORITY_) = 32
@@ -88,7 +87,6 @@ module global_controller (
     // cgra control signals
     output logic                                clk_out,
     output logic                                reset_out,
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 40
     output logic [3:0] cgra_stall, 
     output logic [1:0]         glb_clk_en_master, 
     output logic [1:0]         glb_clk_en_bank_master, 
@@ -99,7 +97,6 @@ module global_controller (
     output logic                                glb_cfg_wr_en,
     output logic                                glb_cfg_wr_clk_en,
     output logic [11:0]  glb_cfg_wr_addr,
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 50
     output logic [31:0]        glb_cfg_wr_data,
     output logic                                glb_cfg_rd_en,
     output logic                                glb_cfg_rd_clk_en,
@@ -110,7 +107,6 @@ module global_controller (
     // global buffer sram configuration
     output logic                                sram_cfg_wr_en,
     output logic [17:0]        sram_cfg_wr_addr,
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 60
     output logic [31:0]        sram_cfg_wr_data,
     output logic                                sram_cfg_rd_en,
     output logic [17:0]        sram_cfg_rd_addr,
@@ -121,7 +117,6 @@ module global_controller (
 	output logic [1:0]         strm_g2f_start_pulse,
 	output logic [1:0]         strm_f2g_start_pulse,
 	output logic [1:0]         pc_start_pulse,
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 70
 	input  logic [1:0]         strm_g2f_interrupt_pulse,
 	input  logic [1:0]         strm_f2g_interrupt_pulse,
 	input  logic [1:0]         pcfg_g2f_interrupt_pulse,
@@ -132,7 +127,6 @@ module global_controller (
     output logic [31:0]        cgra_cfg_addr,
     output logic [31:0]        cgra_cfg_wr_data,
     input  logic [31:0]        cgra_cfg_rd_data,
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 80
 
     // axi4-lite slave interface
     input  logic [12:0]        axi_awaddr,
@@ -143,7 +137,6 @@ module global_controller (
     output logic                                axi_wready,
     input  logic                                axi_bready,
     output logic [1:0]                          axi_bresp,
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 90
     output logic                                axi_bvalid,
     input  logic [12:0]        axi_araddr,
     input  logic                                axi_arvalid,
@@ -154,7 +147,6 @@ module global_controller (
     input  logic                                axi_rready,
 
     output logic                                interrupt,
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 100
 
     // jtag interface signals
     input  logic                                tck,
@@ -165,7 +157,6 @@ module global_controller (
 );
   
 //============================================================================//
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 110
 // logic declaration
 //============================================================================//
 // internal clk is controlled by jtag
@@ -176,7 +167,6 @@ assign clk = clk_out;
 logic [31:0]        config_addr_jtag_out;
 logic [31:0]        config_data_jtag_out;
 logic [4:0]          op_jtag;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 120
 logic [31:0]        config_data_jtag_in;
 logic                                sys_clk_activated;
 
@@ -187,7 +177,6 @@ logic [1:0]         jtag_glb_clk_en_bank_master, axi_glb_clk_en_bank_master;
 logic [1:0]         jtag_glb_pcfg_broadcast_stall, axi_glb_pcfg_broadcast_stall;
 logic [3:0]            jtag_cgra_stall, axi_cgra_stall;
 logic [$clog2(2)*1-1:0] axi_glb_flush_crossbar_sel;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 130
 
 // global buffer configuration
 logic                                jtag_glb_cfg_wr_en, axi_glb_cfg_wr_en;
@@ -198,7 +187,6 @@ logic                                jtag_glb_cfg_rd_en, axi_glb_cfg_rd_en;
 logic                                jtag_glb_cfg_rd_clk_en, axi_glb_cfg_rd_clk_en;
 logic [11:0]  jtag_glb_cfg_rd_addr, axi_glb_cfg_rd_addr;
 logic [31:0]        jtag_glb_cfg_rd_data, axi_glb_cfg_rd_data;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 140
 logic                                jtag_glb_cfg_rd_data_valid, axi_glb_cfg_rd_data_valid;
 
 // global buffer sram configuration
@@ -209,7 +197,6 @@ logic                               jtag_sram_cfg_rd_en;
 logic                               jtag_sram_cfg_rd_clk_en;
 logic [17:0]       jtag_sram_cfg_rd_addr;
 logic [31:0]       jtag_sram_cfg_rd_data;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 150
 logic                               jtag_sram_cfg_rd_data_valid;
 
 // cgra configuration
@@ -220,7 +207,6 @@ logic [31:0]        jtag_cgra_cfg_wr_data, axi_cgra_cfg_wr_data;
 logic [31:0]        jtag_cgra_cfg_data_in, axi_cgra_cfg_data_in;
 
 // jtag to axi addressmap
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 160
 logic                                jtag_axi_wr_en;
 logic [11:0]  jtag_axi_wr_addr;
 logic [31:0]        jtag_axi_wr_data;
@@ -231,7 +217,6 @@ logic                                jtag_axi_rd_data_valid;
 
 // axi global controller configuration
 logic                                axi_glc_cfg_wr_en;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 170
 logic                                axi_glc_cfg_wr_clk_en;
 logic [11:0]  axi_glc_cfg_wr_addr;
 logic [31:0]        axi_glc_cfg_wr_data;
@@ -242,7 +227,6 @@ logic [31:0]        axi_glc_cfg_rd_data;
 logic                                axi_glc_cfg_rd_data_valid;
 
 //============================================================================//
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 180
 // assign
 //============================================================================//
 assign global_reset = jtag_global_reset | axi_global_reset;
@@ -253,7 +237,6 @@ assign glb_flush_crossbar_sel = axi_glb_flush_crossbar_sel;
 assign cgra_stall = jtag_cgra_stall | axi_cgra_stall;
 
 // reset output
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 190
 assign reset_out    = global_reset;
 
 // global buffer configuration
@@ -264,7 +247,6 @@ assign glb_cfg_wr_data              = jtag_glb_cfg_wr_data | axi_glb_cfg_wr_data
 assign glb_cfg_rd_en                = jtag_glb_cfg_rd_en | axi_glb_cfg_rd_en;
 assign glb_cfg_rd_clk_en            = jtag_glb_cfg_rd_clk_en | axi_glb_cfg_rd_clk_en;
 assign glb_cfg_rd_addr              = jtag_glb_cfg_rd_addr | axi_glb_cfg_rd_addr;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 200
 assign jtag_glb_cfg_rd_data         = glb_cfg_rd_data;
 assign axi_glb_cfg_rd_data          = glb_cfg_rd_data;
 assign jtag_glb_cfg_rd_data_valid   = glb_cfg_rd_data_valid;
@@ -275,7 +257,6 @@ assign sram_cfg_wr_en                = jtag_sram_cfg_wr_en;
 assign sram_cfg_wr_addr              = jtag_sram_cfg_wr_addr;
 assign sram_cfg_wr_data              = jtag_sram_cfg_wr_data;
 assign sram_cfg_rd_en                = jtag_sram_cfg_rd_en;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 210
 assign sram_cfg_rd_addr              = jtag_sram_cfg_rd_addr;
 assign jtag_sram_cfg_rd_data         = sram_cfg_rd_data;
 assign jtag_sram_cfg_rd_data_valid   = sram_cfg_rd_data_valid;
@@ -286,7 +267,6 @@ assign cgra_cfg_write               = jtag_cgra_cfg_write | axi_cgra_cfg_write;
 assign cgra_cfg_addr                = jtag_cgra_cfg_addr | axi_cgra_cfg_addr;
 assign cgra_cfg_wr_data             = jtag_cgra_cfg_wr_data | axi_cgra_cfg_wr_data;
 assign jtag_cgra_cfg_data_in        = cgra_cfg_rd_data;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 220
 assign axi_cgra_cfg_data_in         = cgra_cfg_rd_data;
 
 //============================================================================//
@@ -297,7 +277,6 @@ jtag  jtag_controller (
     .ifc_tck(tck),
     .ifc_tms(tms),
     .ifc_tdi(tdi),
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 230
     .ifc_tdo(tdo),
     .ifc_config_addr_to_gc(config_addr_jtag_out),
     .ifc_config_data_from_gc(config_data_jtag_in),
@@ -308,7 +287,6 @@ jtag  jtag_controller (
     .sys_clk_activated(sys_clk_activated),
     .bsr_tdi(),
     .bsr_sample(),
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 240
     .bsr_intest(),
     .bsr_extest(),
     .bsr_update_en(),
@@ -319,7 +297,6 @@ jtag  jtag_controller (
 
 //============================================================================//
 // jtag controller 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 250
 //============================================================================//
 glc_jtag_ctrl  jtag_ctrl (
     .clk_in(clk_in),
@@ -330,7 +307,6 @@ glc_jtag_ctrl  jtag_ctrl (
     .config_data_jtag_out(config_data_jtag_out),
     .op_jtag(op_jtag),
     .config_data_jtag_in(config_data_jtag_in),
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 260
 
     .sys_clk_activated(sys_clk_activated),
     .clk_out(clk_out),
@@ -341,7 +317,6 @@ glc_jtag_ctrl  jtag_ctrl (
     .jtag_cgra_stall(jtag_cgra_stall), 
 
     .jtag_glb_cfg_wr_en(jtag_glb_cfg_wr_en),
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 270
     .jtag_glb_cfg_wr_clk_en(jtag_glb_cfg_wr_clk_en),
     .jtag_glb_cfg_wr_addr(jtag_glb_cfg_wr_addr),
     .jtag_glb_cfg_wr_data(jtag_glb_cfg_wr_data),
@@ -352,7 +327,6 @@ glc_jtag_ctrl  jtag_ctrl (
     .jtag_glb_cfg_rd_data_valid(jtag_glb_cfg_rd_data_valid),
 
     .jtag_sram_cfg_wr_en(jtag_sram_cfg_wr_en),
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 280
     .jtag_sram_cfg_wr_addr(jtag_sram_cfg_wr_addr),
     .jtag_sram_cfg_wr_data(jtag_sram_cfg_wr_data),
     .jtag_sram_cfg_rd_en(jtag_sram_cfg_rd_en),
@@ -363,7 +337,6 @@ glc_jtag_ctrl  jtag_ctrl (
     .jtag_cgra_cfg_read(jtag_cgra_cfg_read),
     .jtag_cgra_cfg_write(jtag_cgra_cfg_write),
     .jtag_cgra_cfg_addr(jtag_cgra_cfg_addr),
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 290
     .jtag_cgra_cfg_wr_data(jtag_cgra_cfg_wr_data),
     .jtag_cgra_cfg_data_in(jtag_cgra_cfg_data_in),
 
@@ -374,7 +347,6 @@ glc_jtag_ctrl  jtag_ctrl (
     .jtag_axi_rd_addr(jtag_axi_rd_addr),
     .jtag_axi_rd_data(jtag_axi_rd_data),
     .jtag_axi_rd_data_valid(jtag_axi_rd_data_valid)
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 300
 );
 
 //============================================================================//
@@ -385,7 +357,6 @@ glc_axi_ctrl  axi_controller (
     .reset(reset_in),
 
     // axi4-lite slave interface
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 310
     .axi_awaddr(axi_awaddr),
     .axi_awvalid(axi_awvalid),
     .axi_awready(axi_awready),
@@ -396,7 +367,6 @@ glc_axi_ctrl  axi_controller (
     .axi_bresp(axi_bresp),
     .axi_bvalid(axi_bvalid),
     .axi_araddr(axi_araddr),
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 320
     .axi_arvalid(axi_arvalid),
     .axi_arready(axi_arready),
     .axi_rdata(axi_rdata),
@@ -407,7 +377,6 @@ glc_axi_ctrl  axi_controller (
     .axi_glb_cfg_wr_en(axi_glb_cfg_wr_en),
     .axi_glb_cfg_wr_clk_en(axi_glb_cfg_wr_clk_en),
     .axi_glb_cfg_wr_addr(axi_glb_cfg_wr_addr),
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 330
     .axi_glb_cfg_wr_data(axi_glb_cfg_wr_data),
     .axi_glb_cfg_rd_en(axi_glb_cfg_rd_en),
     .axi_glb_cfg_rd_clk_en(axi_glb_cfg_rd_clk_en),
@@ -418,7 +387,6 @@ glc_axi_ctrl  axi_controller (
     .axi_glc_cfg_wr_en(axi_glc_cfg_wr_en),
     .axi_glc_cfg_wr_clk_en(axi_glc_cfg_wr_clk_en),
     .axi_glc_cfg_wr_addr(axi_glc_cfg_wr_addr),
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 340
     .axi_glc_cfg_wr_data(axi_glc_cfg_wr_data),
     .axi_glc_cfg_rd_en(axi_glc_cfg_rd_en),
     .axi_glc_cfg_rd_clk_en(axi_glc_cfg_rd_clk_en),
@@ -429,7 +397,6 @@ glc_axi_ctrl  axi_controller (
 
 //============================================================================//
 // axi4-lite addressmap
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 350
 //============================================================================//
 glc_axi_addrmap  axi_addressmap (
     .clk(clk),
@@ -440,7 +407,6 @@ glc_axi_addrmap  axi_addressmap (
     .axi_glb_clk_en_bank_master(axi_glb_clk_en_bank_master), 
     .axi_glb_pcfg_broadcast_stall(axi_glb_pcfg_broadcast_stall), 
     .axi_glb_flush_crossbar_sel(axi_glb_flush_crossbar_sel), 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 360
     .axi_cgra_stall(axi_cgra_stall), 
 
 	.strm_g2f_start_pulse(strm_g2f_start_pulse),
@@ -451,7 +417,6 @@ glc_axi_addrmap  axi_addressmap (
 	.pcfg_g2f_interrupt_pulse(pcfg_g2f_interrupt_pulse),
 
     .axi_glc_cfg_wr_en(axi_glc_cfg_wr_en),
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 370
     .axi_glc_cfg_wr_clk_en(axi_glc_cfg_wr_clk_en),
     .axi_glc_cfg_wr_addr(axi_glc_cfg_wr_addr),
     .axi_glc_cfg_wr_data(axi_glc_cfg_wr_data),
@@ -462,7 +427,6 @@ glc_axi_addrmap  axi_addressmap (
     .axi_glc_cfg_rd_data_valid(axi_glc_cfg_rd_data_valid),
 
     .jtag_axi_wr_en(jtag_axi_wr_en),
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 380
     .jtag_axi_wr_addr(jtag_axi_wr_addr),
     .jtag_axi_wr_data(jtag_axi_wr_data),
     .jtag_axi_rd_en(jtag_axi_rd_en),
@@ -473,7 +437,6 @@ glc_axi_addrmap  axi_addressmap (
     .axi_cgra_cfg_read(axi_cgra_cfg_read),
     .axi_cgra_cfg_write(axi_cgra_cfg_write),
     .axi_cgra_cfg_addr(axi_cgra_cfg_addr),
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller.svp line 390
     .axi_cgra_cfg_wr_data(axi_cgra_cfg_wr_data),
     .axi_cgra_cfg_data_in(axi_cgra_cfg_data_in),
 

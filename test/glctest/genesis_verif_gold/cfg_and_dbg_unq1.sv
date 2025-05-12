@@ -9,7 +9,7 @@
 //  
 //	-----------------------------------------------
 //	|            Genesis Release Info             |
-//	|  $Change: 11904 $ --- $Date: 2013/08/03 $   |
+//	|  $Change: 11905 $ --- $Date: 2025/05/12 $   |
 //	-----------------------------------------------
 //	
 //
@@ -19,12 +19,12 @@
 // --------------- Begin Pre-Generation Parameters Status Report ---------------
 //
 //	From 'generate' statement (priority=5):
-// Parameter sc_cfg_bus_width 	= 32
-// Parameter sc_cfg_op_width 	= 5
 // Parameter SC_CFG_BUS 	= yes
-// Parameter sc_cfg_addr_width 	= 32
 // Parameter SC_CFG_OPCODES 	= Data structure of type HASH
 // Parameter TC_CFG_BUS 	= no
+// Parameter sc_cfg_addr_width 	= 32
+// Parameter sc_cfg_bus_width 	= 32
+// Parameter sc_cfg_op_width 	= 5
 //
 //		---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 //

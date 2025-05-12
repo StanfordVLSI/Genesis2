@@ -9,7 +9,7 @@
 //  
 //	-----------------------------------------------
 //	|            Genesis Release Info             |
-//	|  $Change: 11905 $ --- $Date: 2025/05/06 $   |
+//	|  $Change: 11905 $ --- $Date: 2025/05/12 $   |
 //	-----------------------------------------------
 //	
 //
@@ -19,13 +19,13 @@
 // --------------- Begin Pre-Generation Parameters Status Report ---------------
 //
 //	From 'generate' statement (priority=5):
+// Parameter axi_data_width 	= 32
+// Parameter block_axi_addr_width 	= 12
 // Parameter cfg_addr_width 	= 32
 // Parameter cfg_data_width 	= 32
-// Parameter axi_data_width 	= 32
-// Parameter glb_addr_width 	= 18
 // Parameter cgra_width 	= 4
+// Parameter glb_addr_width 	= 18
 // Parameter num_glb_tiles 	= 2
-// Parameter block_axi_addr_width 	= 12
 //
 //		---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 //
@@ -67,7 +67,6 @@
 // cgra_width_including_io (_GENESIS2_DECLARATION_PRIORITY_) = 32
 //
 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 20
 // local parameter
 
 module glc_axi_addrmap (
@@ -77,7 +76,6 @@ module glc_axi_addrmap (
     // cgra control signals
     output logic                                axi_global_reset,
     output logic [1:0]         axi_glb_clk_en_master, 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 30
     output logic [1:0]         axi_glb_clk_en_bank_master, 
     output logic [1:0]         axi_glb_pcfg_broadcast_stall, 
     output logic [$clog2(2)*1-1:0] axi_glb_flush_crossbar_sel, 
@@ -88,7 +86,6 @@ module glc_axi_addrmap (
 	output logic [1:0]         strm_f2g_start_pulse,
 	output logic [1:0]         pc_start_pulse,
 	input  logic [1:0]         strm_g2f_interrupt_pulse,
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 40
 	input  logic [1:0]         strm_f2g_interrupt_pulse,
 	input  logic [1:0]         pcfg_g2f_interrupt_pulse,
 
@@ -99,7 +96,6 @@ module glc_axi_addrmap (
     input  logic [31:0]        axi_glc_cfg_wr_data,
     input  logic                                axi_glc_cfg_rd_en,
     input  logic                                axi_glc_cfg_rd_clk_en,
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 50
     input  logic [11:0]  axi_glc_cfg_rd_addr,
     output logic [31:0]        axi_glc_cfg_rd_data,
     output logic                                axi_glc_cfg_rd_data_valid,
@@ -110,7 +106,6 @@ module glc_axi_addrmap (
     input  logic [31:0]        jtag_axi_wr_data,
     input  logic                                jtag_axi_rd_en,
     input  logic [11:0]  jtag_axi_rd_addr,
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 60
     output logic [31:0]        jtag_axi_rd_data,
     output logic                                jtag_axi_rd_data_valid,
 
@@ -121,7 +116,6 @@ module glc_axi_addrmap (
     output logic [31:0]        axi_cgra_cfg_wr_data,
     input  logic [31:0]        axi_cgra_cfg_data_in,
 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 70
     output logic                                interrupt
 );
 
@@ -132,7 +126,6 @@ module glc_axi_addrmap (
     logic     [31:0] h2l_global_reset_cnt_w;
     logic    h2l_global_reset_cnt_we;
     logic    h2l_strm_f2g_isr_tile_0_intr;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 80
     logic    h2l_strm_f2g_isr_tile_1_intr;
     logic    h2l_strm_f2g_isr_tile_2_intr;
     logic    h2l_strm_f2g_isr_tile_3_intr;
@@ -143,7 +136,6 @@ module glc_axi_addrmap (
     logic    h2l_strm_f2g_isr_tile_8_intr;
     logic    h2l_strm_f2g_isr_tile_9_intr;
     logic    h2l_strm_f2g_isr_tile_10_intr;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 90
     logic    h2l_strm_f2g_isr_tile_11_intr;
     logic    h2l_strm_f2g_isr_tile_12_intr;
     logic    h2l_strm_f2g_isr_tile_13_intr;
@@ -154,7 +146,6 @@ module glc_axi_addrmap (
     logic    h2l_strm_g2f_isr_tile_2_intr;
     logic    h2l_strm_g2f_isr_tile_3_intr;
     logic    h2l_strm_g2f_isr_tile_4_intr;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 100
     logic    h2l_strm_g2f_isr_tile_5_intr;
     logic    h2l_strm_g2f_isr_tile_6_intr;
     logic    h2l_strm_g2f_isr_tile_7_intr;
@@ -165,7 +156,6 @@ module glc_axi_addrmap (
     logic    h2l_strm_g2f_isr_tile_12_intr;
     logic    h2l_strm_g2f_isr_tile_13_intr;
     logic    h2l_strm_g2f_isr_tile_14_intr;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 110
     logic    h2l_strm_g2f_isr_tile_15_intr;
     logic    h2l_par_cfg_g2f_isr_tile_0_intr;
     logic    h2l_par_cfg_g2f_isr_tile_1_intr;
@@ -176,7 +166,6 @@ module glc_axi_addrmap (
     logic    h2l_par_cfg_g2f_isr_tile_6_intr;
     logic    h2l_par_cfg_g2f_isr_tile_7_intr;
     logic    h2l_par_cfg_g2f_isr_tile_8_intr;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 120
     logic    h2l_par_cfg_g2f_isr_tile_9_intr;
     logic    h2l_par_cfg_g2f_isr_tile_10_intr;
     logic    h2l_par_cfg_g2f_isr_tile_11_intr;
@@ -187,7 +176,6 @@ module glc_axi_addrmap (
     logic     [31:0] h2l_cgra_config_write_cnt_w;
     logic    h2l_cgra_config_write_cnt_we;
     logic     [31:0] h2l_cgra_config_read_cnt_w;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 130
     logic    h2l_cgra_config_read_cnt_we;
     logic     [31:0] h2l_cgra_config_rd_data_data_w;
     logic    h2l_cgra_config_rd_data_data_we;
@@ -198,7 +186,6 @@ module glc_axi_addrmap (
 
     //------- outputs
     logic     [31:0] l2h_global_reset_cnt_r;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 140
     logic     [31:0] l2h_cgra_stall_stall_r;
     logic     [15:0] l2h_glb_clk_en_master_clk_en_r;
     logic     [15:0] l2h_glb_clk_en_bank_master_clk_en_r;
@@ -209,7 +196,6 @@ module glc_axi_addrmap (
     logic    h2l_global_isr_par_cfg_g2f_w;
     logic    l2h_stream_start_pulse_g2f_glb_tile_0_r;
     logic    l2h_stream_start_pulse_g2f_glb_tile_1_r;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 150
     logic    l2h_stream_start_pulse_g2f_glb_tile_2_r;
     logic    l2h_stream_start_pulse_g2f_glb_tile_3_r;
     logic    l2h_stream_start_pulse_g2f_glb_tile_4_r;
@@ -220,7 +206,6 @@ module glc_axi_addrmap (
     logic    l2h_stream_start_pulse_g2f_glb_tile_9_r;
     logic    l2h_stream_start_pulse_g2f_glb_tile_10_r;
     logic    l2h_stream_start_pulse_g2f_glb_tile_11_r;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 160
     logic    l2h_stream_start_pulse_g2f_glb_tile_12_r;
     logic    l2h_stream_start_pulse_g2f_glb_tile_13_r;
     logic    l2h_stream_start_pulse_g2f_glb_tile_14_r;
@@ -231,7 +216,6 @@ module glc_axi_addrmap (
     logic    l2h_stream_start_pulse_f2g_glb_tile_3_r;
     logic    l2h_stream_start_pulse_f2g_glb_tile_4_r;
     logic    l2h_stream_start_pulse_f2g_glb_tile_5_r;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 170
     logic    l2h_stream_start_pulse_f2g_glb_tile_6_r;
     logic    l2h_stream_start_pulse_f2g_glb_tile_7_r;
     logic    l2h_stream_start_pulse_f2g_glb_tile_8_r;
@@ -242,7 +226,6 @@ module glc_axi_addrmap (
     logic    l2h_stream_start_pulse_f2g_glb_tile_13_r;
     logic    l2h_stream_start_pulse_f2g_glb_tile_14_r;
     logic    l2h_stream_start_pulse_f2g_glb_tile_15_r;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 180
     logic    l2h_pc_start_pulse_glb_tile_0_r;
     logic    l2h_pc_start_pulse_glb_tile_1_r;
     logic    l2h_pc_start_pulse_glb_tile_2_r;
@@ -253,7 +236,6 @@ module glc_axi_addrmap (
     logic    l2h_pc_start_pulse_glb_tile_7_r;
     logic    l2h_pc_start_pulse_glb_tile_8_r;
     logic    l2h_pc_start_pulse_glb_tile_9_r;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 190
     logic    l2h_pc_start_pulse_glb_tile_10_r;
     logic    l2h_pc_start_pulse_glb_tile_11_r;
     logic    l2h_pc_start_pulse_glb_tile_12_r;
@@ -264,7 +246,6 @@ module glc_axi_addrmap (
     logic    l2h_strm_g2f_isr_intr_o;
     logic    l2h_par_cfg_g2f_isr_intr_o;
     logic    l2h_global_isr_intr_o;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 200
     logic     [31:0] l2h_cgra_config_addr_addr_r;
     logic     [31:0] l2h_cgra_config_wr_data_data_r;
     logic     [31:0] l2h_cgra_config_write_cnt_r;
@@ -275,7 +256,6 @@ module glc_axi_addrmap (
     logic     [31:0] d2h_dec_pio_read_data;
     logic    d2h_dec_pio_ack;
     logic    d2h_dec_pio_nack;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 210
 
     // internal logic
     logic [31:0] wr_data_internal;
@@ -286,7 +266,6 @@ module glc_axi_addrmap (
     logic is_jtag, is_jtag_d1, is_jtag_d2;
     logic [31:0] axi_rd_data_internal, axi_rd_data_next;
     logic [31:0] jtag_rd_data_internal, jtag_rd_data_next;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 220
     logic axi_rd_data_valid_internal, axi_rd_data_valid_next;
     logic jtag_rd_data_valid_internal, jtag_rd_data_valid_next;
     logic axi_wr_id_match, axi_rd_id_match;
@@ -297,7 +276,6 @@ module glc_axi_addrmap (
 // assigns
 //============================================================================//
 // read/write control logic
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 230
 assign h2d_pio_dec_write_data = wr_data_internal;
 assign h2d_pio_dec_address = addr_internal;
 assign h2d_pio_dec_read = read_internal;
@@ -322,7 +300,6 @@ assign strm_f2g_start_pulse[1] = l2h_stream_start_pulse_f2g_glb_tile_1_r;
 assign pc_start_pulse[0] = l2h_pc_start_pulse_glb_tile_0_r;
 assign pc_start_pulse[1] = l2h_pc_start_pulse_glb_tile_1_r;
 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 260
 assign axi_glb_clk_en_master = l2h_glb_clk_en_master_clk_en_r;
 assign axi_glb_clk_en_bank_master = l2h_glb_clk_en_bank_master_clk_en_r;
 assign axi_glb_pcfg_broadcast_stall = l2h_glb_pcfg_broadcast_stall_stall_r;
@@ -333,7 +310,6 @@ assign interrupt_internal = l2h_global_isr_intr_o;
 
 // global reset controller
 assign axi_global_reset = (l2h_global_reset_cnt_r > 0);
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 270
 
 assign h2l_global_reset_cnt_we = (l2h_global_reset_cnt_r > 0);
 assign h2l_global_reset_cnt_w = l2h_global_reset_cnt_r - 1;
@@ -344,7 +320,6 @@ assign h2l_global_reset_cnt_w = l2h_global_reset_cnt_r - 1;
 always_ff @(posedge clk or posedge reset) begin
     if (reset) begin
         interrupt <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 280
     end
     else begin
         interrupt <= interrupt_internal;
@@ -355,7 +330,6 @@ end
 // cgra config control logic
 //============================================================================//
 always_comb begin
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 290
     h2l_cgra_config_write_cnt_w = l2h_cgra_config_write_cnt_r - 1;
     h2l_cgra_config_write_cnt_we = (l2h_cgra_config_write_cnt_r > 0);
     h2l_cgra_config_read_cnt_w = l2h_cgra_config_read_cnt_r - 1;
@@ -366,7 +340,6 @@ always_comb begin
     axi_cgra_cfg_read = l2h_cgra_config_read_cnt_ored_o;
     axi_cgra_cfg_write = l2h_cgra_config_write_cnt_ored_o;
     axi_cgra_cfg_addr = '0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 300
     axi_cgra_cfg_wr_data = '0;
     if (axi_cgra_cfg_read) begin
         axi_cgra_cfg_addr = l2h_cgra_config_addr_addr_r;
@@ -377,7 +350,6 @@ always_comb begin
     end
 end
 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 310
 always_comb begin
     h2l_cgra_config_rd_data_data_w = axi_cgra_cfg_data_in;
     h2l_cgra_config_rd_data_data_we = axi_cgra_cfg_read;
@@ -388,7 +360,6 @@ end
 //============================================================================//
 always_comb begin
     axi_wr_id_match = (axi_glc_cfg_wr_addr[11:7] == 0);
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 320
     axi_rd_id_match = (axi_glc_cfg_rd_addr[11:7] == 0);
     jtag_wr_id_match = (jtag_axi_wr_addr[11:7] == 0);
     jtag_rd_id_match = (jtag_axi_rd_addr[11:7] == 0);
@@ -399,7 +370,6 @@ always_comb begin
     addr_internal = '0;
     read_internal = 0;
     write_internal = 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 330
     is_jtag = 0;
     // write address override read address when both are asserted
     if (axi_glc_cfg_wr_en & axi_wr_id_match) begin
@@ -410,7 +380,6 @@ always_comb begin
     end
     else if (axi_glc_cfg_rd_en & axi_rd_id_match) begin
         addr_internal = axi_glc_cfg_rd_addr[6:2];
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 340
         read_internal = 1;
         is_jtag = 0;
     end
@@ -421,7 +390,6 @@ always_comb begin
         is_jtag = 1;
     end
     else if (jtag_axi_rd_en & jtag_rd_id_match) begin
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 350
         addr_internal = jtag_axi_rd_addr[6:2];
         read_internal = 1;
         is_jtag = 1;
@@ -432,7 +400,6 @@ always_ff @(posedge clk or posedge reset) begin
     if (reset) begin
         rd_en_d1 <= 0;
         rd_en_d2 <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 360
         is_jtag_d1 <= 0;
         is_jtag_d2 <= 0;
     end
@@ -443,7 +410,6 @@ always_ff @(posedge clk or posedge reset) begin
         is_jtag_d2 <= is_jtag_d1;
     end
 end
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 370
 
 always_comb begin
     axi_rd_data_valid_next = 0;
@@ -454,7 +420,6 @@ always_comb begin
     end
 end
 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 380
 always_comb begin
     jtag_rd_data_valid_next = 0;
     jtag_rd_data_next = '0;
@@ -465,7 +430,6 @@ always_comb begin
 end
 
 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 390
 always_ff @(posedge clk or posedge reset) begin
     if (reset) begin
         axi_rd_data_valid_internal <= 0;
@@ -476,7 +440,6 @@ always_ff @(posedge clk or posedge reset) begin
     else begin
         axi_rd_data_valid_internal <= axi_rd_data_valid_next;
         axi_rd_data_internal <= axi_rd_data_next;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 400
         jtag_rd_data_valid_internal <= jtag_rd_data_valid_next;
         jtag_rd_data_internal <= jtag_rd_data_next;
     end
@@ -487,7 +450,6 @@ always_comb begin
     axi_glc_cfg_rd_data_valid = axi_rd_data_valid_internal;
     jtag_axi_rd_data = jtag_rd_data_internal;
     jtag_axi_rd_data_valid = jtag_rd_data_valid_internal;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_addrmap.svp line 410
 end
 
 //============================================================================//
