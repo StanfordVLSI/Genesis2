@@ -20,7 +20,7 @@ jobs:
 #     - name: Action, branch, and repo information.
 #       run: printf "$SHOW_ACTION\n$SHOW_BRANCH\n$SHOW_BNAME\n$SHOW_SHA\n"
 
-  quick_local_test_1m:
+  quick_local_test_5s:
     runs-on: ubuntu-latest
     steps:
     - name: Check out repository code
