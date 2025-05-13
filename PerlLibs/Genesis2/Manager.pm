@@ -921,7 +921,9 @@ sub find_file_safe{
     # file is absolute path
     $filefound = 1 if (-e $file);
   }else {
+    my ($filename, $dirs) = fileparse($file);
     foreach $dir ($self->{CallDir}, @{$path}) {
+	$dir = canonpath("$dir/" . $dirs);
 	# if relative path, start it from the dir from which the script was called
 	unless ($dir =~ /^\//) { $dir = $self->{CallDir}."/".$dir;}
 
@@ -935,10 +937,10 @@ sub find_file_safe{
         }
 
         # Check if the file is in the directory
-        $filefound = defined($ffs_dir_cache{$dir}->{$file});
+        $filefound = defined($ffs_dir_cache{$dir}->{$filename});
         if ($filefound) {
           # Change file path so it is now absolute.
-          $file = "${dir}/${file}";
+          $file = "${dir}/${filename}";
           last; # got one, so exit the loop
         }
     }
