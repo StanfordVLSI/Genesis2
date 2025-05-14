@@ -22,7 +22,7 @@ export GENESIS_HOME=/home/mydir/Genesis2
 git clone https://github.com/StanfordVLSI/Genesis2.git $GENESIS_HOME
 
 export PATH=$GENESIS_HOME/bin:$GENESIS_HOME/gui/bin:$PATH
-export PERL5LIB=$GENESIS_HOME/PerlLibs/ExtrasForOldPerlDistributions:$PERL5LIB
+export PERL5LIB=$GENESIS_HOME/PerlLibs:/$GENESIS_HOME/PerlLibs/ExtrasForOldPerlDistributions:$PERL5LIB
 ```
 
 If you get an error like this:
