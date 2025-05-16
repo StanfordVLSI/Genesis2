@@ -926,7 +926,7 @@ sub find_file_safe{
     my ($filename, $dirs) = fileparse($file);
     foreach $dir ($self->{CallDir}, @{$path}) {
 	# Cannonicalize the path and assign to a new var
-       # Assigning to $dir was corrupting $self->{CallDir}
+	# Assigning to $dir was corrupting $self->{CallDir}
 	my $cdir = canonpath("$dir/" . $dirs);
 	# if relative path, start it from the dir from which the script was called
 	unless ($cdir =~ /^\//) { $cdir = $self->{CallDir}."/".$cdir;}
