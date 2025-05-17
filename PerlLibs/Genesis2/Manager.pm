@@ -946,13 +946,12 @@ sub find_file_safe{
           last; # got one, so exit the loop
         }
 
-# 	$filefound = 1 if (-e "${dir}/${file}");
-# 	if ($filefound) {
-# 	    # Change file path so it is now absolute.
-# 	    $file = "${dir}/${file}";
-# 	    last; # got one, so exit the loop
-# 	}
-
+	$filefound = 1 if (-e "${dir}/${file}");
+	if ($filefound) {
+	    # Change file path so it is now absolute.
+	    $file = "${dir}/${file}";
+	    last; # got one, so exit the loop
+	}
     }
   }
 
