@@ -905,6 +905,7 @@ sub gen_verilog{
 ## This function receives a file name and a search path and returns
 ## the absolute file name if found. Error and die otherwise.
 ## Usage: $self->find_file(file_name, path_by_ref=[])
+my %ffs_dir_cache;
 sub find_file_safe{
   my $self = shift;
   my $file = shift;
@@ -922,10 +923,20 @@ sub find_file_safe{
     # file is absolute path
     $filefound = 1 if (-e $file);
   }else {
+    my ($filename, $dirs) = fileparse($file);
     foreach $dir ($self->{CallDir}, @{$path}) {
+	# $dir = canonpath("$dir/" . $dirs);
 	# if relative path, start it from the dir from which the script was called
 	unless ($dir =~ /^\//) { $dir = $self->{CallDir}."/".$dir;}
-        print STDERR "$name: Searching in dir '$dir'\n" if $self->{Debug} & 8;
+
+        # Scan directory and cache contents
+        if (!defined($ffs_dir_cache{$dir})) {
+          $ffs_dir_cache{$dir} = {};
+          my @files = map {basename $_} glob("$dir/*");
+          foreach my $file (@files) {
+            $ffs_dir_cache{$dir}->{$file} = 1;
+          }
+        }
 
 	$filefound = 1 if (-e "${dir}/${file}");
 	if ($filefound) {
