@@ -945,9 +945,8 @@ sub find_file_safe{
           $file = "${dir}/${filename}";
           last; # got one, so exit the loop
         }
-
-	$filefound = 1 if (-e "${dir}/${file}");
-	if ($filefound) {
+        elsif (-e "${dir}/${file}") {
+          $filefound = 1;
 	  # Change file path so it is now absolute.
 	  $file = "${dir}/${file}";
 	  last; # got one, so exit the loop
@@ -963,7 +962,6 @@ sub find_file_safe{
     $file = undef;
   }
   return $file;
-
 }
 
 
