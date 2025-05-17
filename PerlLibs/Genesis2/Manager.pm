@@ -461,11 +461,12 @@ sub parse_file_core{
     $self->error("$name: Couldn't open output file $self->{OutputFileName}: $!");
 
   # save the name for your records
-  if (defined $self->{DependHistogram}{$infile}){
-    $self->{DependHistogram}{$infile} = $self->{DependHistogram}{$infile}+1
+  my $base_infile = basename($infile);
+  if (defined $self->{DependHistogram}{$base_infile}){
+    $self->{DependHistogram}{$base_infile} = $self->{DependHistogram}{$base_infile} + 1;
   }else{
-    print {$self->{DependHandle}} "src $infile\n" if defined $self->{DependHandle};
-    $self->{DependHistogram}{$infile} = 1;
+    print {$self->{DependHandle}} "src $base_infile\n" if defined $self->{DependHandle};
+    $self->{DependHistogram}{$base_infile} = 1;
   }
 
   #initialize output file
@@ -629,11 +630,12 @@ sub include{
   my $infile = shift;
 
   # save the name for your records
-  if (defined $self->{DependHistogram}{$infile}){
-    $self->{DependHistogram}{$infile} = $self->{DependHistogram}{$infile}+1
+  my $base_infile = basename($infile);
+  if (defined $self->{DependHistogram}{$base_infile}){
+    $self->{DependHistogram}{$base_infile} = $self->{DependHistogram}{$base_infile} + 1;
   }else{
-    print {$self->{DependHandle}} "inc $infile\n" if defined $self->{DependHandle};
-    $self->{DependHistogram}{$infile} = 1;
+    print {$self->{DependHandle}} "inc $base_infile\n" if defined $self->{DependHandle};
+    $self->{DependHistogram}{$base_infile} = 1;
   }
   $self->parse_file($infile, $self->{IncludesPath}, "inc");
 }
@@ -923,24 +925,26 @@ sub find_file_safe{
   }else {
     my ($filename, $dirs) = fileparse($file);
     foreach $dir ($self->{CallDir}, @{$path}) {
-	$dir = canonpath("$dir/" . $dirs);
+	# Cannonicalize the path and assign to a new var
+       # Assigning to $dir was corrupting $self->{CallDir}
+	my $cdir = canonpath("$dir/" . $dirs);
 	# if relative path, start it from the dir from which the script was called
-	unless ($dir =~ /^\//) { $dir = $self->{CallDir}."/".$dir;}
+	unless ($cdir =~ /^\//) { $cdir = $self->{CallDir}."/".$cdir;}
 
         # Scan directory and cache contents
-        if (!defined($ffs_dir_cache{$dir})) {
-          $ffs_dir_cache{$dir} = {};
-          my @files = map {basename $_} glob("$dir/*");
+        if (!defined($ffs_dir_cache{$cdir})) {
+          $ffs_dir_cache{$cdir} = {};
+          my @files = map {basename $_} glob("$cdir/*");
           foreach my $file (@files) {
-            $ffs_dir_cache{$dir}->{$file} = 1;
+            $ffs_dir_cache{$cdir}->{$file} = 1;
           }
         }
 
         # Check if the file is in the directory
-        $filefound = defined($ffs_dir_cache{$dir}->{$filename});
+        $filefound = defined($ffs_dir_cache{$cdir}->{$filename});
         if ($filefound) {
           # Change file path so it is now absolute.
-          $file = "${dir}/${filename}";
+          $file = "${cdir}/${filename}";
           last; # got one, so exit the loop
         }
     }
@@ -988,7 +992,8 @@ sub add_suffix{
 
   foreach my $suffix ('', @{$self->{InfileSuffixes}}) {
     my $file_w_suffix = $file . $suffix;
-    my $foundfile = $self->find_file_safe($file_w_suffix, $self->{SourcesPath});
+    my $foundfile = defined $self->{DependHistogram}{$file_w_suffix} ||
+                    $self->find_file_safe($file_w_suffix, $self->{SourcesPath});
     if (defined $foundfile) {
       return $file_w_suffix;
     }
