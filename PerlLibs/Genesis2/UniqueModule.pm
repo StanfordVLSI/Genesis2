@@ -1055,7 +1055,7 @@ sub unique_inst{
   }
 
   # TODO clean this up if no problems in a month or so...today is 8 May 2025
-  my ($OLD,$NEW); $OLD=0; $NEW=1;
+  my ($OLD,$NEW); ($OLD,$NEW)=(0,1);
 if ($OLD) {
   #####################
   # Compare against previously generated files
@@ -1121,7 +1121,6 @@ if ($NEW) {
       # Don't compare to self or there will be trouble!
       if ($me eq $rf) { next; }
 
-
       # Assume module name is just filename with extension stripped off
       # E.g. other_file="flop_unq2.sv" => other_module="flop_unq2"
       my ($f, $suffix) = $rf =~ /(.*)[.]([^.]*)/;
@@ -1143,7 +1142,6 @@ if ($NEW) {
           $other_file,			                 # previously created file
           $instance->{UniqueModuleName} => $other_module # mapping of key words between files
           );
-
       last if $match;
   }
 }
@@ -1157,14 +1155,6 @@ if ($NEW) {
     delete $self->{OutfileName_ContentCache}{$instance->{OutputFileName}}; # Clean the file from the cache
     $instance->{OutputFileName} = $other_file;	# instead, use the previously created file
   }
-
-#   #####################
-#   # Show extensive debug info
-#   if ($self->{Debug} & 8) {
-#       foreach my $key (sort keys %{$instance}) {
-#           print STDERR "- instance key2 '$key' = $instance->{$key}\n";
-#       }
-#   }
 
   #####################
   # Reassign the parameter priority
@@ -2286,7 +2276,7 @@ sub gen_param_abbrevs {
     foreach my $param (@{$self->{ParametersList}}) {
       my ($words, $regions) = @{$wr_pairs{$param}};
       my $abbrev = get_abbrev_from_regions($words, $regions);
-      print STDERR "    $param -> $abbrev\n" if $self->{Debug} & 2;
+      print STDERR "    $param -> $abbrev\n" if $self->{Debug} & 2;  # MUST BE STDERR else appears in verilog :(
       $abbrevs{$param} = $abbrev;
       if (!exists $abbrev_srcs{$abbrev}) {
         $abbrev_srcs{$abbrev} = [];
@@ -2297,6 +2287,7 @@ sub gen_param_abbrevs {
     while (my ($abbrev, $params) = each(%abbrev_srcs)) {
       next if (scalar(@$params) <= 1);
 
+      # MUST BE STDERR else appears in verilog instead :(
       print STDERR "  Conflicting parameters: " . join(' ', @$params) . "\n"
         if $self->{Debug} & 2;
       $done = 0;

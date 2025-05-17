@@ -992,12 +992,6 @@ sub add_suffix{
   my $file = shift;
   my $name = __PACKAGE__."->add_suffix";
 
-#   # "No suffix is added if the file name already matches an existing file"
-#   my $foundfile = $self->find_file($file, $self->{SourcesPath});
-#   if (defined $foundfile) {
-#     return $file;
-#   }
-
   # Note this only works in safe mode i.e. only finds top-level files :(
   foreach my $suffix ('', @{$self->{InfileSuffixes}}) {
     my $file_w_suffix = $file . $suffix;
