@@ -263,7 +263,6 @@ Parsing Options:
 	[-sources|srcpath dir]		# Where to find source files
 	[-includes|incpath dir]		# Where to find included files
 	[-input file1 .. filen]		# List of files to process
-        [-safe]                         # Enforce rule that relative-path files must exist in top-level dir
 	[-inputlist filelist1 .. filelistn]	# List of files that each contain a list of files to process
 
 Generating Options:
@@ -309,7 +308,6 @@ sub parse_command_line {
   my %options =
     (
      "parse" => \$self->{ParseMode},			# should we parse input file to generate perl modules?
-     "safe" => \$self->{SafeMode},			# should rel-path input file(s) be limited to top-level dir?
      "top=s" => \$self->{Top},				# name of top module for generation phase
      "synthtop=s" => \$self->{SynthTop},		# Name of top module for synthesis
      "generate" => \$self->{GenMode},			# should we generate a verilog hierarchy?
@@ -903,8 +901,8 @@ sub gen_verilog{
 
 ## find_file_safe:
 ## This function receives a file name and a search path and returns
-## the absolute file name if found. Error and die otherwise.
-## Usage: $self->find_file(file_name, path_by_ref=[])
+## the absolute file name if found, or undef otherwise.
+## Usage: $self->find_file_safe(file_name, path_by_ref=[])
 my %ffs_dir_cache;
 sub find_file_safe{
   my $self = shift;
@@ -918,7 +916,7 @@ sub find_file_safe{
 
   # find the file:
   $filefound = 0;
-  print STDERR "$name: Searching path '$self->{CallDir}:@$path' for file '$file'\n" if $self->{Debug} & 8;
+  print STDERR "$name: Searching path '$self->{CallDir}:@$path' for file '$file'\n" if $self->{Debug} & 2;
   if ($file =~ /^\//) {
     # file is absolute path
     $filefound = 1 if (-e $file);
@@ -965,9 +963,6 @@ sub find_file_safe{
 }
 
 
-
-
-
 ## find_file:
 ## This function receives a file name and a search path and returns
 ## the absolute file name if found. Error and die otherwise.
@@ -980,6 +975,7 @@ sub find_file{
   if (@_){
     $path = shift;
   }
+
   my $filefound = $self->find_file_safe($file, $path);
   $self->error("$name: Can not find file $file \n Search Path: @{$path}") unless defined $filefound;
   return $filefound;
@@ -996,11 +992,11 @@ sub add_suffix{
   my $file = shift;
   my $name = __PACKAGE__."->add_suffix";
 
-  # "No suffix is added if the file name already matches an existing file"
-  my $foundfile = $self->find_file($file, $self->{SourcesPath});
-  if (defined $foundfile) {
-    return $file;
-  }
+#   # "No suffix is added if the file name already matches an existing file"
+#   my $foundfile = $self->find_file($file, $self->{SourcesPath});
+#   if (defined $foundfile) {
+#     return $file;
+#   }
 
   # Note this only works in safe mode i.e. only finds top-level files :(
   foreach my $suffix ('', @{$self->{InfileSuffixes}}) {
