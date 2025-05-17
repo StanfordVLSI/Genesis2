@@ -94,7 +94,6 @@ sub new{
 
     $self->{Manager} = $manager;	# This is the Genesis Manager
     $self->{CallDir} = cwd();		# Directory where the script was called from
-    print STDERR "FOOCH calldir is maybe $self->{CallDir}\n";
 
     $self->{Debug} = 0;			# Debug level (verbosity)
     $self->{TopObj} = undef;		# Pointer to the top UniqueModule in the design
@@ -1415,7 +1414,6 @@ sub find_file{
 	}
     }
   }
-  print STDERR "FOOCH2 calldir is maybe $self->{CallDir}\n";
 
   $file = abs_path($file) if $filefound;
   print "$name: found source: $file\n" if ($filefound && ($self->{Debug} & 2));

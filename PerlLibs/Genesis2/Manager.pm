@@ -93,7 +93,6 @@ sub new {
   $self->{SynthTop} = undef;		# name of synthesizable design top module for generation phase
   $self->{TopObj} = undef;		# Object of top module for generation phase
   $self->{CallDir} = cwd();		# Directory where the script was called from
-  print STDERR "FOO96 calldir is maybe $self->{CallDir}\n";
   $self->{VersionInfoFileName} = 
       "$ENV{GENESIS_HOME}/Info/Genesis2.info"; # Information file on version, date, etc
   $self->{VersionInfo} = [];
@@ -264,6 +263,7 @@ Parsing Options:
 	[-sources|srcpath dir]		# Where to find source files
 	[-includes|incpath dir]		# Where to find included files
 	[-input file1 .. filen]		# List of files to process
+        [-safe]                         # Enforce rule that relative-path files must exist in top-level dir
 	[-inputlist filelist1 .. filelistn]	# List of files that each contain a list of files to process
 
 Generating Options:
@@ -309,6 +309,7 @@ sub parse_command_line {
   my %options =
     (
      "parse" => \$self->{ParseMode},			# should we parse input file to generate perl modules?
+     "safe" => \$self->{SafeMode},			# should rel-path input file(s) be limited to top-level dir?
      "top=s" => \$self->{Top},				# name of top module for generation phase
      "synthtop=s" => \$self->{SynthTop},		# Name of top module for synthesis
      "generate" => \$self->{GenMode},			# should we generate a verilog hierarchy?
@@ -900,145 +901,11 @@ sub gen_verilog{
 ############################## Auxiliary Functions##############################
 ################################################################################
 
-## find_file_unsafe:
+## find_file_safe:
 ## This function receives a file name and a search path and returns
 ## the absolute file name if found. Error and die otherwise.
 ## Usage: $self->find_file(file_name, path_by_ref=[])
-my %ffs_dir_cache;  # This needs to persist across multiple find_file() calls
-sub find_file_unsafe{
-  my $self = shift;
-  my $file = shift;
-  my $name = __PACKAGE__."->find_file_unsafe";
-  my $path = [];
-  my ($dir, $filefound);
-  print STDERR "FOO calldir is maybe $self->{CallDir}\n";
-  if (@_){
-    $path = shift;  # Sets path = first arg passed to sub
-    push(@{$path}, $self->{CallDir});
-  }
-  foreach my $p (@{$path}) { print STDERR "Found path '$p'\n"; }
-
-
-  # find the file:
-  $filefound = 0;
-  print STDERR "$name: Searching path '$self->{CallDir}:@$path' for file '$file'\n" if $self->{Debug} & 8;
-  if ($file =~ /^\//) {
-    # file is absolute path
-    $filefound = 1 if (-e $file);
-  }else {
-    my ($filename, $dirs) = fileparse($file);
-    print STDERR "FOO parsed file '$file' to get filename '$filename' and dirs '$dirs'\n";
-
-#     my $d = $self->{CallDir};
-#     print STDERR "FOO BEFORE calldir = $self->{CallDir}\n";
-#     $d = "bummer, man";
-#     print STDERR "FOO AFTER calldir = $self->{CallDir}\n";
-#     # foreach my $d2 ($self->{CallDir}) {
-#     foreach my $d2 ($d) {
-#         print STDERR "FOO BEFORE2 calldir = $self->{CallDir}\n";
-#         $d2 = "bum2";
-#         print STDERR "FOO AFTER2 calldir = $self->{CallDir}\n";
-#     }
-# 
-#     exit 1;
-
-
-    # FYI if you do this (below) it changes the value of $self->{CallDir}. Perl is a very bad gerl! :(
-    # foreach $dir ($self->{CallDir}) { $dir = "foo"; }
-    my $safe_calldir = $self->{CallDir};
-    foreach $dir ($safe_calldir, @{$path}) {
-
-
-
-        print STDERR "FOO37 BEFORE: calldir is maybe $self->{CallDir}\n";
-        print STDERR "FOO original dir = '$dir'\n";
-	$dir = canonpath("$dir/" . $dirs);
-        print STDERR "FOO new dir = '$dir'\n";
-	# if relative path, start it from the dir from which the script was called
-	unless ($dir =~ /^\//) { $dir = $self->{CallDir}."/".$dir;}
-        print STDERR "$name: Searching in dir '$dir'\n" if $self->{Debug} & 8;
-        print STDERR "FOO938 AFTER: calldir is maybe $self->{CallDir}\n";
-
-        # Scan directory and cache contents
-        if (!defined($ffs_dir_cache{$dir})) {
-          $ffs_dir_cache{$dir} = {};
-          my @files = map {basename $_} glob("$dir/*");
-          foreach my $file (@files) {
-              # print STDERR "FOO adding file '$file' to cache($dir) I guess\n";
-            $ffs_dir_cache{$dir}->{$file} = 1;
-          }
-        }
-        print STDERR "FOO948 AFTER: calldir is maybe $self->{CallDir}\n";
-
-# FOO looking for 'jtag.svp' 
-# cache(/nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/global_controller/rtl/genesis)
-
-
-        # Check if the file is in the directory
-        print STDERR "FOO looking for '$filename' in cache($dir)\n";
-        print STDERR "FOO dir='$dir'\n";
-        print STDERR "FOO dirs='$dirs'\n";
-        $filefound = defined($ffs_dir_cache{$dir}->{$filename});
-        if ($filefound) {
-          # Change file path so it is now absolute.
-          $file = "${dir}/${filename}";
-          last; # got one, so exit the loop
-        }
-        print STDERR "FOO964 calldir is maybe $self->{CallDir}\n";
-
-
-
-
-# FOO adding file 'global_controller.svp' to
-# cache(/nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis)
-
-
-# FOO parsed file
-# 'global_controller/rtl/genesis/global_controller.svp' to get
-# filename 'global_controller.svp' and dirs
-# 'global_controller/rtl/genesis/'
-
-
-
-
-
-
-
-
-
-
-
-
-#         print STDERR "FOO Checking for existence of '${dir}/${file}'\n";
-# 	$filefound = 1 if (-e "${dir}/${file}");
-
-        print STDERR "FOO Checking for existence of '${dirs}/${filename}'\n";
-        my $foo=cwd(); print STDERR "FOO I am here maybe: '$foo'\n";
-	$filefound = 1 if (-e "${dirs}/${filename}");
-
-	if ($filefound) {
-            print STDERR "FOO FOUND FILE\n";
-	    # Change file path so it is now absolute.
-	    $file = "${dir}/${file}";
-	    last; # got one, so exit the loop
-	}
-        print STDERR "FOO1002 calldir is maybe $self->{CallDir}\n";
-    }
-  }
-  print STDERR "FOO1005 calldir is maybe $self->{CallDir}\n";
-
-  $file = abs_path($file) if $filefound;
-  print "$name: found source: $file\n" if ($filefound && ($self->{Debug} & 2));
-  $self->error("$name: Can not find file $file \n Search Path: @{$path}") unless $filefound;
-  return $file;
-}
-
-## find_file_safe:
-## This function receives a file name and a search path and returns
-## the absolute file name if found, or undef otherwise.
-## Usage: $self->find_file_safe(file_name, path_by_ref=[])
 sub find_file_safe{
-  my %ffs_dir_cache;
   my $self = shift;
   my $file = shift;
   my $name = __PACKAGE__."->find_file_safe";
@@ -1050,47 +917,30 @@ sub find_file_safe{
 
   # find the file:
   $filefound = 0;
-  print STDERR "$name: Searching for file $file\n" if $self->{Debug} & 2;
+  print STDERR "$name: Searching path '$self->{CallDir}:@$path' for file '$file'\n" if $self->{Debug} & 8;
   if ($file =~ /^\//) {
     # file is absolute path
     $filefound = 1 if (-e $file);
   }else {
-    my ($filename, $dirs) = fileparse($file);
-
     foreach $dir ($self->{CallDir}, @{$path}) {
-	$dir = canonpath("$dir/" . $dirs);
 	# if relative path, start it from the dir from which the script was called
 	unless ($dir =~ /^\//) { $dir = $self->{CallDir}."/".$dir;}
+        print STDERR "$name: Searching in dir '$dir'\n" if $self->{Debug} & 8;
 
-        # Scan directory and cache contents
-        if (!defined($ffs_dir_cache{$dir})) {
-          $ffs_dir_cache{$dir} = {};
-          my @files = map {basename $_} glob("$dir/*");
-          foreach my $file (@files) {
-            $ffs_dir_cache{$dir}->{$file} = 1;
-          }
-        }
-
-        # Check if the file is in the directory
-        $filefound = defined($ffs_dir_cache{$dir}->{$filename});
-        if ($filefound) {
-          # Change file path so it is now absolute.
-          $file = "${dir}/${filename}";
-          last; # got one, so exit the loop
-        }
+	$filefound = 1 if (-e "${dir}/${file}");
+	if ($filefound) {
+	    # Change file path so it is now absolute.
+	    $file = "${dir}/${file}";
+	    last; # got one, so exit the loop
+	}
     }
   }
 
-  if ($filefound) {
-    $file = abs_path($file);
-    $ffs_dir_cache{$file} = dirname($file);
-    print STDERR "$name: found source: $file\n" if ($self->{Debug} & 2);
-  } else {
-    $file = undef;
-  }
+  $file = abs_path($file) if $filefound;
+  print "$name: found source: $file\n" if ($filefound && ($self->{Debug} & 2));
+  $self->error("$name: Can not find file $file \n Search Path: @{$path}") unless $filefound;
   return $file;
 }
-
 
 ## find_file:
 ## This function receives a file name and a search path and returns
@@ -1104,8 +954,7 @@ sub find_file{
   if (@_){
     $path = shift;
   }
-
-  my $filefound = $self->find_file_unsafe($file, $path);
+  my $filefound = $self->find_file_safe($file, $path);
   $self->error("$name: Can not find file $file \n Search Path: @{$path}") unless defined $filefound;
   return $filefound;
 }
