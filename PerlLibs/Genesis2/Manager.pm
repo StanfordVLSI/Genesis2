@@ -938,6 +938,14 @@ sub find_file_safe{
           }
         }
 
+        # Check if the file is in the directory
+        $filefound = defined($ffs_dir_cache{$dir}->{$filename});
+        if ($filefound) {
+          # Change file path so it is now absolute.
+          $file = "${dir}/${filename}";
+          last; # got one, so exit the loop
+        }
+
 	$filefound = 1 if (-e "${dir}/${file}");
 	if ($filefound) {
 	    # Change file path so it is now absolute.
