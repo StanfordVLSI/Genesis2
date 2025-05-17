@@ -922,10 +922,10 @@ sub find_file_safe{
     # file is absolute path
     $filefound = 1 if (-e $file);
   }else {
+    my ($filename, $dirs) = fileparse($file);
     foreach $dir ($self->{CallDir}, @{$path}) {
 	# if relative path, start it from the dir from which the script was called
 	unless ($dir =~ /^\//) { $dir = $self->{CallDir}."/".$dir;}
-        print STDERR "$name: Searching in dir '$dir'\n" if $self->{Debug} & 8;
 
 	$filefound = 1 if (-e "${dir}/${file}");
 	if ($filefound) {
