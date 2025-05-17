@@ -948,18 +948,27 @@ sub find_file_safe{
 
 	$filefound = 1 if (-e "${dir}/${file}");
 	if ($filefound) {
-	    # Change file path so it is now absolute.
-	    $file = "${dir}/${file}";
-	    last; # got one, so exit the loop
+	  # Change file path so it is now absolute.
+	  $file = "${dir}/${file}";
+	  last; # got one, so exit the loop
 	}
     }
   }
 
-  $file = abs_path($file) if $filefound;
-  print "$name: found source: $file\n" if ($filefound && ($self->{Debug} & 2));
-  $self->error("$name: Can not find file $file \n Search Path: @{$path}") unless $filefound;
+  if ($filefound) {
+    $file = abs_path($file);
+    $ffs_dir_cache{$file} = dirname($file);
+    print STDERR "$name: found source: $file\n" if ($self->{Debug} & 2);
+  } else {
+    $file = undef;
+  }
   return $file;
+
 }
+
+
+
+
 
 ## find_file:
 ## This function receives a file name and a search path and returns
