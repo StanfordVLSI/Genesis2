@@ -1,8 +1,26 @@
-Also see $GENESIS/.github/workflows/gold.yml
+==== NOTES
+* Also see `$GENESIS/.github/workflows/gold.yml`
+* All tests run in docker containers and so should not affect your machine's state...
+* TODO rename `copy_of_garnet_tests_test_app.sh` omg
 
-All tests run in docker containers and so should not affect your machine's state...
+
 
 === Table of Contents
+```
+aha-pr-regressions.sh -- full garnet regressions: 78 apps, 10 hours
+copy_of_garnet_tests_test_app.sh -- quick garnet test builds and runs 4x2 pointwise
+genesis-ci.sh         -- compare this-branch results to master-branch results
+glctest               -- local gold test, see glctests/README.txt
+install-verilator.sh  -- helper script used by `copy_of_garnet_tests_test_app.sh`
+top.v
+```
+
+==== aha-pr-regressions.sh: full garnet regressions
+```
+  Local results archived in subdir 'archives-full-regressions'
+
+
+```
 
 ==== copy_of_garnet_tests_test_app.sh
 ```
