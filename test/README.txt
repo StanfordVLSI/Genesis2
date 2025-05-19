@@ -10,11 +10,12 @@
 * `genesis-ci.sh`         -- compare this-branch results to master-branch results
 * `install-verilator.sh`  -- helper script used by `copy_of_garnet_tests_test_app.sh`
 
+
 === Gold test in `glctest/` subdirectory
 * `glctest/` -- local gold test, see `glctests/README.txt`
 
-=== CI
 
+=== CI
 `Genesis2/.github/workflows/gold.yml` runs five tests on every git
 push. They run in order of how quickly each one is expected to
 finish. The two gold tests compare to master-branch results as gold
