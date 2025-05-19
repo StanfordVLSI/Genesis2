@@ -26,8 +26,7 @@ code emitted by master.
       run: cd test/glctest; ./test.sh -debug 15
 
   func_fail_1m:
-      run: test/copy_of_garnet_tests_test_app.sh \
-             --fail $BRANCH_NAME 4x2 apps/pointwise \
+      run: test/copy_of_garnet_tests_test_app.sh --fail $BRANCH_NAME 4x2 apps/pointwise \
            && exit 13 || echo FAILED SUCCESSFULLY
 
   func_pass_6m:
