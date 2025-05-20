@@ -1093,6 +1093,10 @@ if ($OLD) {
 }
 
 if ($NEW) {
+  # Without this "NEW" update, test.sh generates two identical files
+  # 'flop_unq2.sv' and 'flop_D_0_T_RFlop_W_4.sv' and then uses module
+  # 'flop_unq2.sv' instead of the preferred 'flop_D_0_T_RFlop_W_4.sv'
+
   #####################
   # Find previously generated files e.g. 'flop_unq[123].sv'
 
@@ -2800,6 +2804,8 @@ sub load_base_module{
       return $err_msg;
   }
   else{
+    # Without try/catch, test.sh returns error
+    #   "Genesis2::Manager->add_suffix: Can not find suffix for file jtag"
     use Try::Tiny;
     try {
       # This is the original code for e.g. when jtag.pm already exists
