@@ -9,7 +9,7 @@
 //  
 //	-----------------------------------------------
 //	|            Genesis Release Info             |
-//	|  $Change: 11904 $ --- $Date: 2013/08/03 $   |
+//	|  $Change: 11905 $ --- $Date: 2025/05/06 $   |
 //	-----------------------------------------------
 //	
 //
@@ -19,8 +19,8 @@
 // --------------- Begin Pre-Generation Parameters Status Report ---------------
 //
 //	From 'generate' statement (priority=5):
-// Parameter Type 	= REFlop
-// Parameter Width 	= 32
+// Parameter Width 	= 4
+// Parameter Type 	= RFlop
 // Parameter Default 	= 0
 //
 //		---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -62,35 +62,34 @@
 /*******************************************************************************
  * REQUIRED PARAMETERIZATION
  ******************************************************************************/
-// Type (_GENESIS2_INHERITANCE_PRIORITY_) = REFlop
+// Type (_GENESIS2_INHERITANCE_PRIORITY_) = RFlop
 //
 // Default (_GENESIS2_INHERITANCE_PRIORITY_) = 0
 //
-// Width (_GENESIS2_INHERITANCE_PRIORITY_) = 32
+// Width (_GENESIS2_INHERITANCE_PRIORITY_) = 4
 //
 // SyncMode (_GENESIS2_DECLARATION_PRIORITY_) = ASync
 //
 
-module flop_unq3(
+module flop_D_0_T_RFlop_W_4(
 	       //inputs
 	       input 		   Clk,
-	       input [31:0]  din,
+	       input [3:0]  din,
 	       input 		   Reset,
-	       input 		   en,
 
 	       //outputs
-	       output reg [31:0] dout
+	       output reg [3:0] dout
 	       );
 
 
 
 
-   
    always_ff @(posedge Clk or posedge Reset) begin
       if (Reset) 
-	dout <= 32'h0;
-      else if (en)
-	dout <= din;
+	dout <= 4'h0;
+      else
+	dout <= din; 
    end
+   
 
 endmodule

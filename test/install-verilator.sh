@@ -1,5 +1,12 @@
 #!/bin/bash
 
+HELP='
+DESCRIPTION:
+  Look for verilator 5.028 or better; if not found, install it.
+  May require sudo privilege.
+'
+[ "$1" == "--help" ] && echo "$HELP" && exit
+# ------------------------------------------------------------------------
 set -x
 
 # Verilator must be 5.028 or better maybe

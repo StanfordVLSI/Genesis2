@@ -9,7 +9,7 @@
 //  
 //	-----------------------------------------------
 //	|            Genesis Release Info             |
-//	|  $Change: 11905 $ --- $Date: 2025/05/06 $   |
+//	|  $Change: 11905 $ --- $Date: 2025/05/12 $   |
 //	-----------------------------------------------
 //	
 //
@@ -19,10 +19,10 @@
 // --------------- Begin Pre-Generation Parameters Status Report ---------------
 //
 //	From 'generate' statement (priority=5):
+// Parameter axi_addr_width 	= 13
+// Parameter axi_data_width 	= 32
 // Parameter block_axi_addr_width 	= 12
 // Parameter num_glb_tiles 	= 2
-// Parameter axi_data_width 	= 32
-// Parameter axi_addr_width 	= 13
 //
 //		---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 //
@@ -47,7 +47,6 @@
 **      - Initial version
 **===========================================================================*/
 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 10
 //============================================================================//
 // Genesis parameter declaration
 //============================================================================//
@@ -61,7 +60,6 @@
 //
 
 module glc_axi_ctrl(
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 20
     input  logic                                clk,
     input  logic                                reset,
 
@@ -72,7 +70,6 @@ module glc_axi_ctrl(
     input  logic [31:0]        axi_wdata,
     input  logic                                axi_wvalid,
     output logic                                axi_wready,
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 30
     input  logic                                axi_bready,
     output logic [1:0]                          axi_bresp,
     output logic                                axi_bvalid,
@@ -83,7 +80,6 @@ module glc_axi_ctrl(
     output logic [1:0]                          axi_rresp,
     output logic                                axi_rvalid,
     input  logic                                axi_rready,
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 40
 
     // global buffer configuration
     output logic                                axi_glb_cfg_wr_en,
@@ -94,7 +90,6 @@ module glc_axi_ctrl(
     output logic                                axi_glb_cfg_rd_clk_en,
     output logic [11:0]  axi_glb_cfg_rd_addr,
     input  logic [31:0]        axi_glb_cfg_rd_data,
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 50
     input  logic                                axi_glb_cfg_rd_data_valid,
 
     // global controller configuration
@@ -105,7 +100,6 @@ module glc_axi_ctrl(
     output logic                                axi_glc_cfg_rd_en,
     output logic                                axi_glc_cfg_rd_clk_en,
     output logic [11:0]  axi_glc_cfg_rd_addr,
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 60
     input  logic [31:0]        axi_glc_cfg_rd_data,
     input  logic                                axi_glc_cfg_rd_data_valid
 );
@@ -116,7 +110,6 @@ module glc_axi_ctrl(
 typedef enum logic[2:0] {
     RD_IDLE = 3'h0,
     RD_REQ_GLC = 3'h1,
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 70
     RD_REQ_GLB = 3'h2,
     RD_WAIT = 3'h3,
     RD_RESP = 3'h4
@@ -127,7 +120,6 @@ typedef enum logic[2:0] {
     WR_IDLE = 3'h0,
     WR_REQ_GLC = 3'h1,
     WR_REQ_GLB = 3'h2,
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 80
     WR_WAIT = 3'h3,
     WR_RESP = 3'h4
 } WrState;
@@ -138,7 +130,6 @@ WrState wr_state;
 // internal wires
 //============================================================================//
 logic [$clog2(12):0] wr_wait_cnt;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 90
 logic cfg_rd_is_glb;
 
 logic cfg_wr_glb_clk_en;
@@ -149,7 +140,6 @@ logic cfg_rd_glc_clk_en;
 // timeout
 // local parameter
 localparam bit[9:0] MAX_TIME_CNT = 1023;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 100
 logic [9:0] rd_timeout_cnt;
 logic [9:0] wr_timeout_cnt;
 
@@ -160,7 +150,6 @@ always_ff @(posedge clk or posedge reset) begin
     if (reset) begin
         wr_state <= WR_IDLE;
         wr_wait_cnt <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 110
         cfg_wr_glb_clk_en <= 0;
         cfg_wr_glc_clk_en <= 0;
 
@@ -171,7 +160,6 @@ always_ff @(posedge clk or posedge reset) begin
         axi_bvalid <= '0;
 
         // glc cfg interface
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 120
         axi_glc_cfg_wr_en <= '0;
         axi_glc_cfg_wr_data <= '0;
         axi_glc_cfg_wr_addr <= '0;
@@ -182,7 +170,6 @@ always_ff @(posedge clk or posedge reset) begin
         axi_glb_cfg_wr_addr <= '0;
 
         // timeout cnt
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 130
         wr_timeout_cnt <= MAX_TIME_CNT;
     end
     else if (wr_state == WR_IDLE) begin
@@ -193,7 +180,6 @@ always_ff @(posedge clk or posedge reset) begin
         // axi interface
         axi_awready <= '1;
         axi_wready <= '0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 140
         axi_bresp <= 2'b00;
         axi_bvalid <= '0;
 
@@ -204,7 +190,6 @@ always_ff @(posedge clk or posedge reset) begin
 
         // glb cfg interface
         axi_glb_cfg_wr_en <= '0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 150
         axi_glb_cfg_wr_data <= '0;
         axi_glb_cfg_wr_addr <= '0;
 
@@ -215,7 +200,6 @@ always_ff @(posedge clk or posedge reset) begin
             // awready to 0, wready to 1
             axi_awready <= 1'h0;
             axi_wready <= 1'h1;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 160
 
             if (axi_awaddr[12] == 1'b0) begin
                 wr_state <= WR_REQ_GLC;
@@ -226,7 +210,6 @@ always_ff @(posedge clk or posedge reset) begin
             else begin
                 wr_state <= WR_REQ_GLB;
                 // cfg glb clock gating off
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 170
                 cfg_wr_glb_clk_en <= 1;
                 axi_glb_cfg_wr_addr <= axi_awaddr[11:0];
             end
@@ -237,7 +220,6 @@ always_ff @(posedge clk or posedge reset) begin
     end
     else if (wr_state == WR_REQ_GLC) begin
         if (axi_wvalid & axi_wready) begin
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 180
             axi_wready <= 1'h0;
             axi_glc_cfg_wr_en <= 1'h1;
             axi_glc_cfg_wr_data <= axi_wdata;
@@ -248,7 +230,6 @@ always_ff @(posedge clk or posedge reset) begin
     else if (wr_state == WR_REQ_GLB) begin
         if (axi_wvalid & axi_wready) begin
             axi_wready <= 1'h0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 190
             axi_glb_cfg_wr_en <= 1'h1;
             axi_glb_cfg_wr_data <= axi_wdata;
             wr_wait_cnt <= 12;
@@ -259,7 +240,6 @@ always_ff @(posedge clk or posedge reset) begin
         axi_glc_cfg_wr_en <= 1'h0;
         axi_glb_cfg_wr_en <= 1'h0;
         axi_glc_cfg_wr_addr <= '0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 200
         axi_glb_cfg_wr_addr <= '0;
         axi_glc_cfg_wr_data <= '0;
         axi_glb_cfg_wr_data <= '0;
@@ -270,7 +250,6 @@ always_ff @(posedge clk or posedge reset) begin
         end
         else begin
             wr_wait_cnt <= wr_wait_cnt - 1;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 210
         end
     end
     else if (wr_state == WR_RESP) begin
@@ -281,7 +260,6 @@ always_ff @(posedge clk or posedge reset) begin
             axi_bvalid <= 1'h0;
             wr_state <= WR_IDLE;
         end
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 220
         else if (wr_timeout_cnt == 0) begin
             axi_bvalid <= 1'h0;
             wr_state <= WR_IDLE;
@@ -292,7 +270,6 @@ always_ff @(posedge clk or posedge reset) begin
     end
 end
 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 230
 //============================================================================//
 // read fsm
 //============================================================================//
@@ -303,7 +280,6 @@ always_ff @(posedge clk or posedge reset) begin
 
         // clock gating on
         cfg_rd_glb_clk_en <= 0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 240
         cfg_rd_glc_clk_en <= 0;
 
         // axi interface
@@ -314,7 +290,6 @@ always_ff @(posedge clk or posedge reset) begin
         // glc interface
         axi_glc_cfg_rd_en <= 1'h0;
         axi_glc_cfg_rd_addr <= '0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 250
         
         // glb interface
         axi_glb_cfg_rd_en <= 1'h0;
@@ -325,7 +300,6 @@ always_ff @(posedge clk or posedge reset) begin
     end
     else if (rd_state == RD_IDLE) begin
         // clock gating on
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 260
         cfg_rd_glb_clk_en <= 0;
         cfg_rd_glc_clk_en <= 0;
 
@@ -336,7 +310,6 @@ always_ff @(posedge clk or posedge reset) begin
 
         // glc interface
         axi_glc_cfg_rd_en <= 1'h0;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 270
         axi_glc_cfg_rd_addr <= '0;
 
         // glb interface
@@ -347,7 +320,6 @@ always_ff @(posedge clk or posedge reset) begin
         rd_timeout_cnt <= MAX_TIME_CNT;
 
         if (axi_arvalid & axi_arready) begin
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 280
             axi_arready <= 1'h0;
             if (axi_araddr[12] == 1'b0) begin
                 // cfg glc clock gating off
@@ -358,7 +330,6 @@ always_ff @(posedge clk or posedge reset) begin
             end
             else begin
                 // cfg glb clock gating off
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 290
                 cfg_rd_glb_clk_en <= 1;
 
                 rd_state <= RD_REQ_GLB;
@@ -369,7 +340,6 @@ always_ff @(posedge clk or posedge reset) begin
             axi_arready <= 1'h1;
         end
     end
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 300
     else if (rd_state == RD_REQ_GLC) begin
         axi_glc_cfg_rd_en <= 1'h1;
         rd_state <= RD_WAIT;
@@ -380,7 +350,6 @@ always_ff @(posedge clk or posedge reset) begin
         axi_glb_cfg_rd_en <= 1'h1;
         rd_state <= RD_WAIT;
         cfg_rd_is_glb <= '1;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 310
         rd_timeout_cnt <= MAX_TIME_CNT;
     end
     else if (rd_state == RD_WAIT) begin
@@ -391,7 +360,6 @@ always_ff @(posedge clk or posedge reset) begin
                 axi_rdata <= axi_glb_cfg_rd_data;
                 axi_rvalid <= 1'h1;
                 axi_rresp <= 2'b00;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 320
                 rd_timeout_cnt <= MAX_TIME_CNT;
                 rd_state <= RD_RESP;
             end
@@ -402,7 +370,6 @@ always_ff @(posedge clk or posedge reset) begin
                 rd_timeout_cnt <= MAX_TIME_CNT;
                 rd_state <= RD_RESP;
             end
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 330
             else begin
                 rd_timeout_cnt <= rd_timeout_cnt - 1;
             end
@@ -413,7 +380,6 @@ always_ff @(posedge clk or posedge reset) begin
             if (axi_glc_cfg_rd_data_valid == 1'b1) begin
                 axi_rdata <= axi_glc_cfg_rd_data;
                 axi_rvalid <= 1'h1;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 340
                 axi_rresp <= 2'b00;
                 rd_timeout_cnt <= MAX_TIME_CNT;
                 rd_state <= RD_RESP;
@@ -424,7 +390,6 @@ always_ff @(posedge clk or posedge reset) begin
                 axi_rresp <= 2'b10;
                 rd_timeout_cnt <= MAX_TIME_CNT;
                 rd_state <= RD_RESP;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 350
             end
             else begin
                 rd_timeout_cnt <= rd_timeout_cnt - 1;
@@ -435,7 +400,6 @@ always_ff @(posedge clk or posedge reset) begin
         cfg_rd_glb_clk_en <= 0;
         cfg_rd_glc_clk_en <= 0;
         if (axi_rready & axi_rvalid) begin
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 360
             axi_rresp <= 2'b00;
             axi_rvalid <= 1'h0;
             rd_state <= RD_IDLE;
@@ -446,7 +410,6 @@ always_ff @(posedge clk or posedge reset) begin
             axi_rvalid <= 1'h0;
             rd_state <= RD_IDLE;
         end
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 370
         else begin
             rd_timeout_cnt <= rd_timeout_cnt - 1;
         end
@@ -457,7 +420,6 @@ end
 // assign clk_en
 //============================================================================//
 assign axi_glb_cfg_wr_clk_en = cfg_wr_glb_clk_en;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/glc_axi_ctrl.svp line 380
 assign axi_glc_cfg_wr_clk_en = cfg_wr_glc_clk_en;
 assign axi_glb_cfg_rd_clk_en = cfg_rd_glb_clk_en;
 assign axi_glc_cfg_rd_clk_en = cfg_rd_glc_clk_en;

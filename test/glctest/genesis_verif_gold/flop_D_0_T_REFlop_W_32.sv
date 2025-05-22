@@ -9,7 +9,7 @@
 //  
 //	-----------------------------------------------
 //	|            Genesis Release Info             |
-//	|  $Change: 11904 $ --- $Date: 2013/08/03 $   |
+//	|  $Change: 11905 $ --- $Date: 2025/05/06 $   |
 //	-----------------------------------------------
 //	
 //
@@ -71,7 +71,7 @@
 // SyncMode (_GENESIS2_DECLARATION_PRIORITY_) = ASync
 //
 
-module flop_unq2(
+module flop_D_0_T_REFlop_W_32(
 	       //inputs
 	       input 		   Clk,
 	       input [31:0]  din,

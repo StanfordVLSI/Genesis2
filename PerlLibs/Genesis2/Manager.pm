@@ -67,6 +67,8 @@ use Carp; $Carp::MaxArgLen =16; $Carp::MaxArgNums = 1;
 use Env; # Make environment variables available
 use Term::ANSIColor;
 use File::Tee qw(tee);
+use Genesis2::UniqueModule qw(get_unq_styles default_unq_style
+                              str_to_unq_style);
 #use IO::Tee; # Used to tee stderr to a file
 
 
@@ -147,6 +149,11 @@ sub new {
   $self->{ModuleTail} = [];
 
   $self->{PRLESC} = quotemeta $self->{PrlEsc};
+
+  $self->{UnqStyle} = undef;            # Module uniquification style
+                                        # Use when 'generate' is called rather
+                                        # than 'generate_unq_numeric' or
+                                        # 'generate_unq_param'
 
   # what kind of work should we do?
   $self->{ParseMode} = 0;		# should we parse input file to generate perl modules?
@@ -246,6 +253,7 @@ sub execute{
 
 sub usage {
   my $self = shift;
+  my $unq_styles = join(' ', get_unq_styles());
   print <<END_OF_MESSAGE;
 Usage:	
 	$0 [-option value, ...]
@@ -270,6 +278,7 @@ Generating Options:
 	[-parameter path.to.param1=value1 .. path.to.other.param2=value2]
 					# List of parameter override defintions
 
+	[-unqstyle style]		# Preferred module uniquification style [$unq_styles]
 Help and Debuging Options:
 	[-log filename]			# Name of log file for genesis2 and user stderr messages
 	[-debug level]			# Set debug level. Same as the inline debug directive.
@@ -316,6 +325,7 @@ sub parse_command_line {
      "xml=s" => \$self->{XmlInFileName},		# Input XML representation of definitions
      "cfg=s{,}" => $self->{CfgInFileNames},		# Input config file with more parameter definitions
      "parameter=s{,}" => $self->{PrmOverrides},		# List of parameter override defintions
+     "unqstyle=s" => \$self->{UnqStyle},                # Set preferred module uniquification style
 
      "log=s" => \$self->{LogFileName},			# Name of log file for genesis2 and user stderr messages
      "debug=i" => \$self->{Debug},			# Set the (initial) debug level
@@ -334,6 +344,12 @@ sub parse_command_line {
       if (scalar(@{$self->{InputFileLists}})==1 && ${$self->{InputFileLists}}[0] =~ /^\s*$/);
   $self->error("$name: '-parameter' flag used but no parameter is specified") 
       if (scalar(@{$self->{PrmOverrides}})==1 && ${$self->{PrmOverrides}}[0] =~ /^\s*$/);
+
+  $self->{UnqStyle} = default_unq_style() if !defined($self->{UnqStyle});
+  my @unq_styles = get_unq_styles();
+  $self->error("$name: Invalid module uniquification style specified: " .
+      "'$self->{UnqStyle}'. Valid styles: " . join(', ', @unq_styles))
+      if (!grep {$_ eq $self->{UnqStyle}} @unq_styles);
 
   # Special cases:
   $self->usage() if !$res || $help;
@@ -359,19 +375,17 @@ sub parse_files{
   my ($infile, $suffix, $target, $directories);
   local (*FILE);
 
-  # First, lets consolidate all the file lists:
-  foreach my $filelist (@{$self->{InputFileLists}}){
-      open(FILE, $filelist) or
-	  $self->error("$name: Cannot open input filelist '$filelist'. $!\n");
-      while ($infile = <FILE>) {
-	  chomp $infile;
-	  next if $infile =~ /\s*\#/; # ignore "#" comments
-	  next if $infile =~ /^\s*$/; # ignore empty lines
-	  $infile =~ s/\s//g; # get rid of spaces
-	  print STDERR "$name: Adding $filelist:$infile to parse list\n" if $self->{Debug};
-	  push (@{$self->{InputFileNames}}, $infile);
-      }
-      close FILE;
+  # First, process all the inputlist files
+  if (scalar(@{$self->{InputFileLists}})) {
+    $self->{UnprocessedInputLists} = [];
+    $self->{ProcessedInputLists} = [];    # absolute paths of processed inputlists
+                                          # to avoid processing the same inputlist twice
+
+    @{$self->{UnprocessedInputLists}} = @{$self->{InputFileLists}};
+
+    while (scalar(@{$self->{UnprocessedInputLists}})) {
+      $self->parse_inputlist(shift @{$self->{UnprocessedInputLists}});
+    }
   }
 
   # create and move into work directory
@@ -383,47 +397,229 @@ sub parse_files{
   
   # Now work those file baby
   foreach $infile (@{$self->{InputFileNames}}){
-    $self->{ModuleHead} = [];
-    $self->{ModuleBody} = [];
-    $self->{ModuleTail} = [];
-    print STDERR "$name: Now parsing file $infile\n";
+    # Don't re-parse files that have already been parsed.
+    next if defined($self->{DependHistogram}{$infile});
 
-    # make an output file
-    ($target, $directories) = fileparse($infile);
-    foreach my $suffix (@{$self->{InfileSuffixes}}) {
-	$self->{CurInfileSuffix} = $suffix;
-	last if ($target =~ s/\Q$suffix\E$//); # remove the input suffix
-    }
-    $self->{OutputFileName} = $target . $self->{OutfileSuffix};
-    $self->{OutfileHandle} = new FileHandle;
-    open($self->{OutfileHandle}, ">$self->{OutputFileName}") || 
-      $self->error("$name: Couldn't open output file $self->{OutputFileName}: $!");
-
-    # save the name for your records
-    if (defined $self->{DependHistogram}{$infile}){
-      $self->{DependHistogram}{$infile} = $self->{DependHistogram}{$infile}+1
-    }else{
-      print {$self->{DependHandle}} "src $infile\n" if defined $self->{DependHandle};
-      $self->{DependHistogram}{$infile} = 1;
-    }
-
-    #initialize output file
-    $self->init_perl_module($target);
-
-    # parse the input
-    $self->parse_file($infile, $self->{SourcesPath}, "src");
-
-    # finalize output file
-    $self->finish_perl_module;
-
-    # clean up
-    close($self->{OutfileHandle});
+    # Parse the file
+    $self->parse_file_core($infile);
   }
   
   # move back to home folder
   chdir $self->{CallDir} or $self->error("Cannot cd back to $self->{CallDir} from $self->{WorkDir}");
 
   1;
+}
+
+## parse_unprocessed_file:
+## parse_unprocessed_file parses a single file and dumps the coresponding perl
+## module file only if the file has not been parsed yet.
+sub parse_unprocessed_file {
+  my $self = shift;
+  my $infile = shift;
+  my $name = __PACKAGE__."->parse_unprocessed_file";
+
+  # Don't re-parse files that have already been parsed.
+  return if defined($self->{DependHistogram}{$infile});
+
+  # create and move into work directory
+  unless (-e $self->{WorkDir} && -d $self->{WorkDir}) {
+      mkdir $self->{WorkDir} or
+	  $self->error("Cannot find and cannot create work folder \"".$self->{WorkDir}."\"");
+  }
+  chdir $self->{WorkDir} or $self->error("Cannot cd into $self->{WorkDir}");
+
+  $self->parse_file_core($infile);
+
+  # move back to home folder
+  chdir $self->{CallDir} or $self->error("Cannot cd back to $self->{CallDir} from $self->{WorkDir}");
+
+  1;
+}
+
+# parse_file_core:
+# parse_file_core parses a file and dumps the coresponding perl
+# module file. Used by both parse_files and parse_unprocessed_file.
+sub parse_file_core{
+  my $self = shift;
+  my $infile = shift;
+  my $name = __PACKAGE__."->parse_file_core";
+
+  $self->{ModuleHead} = [];
+  $self->{ModuleBody} = [];
+  $self->{ModuleTail} = [];
+  print STDERR "$name: Now parsing file $infile\n";
+
+  # make an output file
+  my ($target, $directories) = fileparse($infile);
+  foreach my $suffix (@{$self->{InfileSuffixes}}) {
+      $self->{CurInfileSuffix} = $suffix;
+      last if ($target =~ s/\Q$suffix\E$//); # remove the input suffix
+  }
+  $self->{OutputFileName} = $target . $self->{OutfileSuffix};
+  $self->{OutfileHandle} = new FileHandle;
+  open($self->{OutfileHandle}, ">$self->{OutputFileName}") ||
+    $self->error("$name: Couldn't open output file $self->{OutputFileName}: $!");
+
+  # save the name for your records
+  my $base_infile = basename($infile);
+  if (defined $self->{DependHistogram}{$base_infile}){
+    $self->{DependHistogram}{$base_infile} = $self->{DependHistogram}{$base_infile} + 1;
+  }else{
+    print {$self->{DependHandle}} "src $base_infile\n" if defined $self->{DependHandle};
+    $self->{DependHistogram}{$base_infile} = 1;
+  }
+
+  #initialize output file
+  $self->init_perl_module($target);
+
+  # parse the input
+  $self->parse_file($infile, $self->{SourcesPath}, "src");
+
+  # finalize output file
+  $self->finish_perl_module;
+
+  # clean up
+  close($self->{OutfileHandle});
+
+  1;
+}
+
+## Parse an inputlist file.
+##
+## inputlist file can contain -incpath, -srcpath, -input, and -inputlist
+## commands, in addition to files to process.
+##
+## Args: inputlist filename (string)
+## Returns: none
+## Modifies: $self->{InputFileLists}
+##           $self->{InputFileNames}
+##           $self->{SourcesPath}
+##           $self->{IncludesPath}
+sub parse_inputlist{
+    my $self = shift;
+    my $filename = shift;
+
+    my $name = __PACKAGE__."->parse_inputlist";
+
+    my ($infile, $suffix, $target, $directories);
+
+    print STDERR "--- Processing inputlist file $filename...\n"
+        if $self->{Debug};
+
+    # Check whether we've already processed this file
+    my $il_path = abs_path($filename);
+    foreach my $p (@{$self->{ProcessedInputLists}}) {
+        if ($il_path eq $p) {
+            print STDERR "   --- Info: Already processed $il_path; skipping.\n"
+                if $self->{Debug};
+            return;
+        }
+    }
+    push @{$self->{ProcessedInputLists}}, $il_path;
+
+    # Save current directory for this file so that we can
+    # use it for subsequent files and directories.
+
+    my $dir = dirname($il_path);
+
+    my $IL_FILE;
+    open $IL_FILE, '<', $il_path or
+        $self->error("$name: Cannot open inputlist file '$il_path'. $!\n");
+
+    my $line;
+    while ($line = <$IL_FILE>) {
+        # Strip comments and trailing whitespace
+        $line =~ s/#.*//;
+        chomp $line;
+
+        next if $line eq "";
+
+        $line =~ s/^\s+//;
+
+        # Match command with args: -cmd <arg1> <arg2> ...
+        if ($line =~ m{^(-\w+)\s+(.*)}) { # -cmd <file or dir list>
+            my $cmd = $1;
+            my @paths = split ' ', $2;
+
+
+            # Convert relative paths to absolute paths and expand env vars
+            my @new_paths = ();
+            foreach my $path (@paths) {
+                my $orig = $path;
+
+                # Expand environment variables
+                while ($path =~ m/\$\{?(\w+)\}?/) {
+                    my $env_var = $1;
+                    if (defined $ENV{$env_var}) {
+                        $path =~ s/\$\{?(\w+)\}?/$ENV{$env_var}/e;
+                    } else {
+                        print STDERR "   --- WARNING: ignoring path $orig: " .
+                            "environment var $env_var is undefined " .
+                            "at $il_path:$.\n";
+                        next;
+                    }
+                }
+
+                # Prepend current directory if path is not absolute
+                if (!file_name_is_absolute($path)) {
+                    $path = catfile($dir, $path);
+                }
+
+                # Convert to an absolute path
+                my $abspath = abs_path($path);
+                if (!$abspath) {
+                    print STDERR "   --- WARNING: ignoring path $path " .
+                        "(derived from $orig): non-existent path on " .
+                        "$il_path:$.\n";
+                    next;
+                }
+                push @new_paths, $abspath;
+            }
+            @paths = @new_paths;
+
+            if ($cmd eq '-input' or $cmd eq '-inputlist' or
+                $cmd eq '-incpath' or $cmd eq '-srcpath') {
+                my ($var, $comment, $addUnprocInputLists);
+                $addUnprocInputLists = 0;
+                if ($cmd eq '-input') {
+                    $var = 'InputFileNames';
+                    $comment = 'file';
+                } elsif ($cmd eq '-inputlist') {
+                    $var = 'InputFileLists';
+                    $comment = 'inputlist';
+                    $addUnprocInputLists = 1;
+                } elsif ($cmd eq '-incpath') {
+                    $var = 'IncludesPath';
+                    $comment = 'incpath';
+                } elsif ($cmd eq '-srcpath') {
+                    $var = 'SourcesPath';
+                    $comment = 'srcpath';
+                }
+                foreach my $file (@paths) {
+                    push @{$self->{$var}}, $file;
+                    print STDERR "   --- adding $comment $file.\n"
+                        if ($self->{Debug});
+                    push @{$self->{UnprocessedInputLists}}, $file
+                        if $addUnprocInputLists;
+
+                }
+            }
+        }
+
+        # Match file names (no leading hyphen)
+        elsif ($line =~ m{^([^-][^\s]*)$}) {
+            push @{$self->{InputFileNames}}, $1;
+            print STDERR "   --- adding file $1.\n" if ($self->{Debug});
+            next LINE;
+        }
+
+        else {
+            $self->error("$name: Syntax error in file $il_path at line $.\n");
+        }
+    }
+    close $IL_FILE;
+
+    1;
 }
 
 ## include:
@@ -434,11 +630,12 @@ sub include{
   my $infile = shift;
 
   # save the name for your records
-  if (defined $self->{DependHistogram}{$infile}){
-    $self->{DependHistogram}{$infile} = $self->{DependHistogram}{$infile}+1
+  my $base_infile = basename($infile);
+  if (defined $self->{DependHistogram}{$base_infile}){
+    $self->{DependHistogram}{$base_infile} = $self->{DependHistogram}{$base_infile} + 1;
   }else{
-    print {$self->{DependHandle}} "inc $infile\n" if defined $self->{DependHandle};
-    $self->{DependHistogram}{$infile} = 1;
+    print {$self->{DependHandle}} "inc $base_infile\n" if defined $self->{DependHandle};
+    $self->{DependHistogram}{$base_infile} = 1;
   }
   $self->parse_file($infile, $self->{IncludesPath}, "inc");
 }
@@ -691,6 +888,7 @@ sub gen_verilog{
   # Set some back and forth pointers
   $self->{TopObj} = $module->new($self);
   $self->{CfgHandler}->SetTopObj($self->{TopObj});
+  $self->{CfgHandler}->SetUnqStyle(str_to_unq_style($self->{UnqStyle}));
 
   # Start working from the top level
   print STDERR "$name: Starting code generation from module $module\n";
@@ -703,6 +901,66 @@ sub gen_verilog{
 ############################## Auxiliary Functions##############################
 ################################################################################
 
+## find_file_safe:
+## This function receives a file name and a search path and returns
+## the absolute file name if found, or undef otherwise.
+## Usage: $self->find_file_safe(file_name, path_by_ref=[])
+my %ffs_dir_cache;   # This needs to persist across multiple find_file() calls
+sub find_file_safe{
+  my $self = shift;
+  my $file = shift;
+  my $name = __PACKAGE__."->find_file_safe";
+  my $path = [];
+  my ($dir, $filefound);
+  if (@_){
+    $path = shift;
+  }
+
+  # find the file:
+  $filefound = 0;
+  print STDERR "$name: Searching for file $file\n" if $self->{Debug} & 2;
+  if ($file =~ /^\//) {
+    # file is absolute path
+    $filefound = 1 if (-e $file);
+  }else {
+    my ($filename, $dirs) = fileparse($file);
+    foreach $dir ($self->{CallDir}, @{$path}) {
+	# Cannonicalize the path and assign to a new var
+	# Assigning to $dir was corrupting $self->{CallDir}
+	my $cdir = canonpath("$dir/" . $dirs);
+	# if relative path, start it from the dir from which the script was called
+	unless ($cdir =~ /^\//) { $cdir = $self->{CallDir}."/".$cdir;}
+
+        # Scan directory and cache contents
+        if (!defined($ffs_dir_cache{$cdir})) {
+          $ffs_dir_cache{$cdir} = {};
+          my @files = map {basename $_} glob("$cdir/*");
+          foreach my $file (@files) {
+            $ffs_dir_cache{$cdir}->{$file} = 1;
+          }
+        }
+
+        # Check if the file is in the directory
+        $filefound = defined($ffs_dir_cache{$cdir}->{$filename});
+        if ($filefound) {
+          # Change file path so it is now absolute.
+          $file = "${cdir}/${filename}";
+          last; # got one, so exit the loop
+        }
+    }
+  }
+
+  if ($filefound) {
+    $file = abs_path($file);
+    $ffs_dir_cache{$file} = dirname($file);
+    print STDERR "$name: found source: $file\n" if ($self->{Debug} & 2);
+  } else {
+    $file = undef;
+  }
+  return $file;
+}
+
+
 ## find_file:
 ## This function receives a file name and a search path and returns
 ## the absolute file name if found. Error and die otherwise.
@@ -712,35 +970,37 @@ sub find_file{
   my $file = shift;
   my $name = __PACKAGE__."->find_file";
   my $path = [];
-  my ($dir, $filefound);
   if (@_){
     $path = shift;
   }
 
-  # find the file:
-  $filefound = 0;
-  print "$name: Searching for file $file\n" if $self->{Debug} & 2;
-  if ($file =~ /^\//) {
-    # file is absolute path
-    $filefound = 1 if (-e $file);
-  }else {
-    foreach $dir ($self->{CallDir}, @{$path}) {
-	# if relative path, start it from the dir from which the script was called
-	unless ($dir =~ /^\//) { $dir = $self->{CallDir}."/".$dir;}
+  my $filefound = $self->find_file_safe($file, $path);
+  $self->error("$name: Can not find file $file \n Search Path: @{$path}") unless defined $filefound;
+  return $filefound;
+}
 
-	$filefound = 1 if (-e "${dir}/${file}");
-	if ($filefound) {
-	    # Change file path so it is now absolute.
-	    $file = "${dir}/${file}";
-	    last; # got one, so exit the loop
-	}
+
+## add_suffix:
+## Add one of the infile suffixes to the file name to match a file in the
+## search path. No suffix is added if the file name already matches an existing
+## file.
+## Usage: $self->add_suffix(file_name)
+sub add_suffix{
+  my $self = shift;
+  my $file = shift;
+  my $name = __PACKAGE__."->add_suffix";
+
+  foreach my $suffix ('', @{$self->{InfileSuffixes}}) {
+    my $file_w_suffix = $file . $suffix;
+    my $foundfile = defined $self->{DependHistogram}{$file_w_suffix} ||
+                    $self->find_file_safe($file_w_suffix, $self->{SourcesPath});
+    if (defined $foundfile) {
+      return $file_w_suffix;
     }
   }
-
-  $file = abs_path($file) if $filefound;
-  print "$name: found source: $file\n" if ($filefound && ($self->{Debug} & 2));
-  $self->error("$name: Can not find file $file \n Search Path: @{$path}") unless $filefound;
-  return $file;
+  $self->error("$name: Can not find suffix for file $file\n" .
+               "Search path: @{$self->{SourcesPath}}");
+  return undef;
 }
 
 
@@ -917,11 +1177,13 @@ sub create_product_lists{
     # Move files to final location; Print the  file lists
     foreach my $file (@product_list){
 	if ($seen{$file} eq 'verif'){
+            print STDERR "Move $file from $self->{RawDir} to $self->{VerifDir}\n" if \$self->{Debug} & 8;
 	    move(catfile($self->{RawDir}, $file), catfile($self->{VerifDir},$file)) or
 		$self->error("$name: Couldn't move $file from $self->{RawDir} to $self->{VerifDir}");
 	    print { $product_fh } catfile($self->{VerifDir},$file)."\n";
 	    print { $verif_product_fh } catfile($self->{VerifDir},$file)."\n";
 	}else{
+            print STDERR "Move $file from $self->{RawDir} to $self->{SynthDir}\n" if \$self->{Debug} & 8;
 	    move(catfile($self->{RawDir}, $file), catfile($self->{SynthDir},$file)) or
 		$self->error("$name: Couldn't move $file from $self->{RawDir} to $self->{SynthDir}");
 	    print { $product_fh } catfile($self->{SynthDir},$file)."\n";
