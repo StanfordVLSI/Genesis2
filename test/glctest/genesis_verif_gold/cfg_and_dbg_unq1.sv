@@ -278,7 +278,7 @@ module cfg_and_dbg_unq1
    wire 			   sc_data_rd_en;
    assign 			   sc_data_rd_en = (sc_cfgRep_op == 5'd3)? 
 						   1'b1: 1'b0;
-   flop_D_0_T_REFlop_W_32 sc_data_rd_reg 
+   flop_unq2 sc_data_rd_reg 
      (.dout(sc_data_rd),	.din(sc_cfgRep_data),
       .Clk(Clk),	.en(sc_data_rd_en),      
       .Reset(Reset));
@@ -292,7 +292,7 @@ module cfg_and_dbg_unq1
    assign 			     sc_data_nxt = (sc_cfg_data_capture_dr) ? 
 						    sc_data_rd : {tdi, sc_data[31:1]};
    
-   flop_D_0_T_REFlop_W_32 sc_data_reg 
+   flop_unq2 sc_data_reg 
      (.dout(sc_data),	.din(sc_data_nxt),
       .Clk(tck),	.en(sc_cfg_data_shift_dr | sc_cfg_data_capture_dr),      
       .Reset(test_logic_reset));
