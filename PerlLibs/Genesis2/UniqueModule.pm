@@ -1090,14 +1090,6 @@ sub unique_inst{
     $instance->{OutputFileName} = $other_file;	# instead, use the previously created file
   }
 
-#   #####################
-#   # Show extensive debug info
-#   if ($self->{Debug} & 8) {
-#       foreach my $key (sort keys %{$instance}) {
-#           print STDERR "- instance key2 '$key' = $instance->{$key}\n";
-#       }
-#   }
-
   #####################
   # Reassign the parameter priority
   $self->{ParametersPriority} = $prev_priority;
@@ -1438,7 +1430,7 @@ sub ununique_inst{
   if (!defined $self->{UnUniquifiedModules}{$base_module_name}){
       $self->{UnUniquifiedModules}{$base_module_name} = 1;
   }
-  
+
 
   #####################
   # Reassign the parameter priority
