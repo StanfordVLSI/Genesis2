@@ -905,7 +905,7 @@ sub gen_verilog{
 ## This function receives a file name and a search path and returns
 ## the absolute file name if found, or undef otherwise.
 ## Usage: $self->find_file_safe(file_name, path_by_ref=[])
-my %ffs_dir_cache;
+my %ffs_dir_cache;   # This needs to persist across multiple find_file() calls
 sub find_file_safe{
   my $self = shift;
   my $file = shift;
