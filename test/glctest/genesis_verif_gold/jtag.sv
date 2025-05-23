@@ -9,7 +9,7 @@
 //  
 //	-----------------------------------------------
 //	|            Genesis Release Info             |
-//	|  $Change: 11905 $ --- $Date: 2025/05/06 $   |
+//	|  $Change: 11905 $ --- $Date: 2025/05/12 $   |
 //	-----------------------------------------------
 //	
 //
@@ -19,9 +19,9 @@
 // --------------- Begin Pre-Generation Parameters Status Report ---------------
 //
 //	From 'generate' statement (priority=5):
-// Parameter SYSCLK_CFG_OPCODE_WIDTH 	= 5
-// Parameter SYSCLK_CFG_BUS_WIDTH 	= 32
 // Parameter SYSCLK_CFG_ADDR_WIDTH 	= 32
+// Parameter SYSCLK_CFG_BUS_WIDTH 	= 32
+// Parameter SYSCLK_CFG_OPCODE_WIDTH 	= 5
 //
 //		---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 //
@@ -46,7 +46,6 @@
  * 
  * REQUIRED GENESIS PARAMETERS:
  * ----------------------------
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/jtag.svp line 10
  * * IO_LIST -  List of main design IOs. For each IO you must specify:
  *   * name
  *   * width
@@ -57,7 +56,6 @@
  *		     top, bottom}
  * 
  * SYSCLK_CFG_BUS_WIDTH (48) -  Bus width for system clocked configuration entities
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/jtag.svp line 20
  * SYSCLK_CFG_ADDR_WIDTH (18) - Address width for system clocked configuration entities
  * TESTCLK_CFG_BUS_WIDTH (32) - Bus width for test clocked configuration entities
  * TESTCLK_CFG_ADDR_WIDTH (12) - Address width for test clocked configuration entities
@@ -68,7 +66,6 @@
  * Main design inputs, plus  
  * inputs that regard the boundary scan and pads control
  * 
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/jtag.svp line 30
  * Outputs:
  * --------
  * Main design outputs, plus 
@@ -79,7 +76,6 @@
  * Date          Author   Description
  * Mar 28, 2010  shacham  init version  --  
  * May 18, 2010  shacham  Added orientation feild to IO parameter list
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/jtag.svp line 40
  * May 24, 2010  shacham  Pulled config bus parameters to top level
  *			  Added cfg_ifc as the proper way to implement config
  *			  bus uniformity amongst modules.
@@ -110,7 +106,6 @@
 
 
 module jtag
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/jtag.svp line 100
   (
    // main IOs
    output [31:0] ifc_config_addr_to_gc,
@@ -121,7 +116,6 @@ module jtag
    input 	 ifc_trst_n,
    input 	 ifc_tck,
    input 	 ifc_tms,
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/jtag.svp line 110
    input 	 ifc_tdi,
    output 	 ifc_tdo,
    
@@ -132,7 +126,6 @@ module jtag
    output 	 bsr_tdi,
    output 	 bsr_sample,
    output 	 bsr_intest,
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/jtag.svp line 120
    output 	 bsr_extest,
    output 	 bsr_update_en,
    output 	 bsr_capture_en,
@@ -143,7 +136,6 @@ module jtag
 
    // Connect Forward the reset and clock inputs to the global controller
    wire [31:0] sc_jtag2gc_ifc_addr;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/jtag.svp line 130
    wire [31:0] sc_jtag2gc_ifc_data;
    wire [4:0] sc_jtag2gc_ifc_op;
 
@@ -154,7 +146,6 @@ module jtag
 //The opcode is the upper 3 address bits to the gc
    assign ifc_config_addr_to_gc = sc_jtag2gc_ifc_addr;
    assign ifc_config_data_to_gc = sc_jtag2gc_ifc_data;
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/jtag.svp line 140
    assign ifc_config_op_to_gc = sc_jtag2gc_ifc_op;
    assign sc_gc2jtag_ifc_data = ifc_config_data_from_gc;
    assign sc_gc2jtag_ifc_addr = 0;
@@ -166,7 +157,6 @@ module jtag
    // Instantiate the JTAG to reg-files controller
    cfg_and_dbg_unq1 cfg_and_dbg
      (
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/jtag.svp line 170
       // JTAG signals
       .tms(ifc_tms),
       .tck(ifc_tck),
@@ -177,7 +167,6 @@ module jtag
       
       // Boundary Scan Signals (not used in this design. Only connected to supress warnings)
       .bsr_tdi(bsr_tdi),
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/jtag.svp line 180
       .bsr_sample(bsr_sample),
       .bsr_intest(bsr_intest),
       .bsr_extest(bsr_extest),
@@ -188,7 +177,6 @@ module jtag
 
       // signals to the System-clocked global controller
       .sc_cfgReq_addr(sc_jtag2gc_ifc_addr),
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/jtag.svp line 190
       .sc_cfgReq_data(sc_jtag2gc_ifc_data),
       .sc_cfgReq_op(sc_jtag2gc_ifc_op),
       .sc_cfgRep_addr(sc_gc2jtag_ifc_addr),
@@ -199,5 +187,4 @@ module jtag
       .sys_clk_activated(sys_clk_activated)
       );
    
-// From /nobackup/steveri/github/Genesis2/test/glctest/global_controller/rtl/genesis/jtag.svp line 200
 endmodule // jtag

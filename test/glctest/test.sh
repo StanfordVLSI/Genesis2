@@ -51,45 +51,14 @@ sleep 1
 # Compare results to gold model
 echo COMPARE diff -r genesis_verif_gold/ genesis_verif/
 
-# diff -r genesis_verif_gold/ genesis_verif/ && echo PASS || echo FAIL
+# Ignore comment lines...
+diff -r -I '^//' genesis_verif_gold/ genesis_verif/ && result=PASS || result=FAIL
 
-# ARG until such time as parameters get emitted in consistent order,
-# we need this terrible hack. TODO fix parameter order
-
-# Without hack, get verilog that is same but some lines are in different order e.g.
-#   diff -r genesis_verif_gold/flop.sv genesis_verif/flop.sv
-#   22d21
-#   < // Parameter Default  = 0
-#   24a24
-#   > // Parameter Default  = 0
-
-result=PASS
-
-for f in $(cd genesis_verif/; /bin/ls -1); do
-    if ! test -e genesis_verif_gold/$f; then
-        echo ERROR: Only in genesis_verif: $f
-        result=FAIL
-    fi
-done
-
-# Ignore rearranged lines and comments
-function filter { sort $1 | egrep -v '^ *//'; }
-
-for f in $(cd genesis_verif_gold/; /bin/ls -1); do
-    echo COMPARE FILE $f
-    if ! test -e genesis_verif/$f; then
-        echo ERROR: Only in genesis_verif_gold: $f
-        result=FAIL
-
-    elif ! diff <(filter genesis_verif_gold/$f) <(filter genesis_verif/$f); then
-        echo ERROR: Files differ: $f
-        result=FAIL
-    fi
-done
-
-echo ""
+echo ''
 echo '------------------------------------------------------------------------'
 echo Test result: $result
 echo '------------------------------------------------------------------------'
-echo ""
+echo ''
+
 [ "$result" == "PASS" ] || exit 13
+exit 0  # success (0=no errors)
