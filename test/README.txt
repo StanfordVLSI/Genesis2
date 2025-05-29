@@ -15,11 +15,10 @@
 
 === CI
 
-`Genesis2/.github/workflows/gold.yml` runs five tests on every git
-push. They run in order of how quickly each one is expected to
-finish. The two gold tests compare to master-branch results as gold
-and so should be turned OFF if the local branch intends to change the
-code emitted by master.
+`Genesis2/.github/workflows/gold.yml` runs three tests on every git
+push. They run in order of how quickly each is expected to finish.
+
+
 ```
   quick_local_test_5s:
       run: cd test/glctest; ./test.sh -debug 15
@@ -31,12 +30,4 @@ code emitted by master.
 
   func_pass_6m:
       run: test/copy_of_garnet_tests_test_app.sh $BRANCH_NAME 4x2 apps/pointwise
-
-  gold_fail_2m (optional)
-      run: test/genesis-ci.sh --fail $BRANCH_NAME \
-           && exit 13 || echo FAILED SUCCESSFULLY
-
-  gold_pass_3m (optional):
-      run: test/genesis-ci.sh $BRANCH_NAME
-
 ```
