@@ -36,23 +36,6 @@ jobs:
     - name: Run the test
       run: test/copy_of_garnet_tests_test_app.sh --fail $BRANCH_NAME 4x2 apps/pointwise && exit 13 || echo FAILED SUCCESSFULLY
 
-# Turn off gold tests, at least until uniquification works again
-#   gold_fail_2m:
-#     runs-on: ubuntu-latest
-#     steps:
-#     - name: Check out repository code
-#       uses: actions/checkout@v2
-#     - name: Run the test
-#       run: test/genesis-ci.sh --fail $BRANCH_NAME && exit 13 || echo FAILED SUCCESSFULLY
-# 
-#   gold_pass_3m:
-#     runs-on: ubuntu-latest
-#     steps:
-#     - name: Check out repository code
-#       uses: actions/checkout@v2
-#     - name: Run the test
-#       run: test/genesis-ci.sh $BRANCH_NAME
-
   func_pass_6m:
     runs-on: ubuntu-latest
     steps:
