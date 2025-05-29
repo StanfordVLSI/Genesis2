@@ -2558,7 +2558,7 @@ END_OF_MESSAGE
   # GENESIS2_INHERITANCE_PRIORITY
   print { $self->{OutfileHandle} } $self->{LineComment}. 
       "\tFrom 'generate' statement (priority=".GENESIS2_INHERITANCE_PRIORITY."):\n";
-  foreach my $prm (keys %{$self->{Parameters}}){
+  foreach my $prm (sort keys %{$self->{Parameters}}){
       print { $self->{OutfileHandle} } $self->{LineComment}.
 	  " Parameter $prm \t= undef\n" if !defined $self->{Parameters}->{$prm}->{Val};
       my $type = ref($self->{Parameters}->{$prm}->{Val});
@@ -2575,7 +2575,7 @@ END_OF_MESSAGE
   # GENESIS2_CMD_LINE_PRIORITY
   print { $self->{OutfileHandle} } $self->{LineComment}. 
       "\tFrom Command Line input (priority=".GENESIS2_CMD_LINE_PRIORITY."):\n";
-  foreach my $prm (keys %{$self->{ParamsFromCmdLn}}){
+  foreach my $prm (sort keys %{$self->{ParamsFromCmdLn}}){
       my $prm_val = $self->{CfgHandler}->GetCmdLnParamBrief($self->{ParamsFromCmdLn}->{$prm},
 							    $self->get_instance_path.':Parameters:ParamItem('.$prm.')'); 
       $prm_val = 'undef' if !defined $prm_val;
@@ -2589,7 +2589,7 @@ END_OF_MESSAGE
   # GENESIS2_EXTERNAL_XML_PRIORITY
   print { $self->{OutfileHandle} } $self->{LineComment}. 
       "\tFrom XML input (priority=".GENESIS2_EXTERNAL_XML_PRIORITY."):\n";
-  foreach my $prm (keys %{$self->{ParamsFromXML}}){
+  foreach my $prm (sort keys %{$self->{ParamsFromXML}}){
       my $prm_val = $self->{CfgHandler}->GetXmlParamBrief($self->{ParamsFromXML}->{$prm},
 						       $self->get_instance_path.':Parameters:ParamItem('.$prm.')'); 
       $prm_val = 'undef' if !defined $prm_val;
@@ -2604,7 +2604,7 @@ END_OF_MESSAGE
   # GENESIS2_EXTERNAL_CONFIG_PRIORITY
   print { $self->{OutfileHandle} } $self->{LineComment}. 
       "\tFrom Config File input (priority=".GENESIS2_EXTERNAL_CONFIG_PRIORITY."):\n";
-  foreach my $prm (keys %{$self->{ParamsFromCfg}}){
+  foreach my $prm (sort keys %{$self->{ParamsFromCfg}}){
       my $prm_val = $self->{CfgHandler}->GetCfgParamBrief($self->{ParamsFromCfg}->{$prm},
 						       $self->get_instance_path.':Parameters:ParamItem('.$prm.')');
       $prm_val = 'undef' if !defined $prm_val;
