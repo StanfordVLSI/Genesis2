@@ -1085,9 +1085,10 @@ if ($OLD) {
 }
 
 if ($NEW) {
-  # Without this "NEW" update, test.sh generates two identical files
-  # 'flop_unq2.sv' and 'flop_D_0_T_RFlop_W_4.sv' and then uses module
-  # 'flop_unq2.sv' instead of the preferred 'flop_D_0_T_RFlop_W_4.sv'
+
+  # Without this "NEW" update, test.sh generates two identical
+  # files 'flop_unq2.sv' and 'flop_D_0_T_RFlop_W_4.sv'.
+  # This update squelches the redundant 'flop_unq2.sv'
 
   #####################
   # Find previously generated files e.g. 'flop_unq[123].sv'
