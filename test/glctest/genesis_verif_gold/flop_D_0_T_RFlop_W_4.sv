@@ -9,7 +9,7 @@
 //  
 //	-----------------------------------------------
 //	|            Genesis Release Info             |
-//	|  $Change: 11905 $ --- $Date: 2025/05/12 $   |
+//	|  $Change: 11905 $ --- $Date: 2025/05/06 $   |
 //	-----------------------------------------------
 //	
 //
@@ -19,9 +19,9 @@
 // --------------- Begin Pre-Generation Parameters Status Report ---------------
 //
 //	From 'generate' statement (priority=5):
-// Parameter Default 	= 0
-// Parameter Type 	= RFlop
 // Parameter Width 	= 4
+// Parameter Type 	= RFlop
+// Parameter Default 	= 0
 //
 //		---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 //
@@ -71,7 +71,7 @@
 // SyncMode (_GENESIS2_DECLARATION_PRIORITY_) = ASync
 //
 
-module flop_unq2(
+module flop_D_0_T_RFlop_W_4(
 	       //inputs
 	       input 		   Clk,
 	       input [3:0]  din,

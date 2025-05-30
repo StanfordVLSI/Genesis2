@@ -83,6 +83,7 @@ GROUP "UPDATE docker w local Genesis2"
 printf "Build test-model verilog using Genesis2 branch '$commit'\n"
 REPO=/aha/lib/python3.8/site-packages/Genesis2-src
 function dexec { docker exec $container /bin/bash -c "$*"; }
+dexec "set -x; cd $REPO; git remote add grg https://github.com/grg/Genesis2; git fetch grg"
 dexec "set -x; cd $REPO; git pull; git checkout -fq $commit" || exit 13
 ENDGROUP
 
