@@ -2,6 +2,7 @@
 * Also see `$GENESIS/.github/workflows/gold.yml`
 * All tests run in docker containers and so should not affect your machine's state...
 * TODO rename `copy_of_garnet_tests_test_app.sh` omg
+* Misnamed 'genesis-ci.sh' is useful when making changes that are supposed to preserve existing functionality
 
 
 === Testing scripts: for details try doing `<script> --help`
