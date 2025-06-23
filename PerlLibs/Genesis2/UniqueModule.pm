@@ -2756,7 +2756,7 @@ sub load_base_module{
     $self->error("$name: Call to a base class private method is not allowed");
 
   my $base_module_name = shift;
-  my $base_module_name = $base_module_name . $self->{InfileSuffix};  # E.g. 'jtag.pm'
+  my $base_module_file = $base_module_name . $self->{InfileSuffix};  # E.g. 'jtag.pm'
   my $err_msg = '';
 
   if ($INC{$base_module_file}) {

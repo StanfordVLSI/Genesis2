@@ -1,4 +1,4 @@
-==== NOTES
+=== NOTES
 * Also see `$GENESIS/.github/workflows/gold.yml`
 * All tests run in docker containers and so should not affect your machine's state...
 * `garnet.sh` comes from $GARNET_REPO/tests/test_app/test_app.sh 
@@ -13,4 +13,9 @@
 
 === Gold test in `glctest/` subdirectory
 * `glctest/` -- local gold test, see `glctests/README.txt`
+
+=== To run all tests
+```
+  # Quick local test
+  cd glctest; ./test.sh -debug 15 |& tee tmp.log | less
 
