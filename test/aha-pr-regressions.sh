@@ -1,7 +1,7 @@
 #!/bin/bash
 
-IMAGE=stanfordaha/garnet@sha256:030a2eb933513cd67e467eee1b0d934c4124e7ce49fe1e6d322435923d0c2125
-echo "WARNING using last known good docker image $image"
+# IMAGE=stanfordaha/garnet@sha256:030a2eb933513cd67e467eee1b0d934c4124e7ce49fe1e6d322435923d0c2125
+# echo "WARNING using last known good docker image $image"
 
 HELP='
 DESCRIPTION:
@@ -15,10 +15,10 @@ EXAMPLE:
 
   # Monitor the progress
   % jobs
-  % tail -f $log
+  % tail -f pr-aha1.log
 
   # Summarize results so far e.g.
-  % log=pr-aha3.log; egrep 'APP0.*Init' $log | sed "$sedscript" | cat -n; ls -l pr-aha*log; date
+  % log=pr-aha1.log; egrep 'APP0.*Init' $log | sed "$sedscript" | cat -n; ls -l pr-aha*log; date
      9  vec_elemmul
     10  mat_vecmul_ij
     11  mat_elemadd_leakyrelu_exp
@@ -42,6 +42,7 @@ CONFIG=pr_aha3
 # Setup
 image=stanfordaha/garnet:latest
 [ "$IMAGE" ] && image=$IMAGE
+echo "Using docker image $image"
 
 container=deleteme-aha-pr-regressions-$$
 docker pull $image
