@@ -30,11 +30,6 @@ if insufficient $version; then
     diff /etc/apt/sources.list.bak /etc/apt/sources.list
     apt update
 
-    # Gotta do this else get error:
-    #   dpkg: error ... trying to overwrite '/usr/bin/rpcgen',
-    #   which is also in package libc-dev-bin 2.31-0ubuntu9.18
-    yes | apt-get remove libc-dev-bin
-
     # Install verilator
     apt policy verilator
     yes | apt install -t plucky verilator
