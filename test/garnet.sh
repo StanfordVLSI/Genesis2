@@ -1,6 +1,10 @@
 #!/bin/bash
 # Copied from / compare to $GARNET_REPO/tests/test_app/test_app.sh
 
+# Little hack b/c verilator does not install cleanly on latest :(
+IMAGE=stanfordaha/garnet@sha256:030a2eb933513cd67e467eee1b0d934c4124e7ce49fe1e6d322435923d0c2125
+echo "WARNING using last known good docker image $image"
+
 # Use '--fail' test failure path (for debugging)
 [ "$1" == "--fail" ] && TEST_FAILURE_PATH=true
 [ "$1" == "--fail" ] && shift
@@ -61,7 +65,11 @@ ENDGROUP
 ########################################################################
 # DOCKER image and container
 GROUP "DOCKER image and container"
+
+# Setup
 image=stanfordaha/garnet:latest
+[ "$IMAGE" ] && image=$IMAGE
+echo "Using docker image $image"
 docker pull $image
 container=DELETEME-$USER-apptest-$$
 [ "$REUSE_CONTAINER" ] && container=deleteme-steveri-testapp-dev

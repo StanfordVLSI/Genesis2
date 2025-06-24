@@ -918,7 +918,7 @@ sub find_file_safe{
 
   # find the file:
   $filefound = 0;
-  print STDERR "$name: Searching for file $file\n" if $self->{Debug} & 2;
+  print STDERR "$name: Searching path '$self->{CallDir}:@$path' for file '$file'\n" if $self->{Debug} & 2;
   if ($file =~ /^\//) {
     # file is absolute path
     $filefound = 1 if (-e $file);
