@@ -11,6 +11,7 @@ DESCRIPTION:
 
 EXAMPLE:
   # Launch all three regression tests in the background
+  % alias apr=aha-pr-regressions.sh
   % (apr pr_aha1 >& pr-aha1.log; apr pr_aha2 >& pr-aha2.log; apr pr_aha3 >& pr-aha3.log ) &
 
   # Monitor the progress
