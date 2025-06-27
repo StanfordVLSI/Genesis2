@@ -1046,49 +1046,17 @@ sub unique_inst{
   # no more parameter changes allowed
   $instance->{ParametersPriority} = GENESIS2_ZERO_PRIORITY;
 
-  # TODO clean this up if no problems in a month or so...today is 8 May 2025
-  my ($OLD,$NEW); ($OLD,$NEW)=(0,1);
-if ($OLD) {
-  #####################
-  # Compare against previously generated files
-  $match = 0;
-  if ($idx == $self->{ModuleName_NumDerivs}{$base_module_name}){
-      # TO ME: 
-      #   I added the condition of "$idx == $self->{ModuleName_NumDerivs}{$base_module_name}". 
-      #   This is for the case of recursion, which is the only time a higher index is 
-      #   finalized before a lower index for the same base module. Recursion may happen if
-      #   this module has a decendant which has the same base module. 
-      #   Since $self->{ModuleName_NumDerivs}{$base_module_name} is a variable shared by all
-      #   packages that inherit from UniqueModule, if recursion happend it will be incremented
-      #   inside the "$instance->execute;" call a few lines up.
-      #
-      # In addition, if a higher index was finalized and kept
-      #   (i.e. $idx < $self->{ModuleName_NumDerivs}{$base_module_name}), then there is no 
-      #   need for comparing to lower level indexs. 
-      # Proof by negation: Say a lower idx module is identical to this one 
-      #                    AND a module with a higher idx exists.
-      #   Then the lower level's sub-tree would have already been generated, 
-      #   but since this module matches it, it means that this module's sub-tree would 
-      #   have had to match that lower level module's sub-tree, and un-uniquified. 
-      #   Therefore this module's idx would be the highest.
-    for ($iterator = 1; $iterator < $idx; $iterator++){
-      $other_module = $base_module_name."_unq".$iterator;
-      $other_file = $other_module.$instance->{OutfileSuffix};
-      $match = $self->compare_generated_files($instance->{OutputFileName},	# the file we just created
-					      $other_file,			# previously created file
-					      $instance->{UniqueModuleName} =>
-					      $other_module # mapping of key words between files
-	  				     );
-      last if $match;
-    }
+  ########################################
+  # Show extensive debug info if requested
+  if ($self->{Debug} & 8) {
+      foreach my $key (sort keys %{$instance}) {
+          print STDERR "- instance key '$key' = $instance->{$key}\n";
+      }
   }
-}
 
-if ($NEW) {
-
-  # Without this "NEW" update, test.sh generates two identical
-  # files 'flop_unq2.sv' and 'flop_D_0_T_RFlop_W_4.sv'.
-  # This update squelches the redundant 'flop_unq2.sv'
+  # Without this "NEW" update, test.sh generates two identical files
+  # 'flop_unq2.sv' and 'flop_D_0_T_RFlop_W_4.sv' and then uses module
+  # 'flop_unq2.sv' instead of the preferred 'flop_D_0_T_RFlop_W_4.sv'
 
   #####################
   # Find previously generated files e.g. 'flop_unq[123].sv'
@@ -1141,7 +1109,6 @@ if ($NEW) {
           );
       last if $match;
   }
-}
 
   # need to revert a bunch of values if there was a match to another unique module
   if ($match){
@@ -2789,7 +2756,7 @@ sub load_base_module{
     $self->error("$name: Call to a base class private method is not allowed");
 
   my $base_module_name = shift;
-  my $base_module_file = $base_module_name . $self->{InfileSuffix};
+  my $base_module_file = $base_module_name . $self->{InfileSuffix};  # E.g. 'jtag.pm'
   my $err_msg = '';
 
   if ($INC{$base_module_file}) {
