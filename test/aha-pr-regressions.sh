@@ -19,7 +19,8 @@ EXAMPLE:
   % tail -f pr-aha1.log
 
   # Summarize results so far e.g.
-  % log=pr-aha1.log; egrep 'APP0.*Init' $log | sed "$sedscript" | cat -n; ls -l pr-aha*log; date
+  % sedscript="s/.APP0.//;s/..Init.*//;s/_seed.*//;s/_combined.*//"
+  % log=pr-aha1.log; egrep "APP0.*Init" $log | sed "$sedscript" | cat -n; ls -l pr-aha*log; date
      9  vec_elemmul
     10  mat_vecmul_ij
     11  mat_elemadd_leakyrelu_exp
