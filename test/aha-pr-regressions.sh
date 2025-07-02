@@ -68,6 +68,21 @@ docker cp $tmpdir $container:$there                  # Insert new repo
 # Verify the update (ish)
 # docker exec $container /bin/bash -c "cat $there/Info/Genesis2.info"
 
+# What th'...? SIXTY-NINE MEGABYTES???
+# % lsl -h /nobackup/zircon/MatrixUnit_sim_sram.v /nobackup/zircon/MatrixUnitWrapper_sim.v
+# -rw-r--r-- 1 mcoduoza users  69M May 27 17:32 /nobackup/zircon/MatrixUnit_sim_sram.v
+# -rw-r--r-- 1 mcoduoza users 409K May 27 17:33 /nobackup/zircon/MatrixUnitWrapper_sim.v
+for f in MatrixUnit_sim_sram.v MatrixUnitWrapper_sim.v; do
+    if ! test -e /nobackup/zircon/$f; then
+        for i in {1..100}; do echo ERROR; done
+        echo 'ERROR cannot find $f in dir /nobackup/zircon/'
+        echo 'ERROR test will probably FAIL!'
+        echo 'Continuing on anyway...'
+    else
+        docker cp /nobackup/zircon/$f $container:/aha/garnet/$f
+    fi
+done
+
 # Do it, man
 # Emulate the behavior of aha's buildkite/pipeline.yml => regress-metahooks.sh
 # You know this is gonna take 12 hours, right...
