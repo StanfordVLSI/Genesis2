@@ -177,12 +177,17 @@ sub new {
   # genesis instances share the list of modules
   $self->{SubInstance_InstanceObj} = {};# instance name => Instance Object (local to this engine!)
   $self->{SubInstanceList} = [];        # List of sub instances in order of creation
+  $self->{SubInstanceListUnunique} = [];# List of ununique sub instances in order of creation
+  $self->{SubInstanceListUnique} = [];	# List of unique-numeric sub instances in order of creation
+  $self->{SubInstanceListUniqueParam} = []; # List of unique-param sub instances in order of creation
   $self->{ModuleName_NumDerivs} = {};	# non-unique module => count (global across engines!)
   $self->{UnUniquifiedModules} = {$package=>$self};	# modules that were generated WITHOUT uniquification (global across engines!)
   $self->{OutfileName_ContentCache} = {}; # Outfilename => cache of txt content for the file (global across engines!)
+  $self->{ModuleCache} = { $package => $self };  # Generated module cache (global across engines!)
   $self->{Parameters} = {};		# All the parameters used by this module
   $self->{ParametersList} = [];         # List of Parameters in order of creation
   $self->{ParametersPriority} = GENESIS2_DECLARATION_PRIORITY;
+  $self->{ParamsFromInst} = [];		# All parameters specified at instantiation
   $self->{ParamsFromXML} = {};		# All parameters read from xml input file
   $self->{ParamsFromCfg} = {};		# All parameters read from config input file
   $self->{ParamsFromCmdLn} = {}; 	# All parameters read from the command line
@@ -243,12 +248,17 @@ sub new_as_son {
   # genesis instances share the list of modules
   $self->{SubInstance_InstanceObj} = {};	# start with empty list	
   $self->{SubInstanceList} = [];        # List of sub instances in order of creation
+  $self->{SubInstanceListUnunique} = [];# List of ununique sub instances in order of creation
+  $self->{SubInstanceListUnique} = [];	# List of unique-numeric sub instances in order of creation
+  $self->{SubInstanceListUniqueParam} = []; # List of unique-param sub instances in order of creation
   $self->{ModuleName_NumDerivs} = $parent->{ModuleName_NumDerivs} ; # (reference)
   $self->{UnUniquifiedModules} = $parent->{UnUniquifiedModules}; # (reference)
   $self->{OutfileName_ContentCache} = $parent->{OutfileName_ContentCache}; # (reference)
+  $self->{ModuleCache} = $parent->{ModuleCache};  # (reference)
   $self->{Parameters} = {};		# All the parameters used by this module
   $self->{ParametersList} = [];         # List of Parameters in order of creation
   $self->{ParametersPriority} = GENESIS2_DECLARATION_PRIORITY;
+  $self->{ParamsFromInst} = [];		# All parameters specified at instantiation
   $self->{ParamsFromXML} = {};		# All parameters read from xml input file
   $self->{ParamsFromCfg} = {};		# All parameters read from config input file
   $self->{ParamsFromCmdLn} = {}; 	# All parameters read from the command line
@@ -306,12 +316,17 @@ sub new_as_clone {
   # genesis instances share the list of modules
   $self->{SubInstance_InstanceObj} = $src_inst->{SubInstance_InstanceObj}; # This is a clone: Point to source's list
   $self->{SubInstanceList} = $src_inst->{SubInstanceList};                 # This is a clone: Point to source's list
+  $self->{SubInstanceListUnunique} = $src_inst->{SubInstanceListUnunique};# This is a clone: Point to source's list
+  $self->{SubInstanceListUnique} = $src_inst->{SubInstanceListUnique};	# This is a clone: Point to source's list
+  $self->{SubInstanceListUniqueParam} = $src_inst->{SubInstanceListUniqueParam}; # This is a clone: Point to source's list
   $self->{ModuleName_NumDerivs} = $src_inst->{ModuleName_NumDerivs}; # (reference)
   $self->{UnUniquifiedModules} = $src_inst->{UnUniquifiedModules}; # (reference)
   $self->{OutfileName_ContentCache} = $src_inst->{OutfileName_ContentCache}; # (reference)
+  $self->{ModuleCache} = $src_inst->{ModuleCache};  # (reference)
   $self->{Parameters} = $src_inst->{Parameters};		# This is a clone: Point to source's list
   $self->{ParametersList} = $src_inst->{ParametersList};	# This is a clone: Point to source's list
   $self->{ParametersPriority} = GENESIS2_ZERO_PRIORITY;		# This is a clone: no params changes allowed
+  $self->{ParamsFromInst} = $src_inst->{ParamsFromInst};	# This is a clone: Point to source's list
   $self->{ParamsFromXML} = {};		# All parameters read from xml input file
   $self->{ParamsFromCfg} = {};		# All parameters read from config input file
   $self->{ParamsFromCmdLn} = {}; 	# All parameters read from the command line
@@ -978,7 +993,7 @@ sub unique_inst{
   $self->{ParametersPriority} = GENESIS2_ZERO_PRIORITY;
 
   # flush the buffer to be safe for comparisons (important for recursion)
-  $self->{OutfileHandle}->flush;
+  $self->{OutfileHandle}->flush if defined($self->{OutfileHandle});
 
   #####################
   # Parse Inputs: module base name
@@ -1015,6 +1030,7 @@ sub unique_inst{
   $instance = $base_module_name->new_as_son($self);
   $self->{SubInstance_InstanceObj}{$inst_name} = $instance;
   push(@{$self->{SubInstanceList}}, $inst_name);
+  push(@{$self->{SubInstanceListUnique}}, $inst_name);
 
   #####################
   # Decide what the new submodule name and the generated filename will be
@@ -1036,7 +1052,29 @@ sub unique_inst{
   # Set the values for the sub-pre-processor based on instantiation line
   $instance->{ParametersPriority} = GENESIS2_INHERITANCE_PRIORITY;
   $instance->set_param(@params) if @params;
+  push(@{$instance->{ParamsFromInst}}, @params) if @params;
   $instance->{ParametersPriority} = GENESIS2_DECLARATION_PRIORITY;
+
+  #####################
+  # Avoid regenerating the same module multiple times
+  #  -> Check if an identical module has already been generated
+  $instance->fetch_params();
+  my $instance_param_list = $instance->get_mod_param_list();
+  my $param_module_name = $base_module_name . $instance_param_list;
+  if (defined $self->{ModuleCache}{$param_module_name}) {
+    my $prev_inst = $self->{ModuleCache}{$param_module_name};
+
+    if ($self->does_generate_same($instance, $prev_inst)) {
+      my $prev_module = $prev_inst->{UniqueModuleName};
+      my $prev_file_name = $prev_inst->{OutputFileName};
+
+      $instance->{UniqueModuleName} = $prev_module;  # use previously created module
+      $instance->{OutputFileName} = $prev_file_name;  # use previously created file
+
+      $self->{ParametersPriority} = $prev_priority;
+      return $instance;
+    }
+  }
 
 
   #####################
@@ -1120,6 +1158,11 @@ sub unique_inst{
     $instance->{OutputFileName} = $other_file;	# instead, use the previously created file
   }
 
+  if (!defined $self->{ModuleCache}{$param_module_name}){
+    $self->{ModuleCache}{$param_module_name} = $instance;
+  }
+
+
   #####################
   # Reassign the parameter priority
   $self->{ParametersPriority} = $prev_priority;
@@ -1150,7 +1193,7 @@ sub unique_inst_param{
   $self->{ParametersPriority} = GENESIS2_ZERO_PRIORITY;
 
   # flush the buffer to be safe for comparisons (important for recursion)
-  $self->{OutfileHandle}->flush;
+  $self->{OutfileHandle}->flush if defined($self->{OutfileHandle});
 
   #####################
   # Parse Inputs: module base name
@@ -1187,6 +1230,7 @@ sub unique_inst_param{
   $instance = $base_module_name->new_as_son($self);
   $self->{SubInstance_InstanceObj}{$inst_name} = $instance;
   push(@{$self->{SubInstanceList}}, $inst_name);
+  push(@{$self->{SubInstanceListUniqueParam}}, $inst_name);
 
   #####################
   # Decide what the new submodule name and the generated filename will be
@@ -1200,9 +1244,29 @@ sub unique_inst_param{
   # Set the values for the sub-pre-processor based on instantiation line
   $instance->{ParametersPriority} = GENESIS2_INHERITANCE_PRIORITY;
   $instance->set_param(@params) if @params;
+  push(@{$instance->{ParamsFromInst}}, @params) if @params;
   $instance->{ParametersPriority} = GENESIS2_DECLARATION_PRIORITY;
 
-  # FIXME: Avoid regenerating the same module multiple times
+  #####################
+  # Avoid regenerating the same module multiple times
+  #  -> Check if an identical module has already been generated
+  $instance->fetch_params();
+  my $instance_param_list = $instance->get_mod_param_list();
+  my $tgt_module_name = $base_module_name . $instance_param_list;
+  if (defined $self->{ModuleCache}{$tgt_module_name}) {
+    my $prev_inst = $self->{ModuleCache}{$tgt_module_name};
+
+    if ($self->does_generate_same($instance, $prev_inst)) {
+      my $prev_module = $prev_inst->{UniqueModuleName};
+      my $prev_file_name = $prev_inst->{OutputFileName};
+
+      $instance->{UniqueModuleName} = $prev_module;  # use previously created module
+      $instance->{OutputFileName} = $prev_file_name;  # use previously created file
+
+      $self->{ParametersPriority} = $prev_priority;
+      return $instance;
+    }
+  }
 
   #####################
   # Now, generate the verilog file, with the new init conditions
@@ -1214,8 +1278,6 @@ sub unique_inst_param{
 
   #####################
   # Compare against previously generated files
-  my $instance_param_list = $instance->get_mod_param_list();
-  my $tgt_module_name = $base_module_name . $instance_param_list;
   my $tgt_file_name = $tgt_module_name . $instance->{OutfileSuffix};
   if (defined($self->{OutfileName_ContentCache}{$tgt_file_name})) {
     $match = $self->compare_generated_files(
@@ -1268,8 +1330,8 @@ sub unique_inst_param{
     $instance->{OutputFileName} = $tgt_file_name;     # Update the module filename
   }
 
-  if (!defined $self->{ModuleCache}{$instance->{UniqueModuleName}}){
-    $self->{ModuleCache}{$instance->{UniqueModuleName}} = $instance;
+  if (!defined $self->{ModuleCache}{$tgt_module_name}){
+    $self->{ModuleCache}{$tgt_module_name} = $instance;
   }
 
 
@@ -1364,7 +1426,7 @@ sub ununique_inst{
   $self->{ParametersPriority} = GENESIS2_ZERO_PRIORITY;
 
   # flush the buffer to be safe for comparisons (important for recursion)
-  $self->{OutfileHandle}->flush;
+  $self->{OutfileHandle}->flush if defined($self->{OutfileHandle});
 
   #####################
   # Parse Inputs: module base name
@@ -1401,6 +1463,7 @@ sub ununique_inst{
   $instance = $base_module_name->new_as_son($self);
   $self->{SubInstance_InstanceObj}{$inst_name} = $instance;
   push(@{$self->{SubInstanceList}}, $inst_name);
+  push(@{$self->{SubInstanceListUnunique}}, $inst_name);
 
   #####################
   # Decide what the new submodule name and the generated filename will be
@@ -1420,9 +1483,33 @@ sub ununique_inst{
   # Set the values for the sub-pre-processor based on instantiation line
   $instance->{ParametersPriority} = GENESIS2_INHERITANCE_PRIORITY;
   $instance->set_param(@params) if @params;
+  push(@{$instance->{ParamsFromInst}}, @params) if @params;
   $instance->{ParametersPriority} = GENESIS2_DECLARATION_PRIORITY;
   
   
+  #####################
+  # Avoid regenerating the same module multiple times
+  #  -> Check if an identical module has already been generated
+  $instance->fetch_params();
+  my $instance_param_list = $instance->get_mod_param_list();
+  if (defined $self->{ModuleCache}{$base_module_name}) {
+    my $prev_inst = $self->{ModuleCache}{$base_module_name};
+
+    if ($self->does_generate_same($instance, $prev_inst)) {
+      $other_module = $base_module_name;
+      $other_file = $other_module . $instance->{OutfileSuffix};
+
+      $instance->{UniqueModuleName} = $other_module;  # use previously created module
+      $instance->{OutputFileName} = $other_file;  # use previously created file
+
+      $self->{ParametersPriority} = $prev_priority;
+      return $instance;
+    } else {
+      # Files don't match but they should if we're generating ununiquie
+      $self->error("$name: Will generate two different UN-uniquified $base_module_name modules!");
+    }
+  }
+
   #####################
   # Now, generate the verilog file, with the new init conditions
   $instance->execute;
@@ -1459,6 +1546,10 @@ sub ununique_inst{
   # if a module did not already exists, mark that it exists now.
   if (!defined $self->{UnUniquifiedModules}{$base_module_name}){
       $self->{UnUniquifiedModules}{$base_module_name} = 1;
+  }
+
+  if (!defined $self->{ModuleCache}{$base_module_name}){
+    $self->{ModuleCache}{$base_module_name} = $instance;
   }
 
 
@@ -1820,6 +1911,22 @@ sub parameter{
 ################################################################################
 ############################ API For Manager Package ###########################
 ################################################################################
+sub fetch_params{
+  my $self = shift;
+  local $Genesis2::UniqueModule::myself = $self;
+  my $name = $self->{BaseModuleName}."->fetch_params";
+  caller eq __PACKAGE__ || caller eq 'Genesis2::Manager'
+    or $self->error("$name: access restricted to ".__PACKAGE__." or Genesis2::Manager");
+
+  # parse the xml input to actual parameters
+  my $path = $self->get_instance_path();
+  $self->{ParamsFromXML} = $self->{CfgHandler}->GetXmlParamList($path);
+  $self->{ParamsFromCfg} = $self->{CfgHandler}->GetCfgParamList($path);
+  $self->{ParamsFromCmdLn} = $self->{CfgHandler}->GetCmdLnParamList($path);
+
+  1;
+}
+
 sub execute{
   my $self = shift;
   local $Genesis2::UniqueModule::myself = $self;
@@ -2358,6 +2465,60 @@ sub get_mod_param_list{
 
 
   return $ret;
+}
+
+
+## private: does_generate_same
+## Usage: $self->does_generate_same($new_inst, $old_inst);
+## Check whether a new instance will generate identically to an existing instance
+sub does_generate_same {
+  my $self = shift;
+  my $name = $self->{BaseModuleName}."->does_generate_same";
+  caller eq __PACKAGE__
+    or $self->error("$name: Call to a base class private method is not allowed");
+
+  my $new_inst = shift;
+  my $old_inst = shift;
+
+  # Step 1: check that parameters for the two modules are identical
+  $new_inst->fetch_params();
+  my $new_inst_params = $new_inst->get_mod_param_list();
+  my $old_inst_params = $old_inst->get_mod_param_list();
+
+  my $match = $new_inst_params eq $old_inst_params;
+
+
+  # Step 2: check that the parameters of all child modules match
+  foreach my $ref (
+        ["SubInstanceListUnunique", \&Genesis2::UniqueModule::ununique_inst],
+        ["SubInstanceListUnique", \&Genesis2::UniqueModule::unique_inst],
+        ["SubInstanceListUniqueParam", \&Genesis2::UniqueModule::unique_inst_param]
+    ) {
+    my ($list, $func) = @{$ref};
+    if ($match) {
+      for my $child_name (@{$old_inst->{$list}}) {
+        my $old_child_inst = $old_inst->{SubInstance_InstanceObj}->{$child_name};
+
+        my @params = ();
+        push @params, $old_child_inst->{BaseModuleName}, $old_child_inst->{InstanceName};
+        push @params, @{$old_child_inst->{ParamsFromInst}} if scalar(@{$old_child_inst->{ParamsFromInst}});
+        my $my_child_inst = $func->($new_inst, @params);
+
+        $match &= $old_child_inst->{InstanceName} eq $my_child_inst->{InstanceName};
+      }
+    }
+  }
+
+  # Remove sub instance info if the modules differ
+  if (!$match) {
+    $new_inst->{SubInstance_InstanceObj} = {};
+    $new_inst->{SubInstanceList} = [];
+    $new_inst->{SubInstanceListUnunique} = [];
+    $new_inst->{SubInstanceListUnique} = [];
+    $new_inst->{SubInstanceListUniqueParam} = [];
+  }
+
+  return $match;
 }
 
 #################################################################
