@@ -1,7 +1,13 @@
 name: Gold-Compare and Functional Tests
 
-# Runs on every push. Note (I think) PR triggers at least one push?
-on: [push]
+# Runs on every push or pull request.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      -main
 
 # StackOverflow 58033366
 env:
