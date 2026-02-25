@@ -4,10 +4,10 @@ name: Gold-Compare and Functional Tests
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
-      -main
+      - master
 
 # StackOverflow 58033366
 env:
