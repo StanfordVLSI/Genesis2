@@ -1,0 +1,8 @@
+#vim swaps
+.*.swp
+.*.swo
+.*.swa
+
+# emacs backup
+*~
+
