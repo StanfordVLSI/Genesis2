@@ -60,6 +60,8 @@ use Cwd 'abs_path';
 use File::Copy;
 use File::Spec::Functions;
 use List::Util qw(min max);
+use Data::Dumper;
+use Digest::SHA qw(sha256_hex);
 
 use FileHandle;
 use Env; # Make environment variables available
@@ -2447,6 +2449,7 @@ sub get_mod_param_list{
     next if $param =~ /^__/;
     my $abbrev = $abbrevs->{$param};
     my $val = $self->internal_get_param($param);
+    $val = $self->internal_get_ref_param_hash($val) if ref $val;
 
     if (defined $val) {
       $val =~ s/\./_/g;
@@ -2968,4 +2971,30 @@ sub check_if_self{
     return 1 if (ref($arg) eq ref($Genesis2::UniqueModule::myself) && $arg==$Genesis2::UniqueModule::myself);
     return 0;
 }
+
+# Convert a reference to a stable value
+# by hashing the dumped contents
+sub internal_get_ref_param_hash {
+  my $self = shift;
+  my $name = $self->{BaseModuleName}."->internal_get_ref_param_hash";
+  caller eq __PACKAGE__
+    or $self->error("$name: Call to a base class private method is not allowed");
+
+  my $ref = shift;
+  if (!ref $ref) {
+    $self->error("$name: expects a reference parameter");
+  }
+
+  # Make Data::Dumper output deterministic
+  local $Data::Dumper::Indent   = 0;
+  local $Data::Dumper::Terse    = 1;
+  local $Data::Dumper::Sortkeys = 1;
+
+  my $dump = Dumper($ref);
+  my $hash = sha256_hex($dump);
+
+  my $hash32b = substr($hash, 0, 8);
+  return "R$hash32b";
+}
+
 1;
