@@ -154,6 +154,7 @@ sub new {
                                         # Use when 'generate' is called rather
                                         # than 'generate_unq_numeric' or
                                         # 'generate_unq_param'
+  $self->{PathFileName} = undef;        # FileName for generating a path list file
 
   # what kind of work should we do?
   $self->{ParseMode} = 0;		# should we parse input file to generate perl modules?
@@ -233,6 +234,9 @@ sub execute{
       $self->{CfgHandler}->Finalize();
   }
 
+  # Print the path list if needed
+  $self->create_path_file if ($self->{ParseMode} && defined $self->{PathFileName});
+
   # Some cleanning up of the engine
   close $self->{DependHandle} if defined $self->{DependHandle};
   # Re-Create a genesis_clean.cmd file
@@ -279,6 +283,8 @@ Generating Options:
 					# List of parameter override defintions
 
 	[-unqstyle style]		# Preferred module uniquification style [$unq_styles]
+	[-pathfile filename]		# Generate a path file (list of directories processed)
+
 Help and Debuging Options:
 	[-log filename]			# Name of log file for genesis2 and user stderr messages
 	[-debug level]			# Set debug level. Same as the inline debug directive.
@@ -326,6 +332,7 @@ sub parse_command_line {
      "cfg=s{,}" => $self->{CfgInFileNames},		# Input config file with more parameter definitions
      "parameter=s{,}" => $self->{PrmOverrides},		# List of parameter override defintions
      "unqstyle=s" => \$self->{UnqStyle},                # Set preferred module uniquification style
+     "pathfile=s" => \$self->{PathFileName},            # Path file to generate (if any)
 
      "log=s" => \$self->{LogFileName},			# Name of log file for genesis2 and user stderr messages
      "debug=i" => \$self->{Debug},			# Set the (initial) debug level
@@ -1222,6 +1229,9 @@ sub create_clean_file{
   if ($self->{ParseMode} && defined $self->{DependFileName}){
       print {$cfh} "\\rm -f $self->{DependFileName};\n";
   }
+  if ($self->{ParseMode} && defined $self->{PathFileName}){
+      print {$cfh} "\\rm -f $self->{PathFileName};\n";
+  }
   print {$cfh} "\\rm -rf $self->{LogFileName};\n";
   print {$cfh} "\\rm -rf $self->{WorkDir};\n";
   print {$cfh} "\\rm -rf $self->{RawDir};\n";
@@ -1245,6 +1255,31 @@ sub create_clean_file{
   
   # close file
   close $cfh;
+}
+
+
+## create_path_file
+## protected subroutine that generates a file containing all paths used for sources
+sub create_path_file{
+  my $self = shift;
+  my $name = __PACKAGE__."->create_path_file";
+  caller eq __PACKAGE__ or $self->error("$name: Call to a private method is not allowed ".caller);
+  my $pfh;
+
+  open($pfh, ">$self->{PathFileName}") or
+    $self->error("$name: Couldn't open path list file $self->{PathFileName}: $!");
+
+  # TODO: do we need to sort the paths?
+  my %paths;
+  foreach my $srcPath (@{$self->{SourcesPath}}, @{$self->{IncludesPath}}) {
+    my $absPath = abs_path($srcPath);
+    if (!defined($paths{$absPath})) {
+      print {$pfh} "$absPath\n";
+      $paths{$absPath} = 1;
+    }
+  }
+
+  close $pfh;
 }
 
 
