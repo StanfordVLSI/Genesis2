@@ -2273,18 +2273,18 @@ sub gen_param_abbrevs {
           my $j_word = $j_words->[$w_num];
 
           if ($i_word ne $j_word) {
-            for (my $w_idx = 0; $w_idx < length($i_word); $w_idx++) {
+            for (my $w_idx = 0; $w_idx < length($i_word) || $w_idx < length($j_word); $w_idx++) {
               if (substr($i_word, $w_idx, 1) ne substr($j_word, $w_idx, 1)) {
                 my $i_region = $i_regions->[$w_num];
                 my $j_region = $j_regions->[$w_num];
 
-                if ($w_idx + 1 > $i_region) {
+                if ($w_idx + 1 > $i_region && $w_idx < length($i_word)) {
                   $i_regions->[$w_num] = $w_idx + 1;
                   $updated = 1;
                   print STDERR "  $i_param: $w_num set to " . ($w_idx + 1) . "\n"
                     if $self->{Debug} & 2;
                 }
-                if ($w_idx + 1 > $j_region) {
+                if ($w_idx + 1 > $j_region && $w_idx < length($j_word)) {
                   $j_regions->[$w_num] = $w_idx + 1;
                   $updated = 1;
                   print STDERR "  $j_param: $w_num set to " . ($w_idx + 1) . "\n"
