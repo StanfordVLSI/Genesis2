@@ -9,8 +9,6 @@
 # ** $Author: shacham $
 # *************************************************************************
 
-
-
 ###################################################################################
 # Copyright (c) 2013, Ofer Shacham and Stanford University                        #
 # All rights reserved.                                                            #
@@ -59,43 +57,43 @@ system("clear");
 print "\nGENESIS2 MAKE EXECUTABLE WARNING: THIS SCRIPTS OVERRIDES THE GENESIS2 EXECUTABLE!!!\n";
 print "GENESIS2 MAKE EXECUTABLE WARNING: ARE YOU SURE YOU KNOW WHAT YOU ARE DOING? (NO):  ";
 my $continue = <STDIN>;
-if ($continue !~ /^y(es)?$/i){
+if ( $continue !~ /^y(es)?$/i ) {
     print "\nGENESIS2 MAKE EXECUTABLE ABORTS\n\n";
     exit;
 }
 my $verbose = 1;
 
-my $pp = "/usr/bin/pp -P --clean -vv "; # add -vvv for verbos run, 
+my $pp           = "/usr/bin/pp -P --clean -vv ";    # add -vvv for verbos run,
 my $genesis_home = $ENV{GENESIS_HOME};
 my $chipgen_home = $ENV{CHIPGEN};
-my $perllibs = '';
+my $perllibs     = '';
 print "\nWHERE SOURCE FILES ARE... \n";
 print "\t (1) I found that \$GENESIS_HOME=$genesis_home\n" if defined $genesis_home;
-print "\t (2) I found that \$CHIPGEN/bin/Genesis2Tools=${chipgen_home}/bin/Genesis2Tools\n" 
-    if defined $chipgen_home && -e "${chipgen_home}/bin/Genesis2Tools";
+print "\t (2) I found that \$CHIPGEN/bin/Genesis2Tools=${chipgen_home}/bin/Genesis2Tools\n"
+  if defined $chipgen_home && -e "${chipgen_home}/bin/Genesis2Tools";
 print "WHICH LOCATION DO YOU PREFER? (abort):  ";
 $continue = <STDIN>;
-if ($continue !~ /^\d$/){
+
+if ( $continue !~ /^\d$/ ) {
     print "\nGENESIS2 MAKE EXECUTABLE ABORTS\n\n";
     exit;
-}
-elsif ($continue =~ /1/ && defined $genesis_home){
+} elsif ( $continue =~ /1/ && defined $genesis_home ) {
     $perllibs = "$genesis_home/PerlLibs";
-}elsif ($continue =~ /2/ && defined $chipgen_home && -e "${chipgen_home}/bin/Genesis2Tools"){
-    $perllibs = "${chipgen_home}/bin/Genesis2Tools/PerlLibs"
-}else{
+} elsif ( $continue =~ /2/ && defined $chipgen_home && -e "${chipgen_home}/bin/Genesis2Tools" ) {
+    $perllibs = "${chipgen_home}/bin/Genesis2Tools/PerlLibs";
+} else {
     print "\nGENESIS2 MAKE EXECUTABLE ABORTS\n\n";
     exit 7;
 }
-   
+
 my $genesis_src = "$perllibs/Genesis2";
-my $genesis_pl = "$genesis_src/Genesis2.pl";
-my @genesis_pm = qw(Manager UniqueModule ConfigHandler UserConfigBase);
-@genesis_pm = map {"-M Genesis2::$_";} @genesis_pm;
+my $genesis_pl  = "$genesis_src/Genesis2.pl";
+my @genesis_pm  = qw(Manager UniqueModule ConfigHandler UserConfigBase);
+@genesis_pm = map { "-M Genesis2::$_"; } @genesis_pm;
 
-
-my $extrainc = "$perllibs/ExtrasForOldPerlDistributions";
+my $extrainc  = "$perllibs/ExtrasForOldPerlDistributions";
 my @extralibs = ();
+
 #my @extrafiles = ();
 #my @list = `ls -R $extrainc`;
 #my $prefix = '';
@@ -116,15 +114,14 @@ my @extralibs = ();
 #	push @extrafiles, "-a $prefix/$token" if -f "$extrainc/$prefix/$token";
 #    }
 #}
-@extralibs = map {"-M $_";} @extralibs;
+@extralibs = map { "-M $_"; } @extralibs;
 mysystem("$pp --output Genesis2    -I $perllibs -I $extrainc @genesis_pm @extralibs $genesis_pl");
 mysystem("$pp --output Genesis2.pl -I $perllibs -I $extrainc @genesis_pm @extralibs $genesis_pl");
 
-
-sub mysystem{
+sub mysystem {
     my $cmd = shift;
-    if ($verbose){
-	print "DEBUG: ".$cmd."\n";
+    if ($verbose) {
+        print "DEBUG: " . $cmd . "\n";
     }
     system($cmd);
 }
