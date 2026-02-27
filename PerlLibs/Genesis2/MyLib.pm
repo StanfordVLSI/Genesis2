@@ -18,7 +18,7 @@ $VERSION = '1.00';
 
 # ****************  METHOD 2 FOR INHERITING ALL METHODS *****************
 # Uncomment the following line to activate inheritance
-push( @Genesis2::UniqueModule::ISA, qw(MyLib) );
+push(@Genesis2::UniqueModule::ISA, qw(MyLib));
 
 # ***********************************************************************
 

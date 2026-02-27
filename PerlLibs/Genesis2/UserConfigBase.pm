@@ -72,11 +72,11 @@ BEGIN {
     my $subroutine     = '-';
     my $i              = 0;
     my $is_design_time = 0;
-    while ( ( $package, $filename, $line, $subroutine ) = caller( $i++ ) ) {
+    while (($package, $filename, $line, $subroutine) = caller($i++)) {
 
         #print STDERR "DEBUG: caller($i-1) == $package sub=$subroutine\n";
         last if $package eq 'Genesis2::UserConfigScript';
-        if ( $package eq 'Genesis2::UniqueModule' || $package eq 'Genesis2::Manager' ) {
+        if ($package eq 'Genesis2::UniqueModule' || $package eq 'Genesis2::Manager') {
             die "Importing " . __PACKAGE__ . " into design files is forbidden\n";
         }
     }
@@ -89,14 +89,14 @@ sub configure {
     my $subroutine     = '-';
     my $i              = 0;
     my $is_design_time = 0;
-    while ( ( $package, $filename, $line, $subroutine ) = caller( $i++ ) ) {
+    while (($package, $filename, $line, $subroutine) = caller($i++)) {
 
         #print STDERR "DEBUG: caller($i-1) == $package sub=$subroutine\n";
         last if $package eq 'Genesis2::UserConfigScript';
-        if ( $package eq 'Genesis2::UniqueModule' || $package eq 'Genesis2::Manager' ) {
+        if ($package eq 'Genesis2::UniqueModule' || $package eq 'Genesis2::Manager') {
             print STDERR "\n\n";
-            confess colored( "ERROR: Using " . __PACKAGE__ . " from design files is forbidden\n",
-                'bold red on_black' );
+            confess colored("ERROR: Using " . __PACKAGE__ . " from design files is forbidden\n",
+                'bold red on_black');
         }
     }
 
@@ -110,14 +110,14 @@ sub exists_configuration {
     my $subroutine     = '-';
     my $i              = 0;
     my $is_design_time = 0;
-    while ( ( $package, $filename, $line, $subroutine ) = caller( $i++ ) ) {
+    while (($package, $filename, $line, $subroutine) = caller($i++)) {
 
         #print STDERR "DEBUG: caller($i-1) == $package sub=$subroutine\n";
         last if $package eq 'Genesis2::UserConfigScript';
-        if ( $package eq 'Genesis2::UniqueModule' || $package eq 'Genesis2::Manager' ) {
+        if ($package eq 'Genesis2::UniqueModule' || $package eq 'Genesis2::Manager') {
             print STDERR "\n\n";
-            confess colored( "ERROR: Using " . __PACKAGE__ . " from design files is forbidden\n",
-                'bold red on_black' );
+            confess colored("ERROR: Using " . __PACKAGE__ . " from design files is forbidden\n",
+                'bold red on_black');
         }
     }
 
@@ -131,14 +131,14 @@ sub remove_configuration {
     my $subroutine     = '-';
     my $i              = 0;
     my $is_design_time = 0;
-    while ( ( $package, $filename, $line, $subroutine ) = caller( $i++ ) ) {
+    while (($package, $filename, $line, $subroutine) = caller($i++)) {
 
         #print STDERR "DEBUG: caller($i-1) == $package sub=$subroutine\n";
         last if $package eq 'Genesis2::UserConfigScript';
-        if ( $package eq 'Genesis2::UniqueModule' || $package eq 'Genesis2::Manager' ) {
+        if ($package eq 'Genesis2::UniqueModule' || $package eq 'Genesis2::Manager') {
             print STDERR "\n\n";
-            confess colored( "ERROR: Using " . __PACKAGE__ . " from design files is forbidden\n",
-                'bold red on_black' );
+            confess colored("ERROR: Using " . __PACKAGE__ . " from design files is forbidden\n",
+                'bold red on_black');
         }
     }
 
@@ -152,14 +152,14 @@ sub get_configuration {
     my $subroutine     = '-';
     my $i              = 0;
     my $is_design_time = 0;
-    while ( ( $package, $filename, $line, $subroutine ) = caller( $i++ ) ) {
+    while (($package, $filename, $line, $subroutine) = caller($i++)) {
 
         #print STDERR "DEBUG: caller($i-1) == $package sub=$subroutine\n";
         last if $package eq 'Genesis2::UserConfigScript';
-        if ( $package eq 'Genesis2::UniqueModule' || $package eq 'Genesis2::Manager' ) {
+        if ($package eq 'Genesis2::UniqueModule' || $package eq 'Genesis2::Manager') {
             print STDERR "\n\n";
-            confess colored( "ERROR: Using " . __PACKAGE__ . " from design files is forbidden\n",
-                'bold red on_black' );
+            confess colored("ERROR: Using " . __PACKAGE__ . " from design files is forbidden\n",
+                'bold red on_black');
         }
     }
 
@@ -173,18 +173,18 @@ sub include {
     my $subroutine     = '-';
     my $i              = 0;
     my $is_design_time = 0;
-    while ( ( $package, $filename, $line, $subroutine ) = caller( $i++ ) ) {
+    while (($package, $filename, $line, $subroutine) = caller($i++)) {
 
         #print STDERR "DEBUG: caller($i-1) == $package sub=$subroutine\n";
         last if $package eq 'Genesis2::UserConfigScript';
-        if ( $package eq 'Genesis2::UniqueModule' || $package eq 'Genesis2::Manager' ) {
+        if ($package eq 'Genesis2::UniqueModule' || $package eq 'Genesis2::Manager') {
             print STDERR "\n\n";
-            confess colored( "ERROR: Using " . __PACKAGE__ . " from design files is forbidden\n",
-                'bold red on_black' );
+            confess colored("ERROR: Using " . __PACKAGE__ . " from design files is forbidden\n",
+                'bold red on_black');
         }
     }
 
-    eval( Genesis2::ConfigHandler::read_cfg_file(@_) );
+    eval(Genesis2::ConfigHandler::read_cfg_file(@_));
     die \$@ if \$@;
     1;
 }
@@ -196,14 +196,14 @@ sub print_configuration {
     my $subroutine     = '-';
     my $i              = 0;
     my $is_design_time = 0;
-    while ( ( $package, $filename, $line, $subroutine ) = caller( $i++ ) ) {
+    while (($package, $filename, $line, $subroutine) = caller($i++)) {
 
         #print STDERR "DEBUG: caller($i-1) == $package sub=$subroutine\n";
         last if $package eq 'Genesis2::UserConfigScript';
-        if ( $package eq 'Genesis2::UniqueModule' || $package eq 'Genesis2::Manager' ) {
+        if ($package eq 'Genesis2::UniqueModule' || $package eq 'Genesis2::Manager') {
             print STDERR "\n\n";
-            confess colored( "ERROR: Using " . __PACKAGE__ . " from design files is forbidden\n",
-                'bold red on_black' );
+            confess colored("ERROR: Using " . __PACKAGE__ . " from design files is forbidden\n",
+                'bold red on_black');
         }
     }
 
@@ -218,14 +218,14 @@ sub get_top_name {
     my $subroutine     = '-';
     my $i              = 0;
     my $is_design_time = 0;
-    while ( ( $package, $filename, $line, $subroutine ) = caller( $i++ ) ) {
+    while (($package, $filename, $line, $subroutine) = caller($i++)) {
 
         #print STDERR "DEBUG: caller($i-1) == $package sub=$subroutine\n";
         last if $package eq 'Genesis2::UserConfigScript';
-        if ( $package eq 'Genesis2::UniqueModule' || $package eq 'Genesis2::Manager' ) {
+        if ($package eq 'Genesis2::UniqueModule' || $package eq 'Genesis2::Manager') {
             print STDERR "\n\n";
-            confess colored( "ERROR: Using " . __PACKAGE__ . " from design files is forbidden\n",
-                'bold red on_black' );
+            confess colored("ERROR: Using " . __PACKAGE__ . " from design files is forbidden\n",
+                'bold red on_black');
         }
     }
 
@@ -239,14 +239,14 @@ sub get_synthtop_path {
     my $subroutine     = '-';
     my $i              = 0;
     my $is_design_time = 0;
-    while ( ( $package, $filename, $line, $subroutine ) = caller( $i++ ) ) {
+    while (($package, $filename, $line, $subroutine) = caller($i++)) {
 
         #print STDERR "DEBUG: caller($i-1) == $package sub=$subroutine\n";
         last if $package eq 'Genesis2::UserConfigScript';
-        if ( $package eq 'Genesis2::UniqueModule' || $package eq 'Genesis2::Manager' ) {
+        if ($package eq 'Genesis2::UniqueModule' || $package eq 'Genesis2::Manager') {
             print STDERR "\n\n";
-            confess colored( "ERROR: Using " . __PACKAGE__ . " from design files is forbidden\n",
-                'bold red on_black' );
+            confess colored("ERROR: Using " . __PACKAGE__ . " from design files is forbidden\n",
+                'bold red on_black');
         }
     }
 
@@ -260,14 +260,14 @@ sub error {
     my $subroutine     = '-';
     my $i              = 0;
     my $is_design_time = 0;
-    while ( ( $package, $filename, $line, $subroutine ) = caller( $i++ ) ) {
+    while (($package, $filename, $line, $subroutine) = caller($i++)) {
 
         #print STDERR "DEBUG: caller($i-1) == $package sub=$subroutine\n";
         last if $package eq 'Genesis2::UserConfigScript';
-        if ( $package eq 'Genesis2::UniqueModule' || $package eq 'Genesis2::Manager' ) {
+        if ($package eq 'Genesis2::UniqueModule' || $package eq 'Genesis2::Manager') {
             print STDERR "\n\n";
-            confess colored( "ERROR: Using " . __PACKAGE__ . " from design files is forbidden\n",
-                'bold red on_black' );
+            confess colored("ERROR: Using " . __PACKAGE__ . " from design files is forbidden\n",
+                'bold red on_black');
         }
     }
 

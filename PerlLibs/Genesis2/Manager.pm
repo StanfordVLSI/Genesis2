@@ -133,7 +133,7 @@ sub new {
     $self->{LineComment} = '#';    # The Line Comment string in the target language (perl)
     $self->{Debug}       = 0;      # The Debug value
 
-    $self->{InfileSuffixes}  = [ ".vp", ".svp", ".cp", ".tclp" ];  # FileName suffix for input files
+    $self->{InfileSuffixes}  = [".vp", ".svp", ".cp", ".tclp"];    # FileName suffix for input files
     $self->{CurInfileSuffix} = ".vp";                              # Default is the ".vp" extension
     $self->{OutfileSuffix}   = ".pm";              # FileName suffix for perl output files
     $self->{WorkDir}         = "genesis_work";     # Where .pm files are placed
@@ -158,7 +158,7 @@ sub new {
     $self->{GenMode}   = 0;    # should we generate a verilog hierarchy?
 
     # Bless this package
-    bless( $self, $package );
+    bless($self, $package);
 }
 
 ################################################################################
@@ -167,7 +167,7 @@ sub new {
 sub execute {
     my $self        = shift;
     my $name        = __PACKAGE__ . "->execute";
-    my @commandline = ( $0, @ARGV );
+    my @commandline = ($0, @ARGV);
 
     # Parse the command line
     $self->parse_command_line();
@@ -186,11 +186,11 @@ sub execute {
     print STDERR "--- Genesis Is Starting Work On Your Design ---\n";
     print STDERR "-----------------------------------------------\n";
 
-    if ( -e $self->{VersionInfoFileName} ) {
-        open( VERSION_INFO, $self->{VersionInfoFileName} );    # Open the file
-        @{ $self->{VersionInfo} } = <VERSION_INFO>;            # Read it into an array
-        print STDERR @{ $self->{VersionInfo} };                # Print to screen/log
-        close(VERSION_INFO);                                   # Close the file
+    if (-e $self->{VersionInfoFileName}) {
+        open(VERSION_INFO, $self->{VersionInfoFileName});    # Open the file
+        @{$self->{VersionInfo}} = <VERSION_INFO>;            # Read it into an array
+        print STDERR @{$self->{VersionInfo}};                # Print to screen/log
+        close(VERSION_INFO);                                 # Close the file
     } else {
         $self->error("$name: Genesis Release Info Not Found\n");
     }
@@ -203,8 +203,8 @@ sub execute {
     $self->add_perl_modules;
 
     #open statistics files if needed
-    if ( $self->{ParseMode} && defined $self->{DependFileName} ) {
-        open( $self->{DependHandle}, ">$self->{DependFileName}" )
+    if ($self->{ParseMode} && defined $self->{DependFileName}) {
+        open($self->{DependHandle}, ">$self->{DependFileName}")
           || $self->error("$name: Couldn't open file dependants list $self->{DependFileName}: $!");
     }
 
@@ -221,18 +221,18 @@ sub execute {
     print STDERR "\n$name: Starting Auxiliary File Generation Phase\n";
 
     # print the product lists if needed
-    if ( $self->{GenMode} ) {
+    if ($self->{GenMode}) {
         $self->create_product_lists;
     }
 
     # print hierarchy if needed
-    if ( $self->{GenMode} ) {
+    if ($self->{GenMode}) {
         $self->{CfgHandler}->WriteXml();
         $self->{CfgHandler}->Finalize();
     }
 
     # Print the path list if needed
-    $self->create_path_file if ( $self->{ParseMode} && defined $self->{PathFileName} );
+    $self->create_path_file if ($self->{ParseMode} && defined $self->{PathFileName});
 
     # Some cleanning up of the engine
     close $self->{DependHandle} if defined $self->{DependHandle};
@@ -255,7 +255,7 @@ sub execute {
 
 sub usage {
     my $self       = shift;
-    my $unq_styles = join( ' ', get_unq_styles() );
+    my $unq_styles = join(' ', get_unq_styles());
     print <<END_OF_MESSAGE;
 Usage:	
 	$0 [-option value, ...]
@@ -347,27 +347,27 @@ sub parse_command_line {
 
     # Catch some common command line errors
     $self->error("$name: '-input' flag used but no input file specified")
-      if ( scalar( @{ $self->{InputFileNames} } ) == 1
-        && ${ $self->{InputFileNames} }[0] =~ /^\s*$/ );
+      if (scalar(@{$self->{InputFileNames}}) == 1
+        && ${$self->{InputFileNames}}[0] =~ /^\s*$/);
     $self->error("$name: '-inputlist' flag used but no inputlist file specified")
-      if ( scalar( @{ $self->{InputFileLists} } ) == 1
-        && ${ $self->{InputFileLists} }[0] =~ /^\s*$/ );
+      if (scalar(@{$self->{InputFileLists}}) == 1
+        && ${$self->{InputFileLists}}[0] =~ /^\s*$/);
     $self->error("$name: '-parameter' flag used but no parameter is specified")
-      if ( scalar( @{ $self->{PrmOverrides} } ) == 1 && ${ $self->{PrmOverrides} }[0] =~ /^\s*$/ );
+      if (scalar(@{$self->{PrmOverrides}}) == 1 && ${$self->{PrmOverrides}}[0] =~ /^\s*$/);
 
-    $self->{UnqStyle} = default_unq_style() if !defined( $self->{UnqStyle} );
+    $self->{UnqStyle} = default_unq_style() if !defined($self->{UnqStyle});
     my @unq_styles = get_unq_styles();
-    $self->error( "$name: Invalid module uniquification style specified: "
+    $self->error("$name: Invalid module uniquification style specified: "
           . "'$self->{UnqStyle}'. Valid styles: "
-          . join( ', ', @unq_styles ) )
-      if ( !grep { $_ eq $self->{UnqStyle} } @unq_styles );
+          . join(', ', @unq_styles))
+      if (!grep { $_ eq $self->{UnqStyle} } @unq_styles);
 
     # Special cases:
     $self->usage() if !$res || $help;
     exit 0         if $help;
     die "$@ $!"    if !$res;
 
-    if ( defined $man ) {
+    if (defined $man) {
         print STDERR "\n\n\t\tGENESIS MANUAL AVAILABLE AT URL: http://genesis2.stanford.edu \n\n";
     }
     1;
@@ -383,35 +383,34 @@ sub parse_command_line {
 sub parse_files {
     my $self = shift;
     my $name = __PACKAGE__ . "->parse_files";
-    my ( $infile, $suffix, $target, $directories );
+    my ($infile, $suffix, $target, $directories);
     local (*FILE);
 
     # First, process all the inputlist files
-    if ( scalar( @{ $self->{InputFileLists} } ) ) {
+    if (scalar(@{$self->{InputFileLists}})) {
         $self->{UnprocessedInputLists} = [];
         $self->{ProcessedInputLists}   = [];    # absolute paths of processed inputlists
                                                 # to avoid processing the same inputlist twice
 
-        @{ $self->{UnprocessedInputLists} } = @{ $self->{InputFileLists} };
+        @{$self->{UnprocessedInputLists}} = @{$self->{InputFileLists}};
 
-        while ( scalar( @{ $self->{UnprocessedInputLists} } ) ) {
-            $self->parse_inputlist( shift @{ $self->{UnprocessedInputLists} } );
+        while (scalar(@{$self->{UnprocessedInputLists}})) {
+            $self->parse_inputlist(shift @{$self->{UnprocessedInputLists}});
         }
     }
 
     # create and move into work directory
-    unless ( -e $self->{WorkDir} && -d $self->{WorkDir} ) {
+    unless (-e $self->{WorkDir} && -d $self->{WorkDir}) {
         mkdir $self->{WorkDir}
-          or
-          $self->error( "Cannot find and cannot create work folder \"" . $self->{WorkDir} . "\"" );
+          or $self->error("Cannot find and cannot create work folder \"" . $self->{WorkDir} . "\"");
     }
     chdir $self->{WorkDir} or $self->error("Cannot cd into $self->{WorkDir}");
 
     # Now work those file baby
-    foreach $infile ( @{ $self->{InputFileNames} } ) {
+    foreach $infile (@{$self->{InputFileNames}}) {
 
         # Don't re-parse files that have already been parsed.
-        next if defined( $self->{DependHistogram}{$infile} );
+        next if defined($self->{DependHistogram}{$infile});
 
         # Parse the file
         $self->parse_file_core($infile);
@@ -433,13 +432,12 @@ sub parse_unprocessed_file {
     my $name   = __PACKAGE__ . "->parse_unprocessed_file";
 
     # Don't re-parse files that have already been parsed.
-    return if defined( $self->{DependHistogram}{$infile} );
+    return if defined($self->{DependHistogram}{$infile});
 
     # create and move into work directory
-    unless ( -e $self->{WorkDir} && -d $self->{WorkDir} ) {
+    unless (-e $self->{WorkDir} && -d $self->{WorkDir}) {
         mkdir $self->{WorkDir}
-          or
-          $self->error( "Cannot find and cannot create work folder \"" . $self->{WorkDir} . "\"" );
+          or $self->error("Cannot find and cannot create work folder \"" . $self->{WorkDir} . "\"");
     }
     chdir $self->{WorkDir} or $self->error("Cannot cd into $self->{WorkDir}");
 
@@ -466,31 +464,31 @@ sub parse_file_core {
     print STDERR "$name: Now parsing file $infile\n";
 
     # make an output file
-    my ( $target, $directories ) = fileparse($infile);
+    my ($target, $directories) = fileparse($infile);
     my $suf_found = 0;
-    foreach my $suffix ( @{ $self->{InfileSuffixes} } ) {
-        if ( $target =~ /\Q$suffix\E$/ ) {
+    foreach my $suffix (@{$self->{InfileSuffixes}}) {
+        if ($target =~ /\Q$suffix\E$/) {
             $self->{CurInfileSuffix} = $suffix;
             $target =~ s/\Q$suffix\E$//;    # remove the input suffix
             $suf_found = 1;
             last;
         }
     }
-    if ( !$suf_found ) {
+    if (!$suf_found) {
         $self->error("$name: Couldn't find suffix for $target");
     }
 
     $self->{OutputFileName} = $target . $self->{OutfileSuffix};
     $self->{OutfileHandle}  = new FileHandle;
-    open( $self->{OutfileHandle}, ">$self->{OutputFileName}" )
+    open($self->{OutfileHandle}, ">$self->{OutputFileName}")
       || $self->error("$name: Couldn't open output file $self->{OutputFileName}: $!");
 
     # save the name for your records
     my $base_infile = basename($infile);
-    if ( defined $self->{DependHistogram}{$base_infile} ) {
+    if (defined $self->{DependHistogram}{$base_infile}) {
         $self->{DependHistogram}{$base_infile} = $self->{DependHistogram}{$base_infile} + 1;
     } else {
-        print { $self->{DependHandle} } "src $base_infile\n" if defined $self->{DependHandle};
+        print {$self->{DependHandle}} "src $base_infile\n" if defined $self->{DependHandle};
         $self->{DependHistogram}{$base_infile} = 1;
     }
 
@@ -498,13 +496,13 @@ sub parse_file_core {
     $self->init_perl_module($target);
 
     # parse the input
-    $self->parse_file( $infile, $self->{SourcesPath}, "src" );
+    $self->parse_file($infile, $self->{SourcesPath}, "src");
 
     # finalize output file
     $self->finish_perl_module;
 
     # clean up
-    close( $self->{OutfileHandle} );
+    close($self->{OutfileHandle});
 
     1;
 }
@@ -526,21 +524,21 @@ sub parse_inputlist {
 
     my $name = __PACKAGE__ . "->parse_inputlist";
 
-    my ( $infile, $suffix, $target, $directories );
+    my ($infile, $suffix, $target, $directories);
 
     print STDERR "--- Processing inputlist file $filename...\n"
       if $self->{Debug};
 
     # Check whether we've already processed this file
     my $il_path = abs_path($filename);
-    foreach my $p ( @{ $self->{ProcessedInputLists} } ) {
-        if ( $il_path eq $p ) {
+    foreach my $p (@{$self->{ProcessedInputLists}}) {
+        if ($il_path eq $p) {
             print STDERR "   --- Info: Already processed $il_path; skipping.\n"
               if $self->{Debug};
             return;
         }
     }
-    push @{ $self->{ProcessedInputLists} }, $il_path;
+    push @{$self->{ProcessedInputLists}}, $il_path;
 
     # Save current directory for this file so that we can
     # use it for subsequent files and directories.
@@ -552,7 +550,7 @@ sub parse_inputlist {
       or $self->error("$name: Cannot open inputlist file '$il_path'. $!\n");
 
     my $line;
-    while ( $line = <$IL_FILE> ) {
+    while ($line = <$IL_FILE>) {
 
         # Strip comments and trailing whitespace
         $line =~ s/#.*//;
@@ -563,7 +561,7 @@ sub parse_inputlist {
         $line =~ s/^\s+//;
 
         # Match command with args: -cmd <arg1> <arg2> ...
-        if ( $line =~ m{^(-\w+)\s+(.*)} ) {    # -cmd <file or dir list>
+        if ($line =~ m{^(-\w+)\s+(.*)}) {    # -cmd <file or dir list>
             my $cmd   = $1;
             my @paths = split ' ', $2;
 
@@ -573,9 +571,9 @@ sub parse_inputlist {
                 my $orig = $path;
 
                 # Expand environment variables
-                while ( $path =~ m/\$\{?(\w+)\}?/ ) {
+                while ($path =~ m/\$\{?(\w+)\}?/) {
                     my $env_var = $1;
-                    if ( defined $ENV{$env_var} ) {
+                    if (defined $ENV{$env_var}) {
                         $path =~ s/\$\{?(\w+)\}?/$ENV{$env_var}/e;
                     } else {
                         print STDERR "   --- WARNING: ignoring path $orig: "
@@ -586,13 +584,13 @@ sub parse_inputlist {
                 }
 
                 # Prepend current directory if path is not absolute
-                if ( !file_name_is_absolute($path) ) {
-                    $path = catfile( $dir, $path );
+                if (!file_name_is_absolute($path)) {
+                    $path = catfile($dir, $path);
                 }
 
                 # Convert to an absolute path
                 my $abspath = abs_path($path);
-                if ( !$abspath ) {
+                if (!$abspath) {
                     print STDERR "   --- WARNING: ignoring path $path "
                       . "(derived from $orig): non-existent path on "
                       . "$il_path:$.\n";
@@ -605,29 +603,29 @@ sub parse_inputlist {
             if (   $cmd eq '-input'
                 or $cmd eq '-inputlist'
                 or $cmd eq '-incpath'
-                or $cmd eq '-srcpath' )
+                or $cmd eq '-srcpath')
             {
-                my ( $var, $comment, $addUnprocInputLists );
+                my ($var, $comment, $addUnprocInputLists);
                 $addUnprocInputLists = 0;
-                if ( $cmd eq '-input' ) {
+                if ($cmd eq '-input') {
                     $var     = 'InputFileNames';
                     $comment = 'file';
-                } elsif ( $cmd eq '-inputlist' ) {
+                } elsif ($cmd eq '-inputlist') {
                     $var                 = 'InputFileLists';
                     $comment             = 'inputlist';
                     $addUnprocInputLists = 1;
-                } elsif ( $cmd eq '-incpath' ) {
+                } elsif ($cmd eq '-incpath') {
                     $var     = 'IncludesPath';
                     $comment = 'incpath';
-                } elsif ( $cmd eq '-srcpath' ) {
+                } elsif ($cmd eq '-srcpath') {
                     $var     = 'SourcesPath';
                     $comment = 'srcpath';
                 }
                 foreach my $file (@paths) {
-                    push @{ $self->{$var} }, $file;
+                    push @{$self->{$var}}, $file;
                     print STDERR "   --- adding $comment $file.\n"
-                      if ( $self->{Debug} );
-                    push @{ $self->{UnprocessedInputLists} }, $file
+                      if ($self->{Debug});
+                    push @{$self->{UnprocessedInputLists}}, $file
                       if $addUnprocInputLists;
 
                 }
@@ -635,9 +633,9 @@ sub parse_inputlist {
         }
 
         # Match file names (no leading hyphen)
-        elsif ( $line =~ m{^([^-][^\s]*)$} ) {
-            push @{ $self->{InputFileNames} }, $1;
-            print STDERR "   --- adding file $1.\n" if ( $self->{Debug} );
+        elsif ($line =~ m{^([^-][^\s]*)$}) {
+            push @{$self->{InputFileNames}}, $1;
+            print STDERR "   --- adding file $1.\n" if ($self->{Debug});
             next LINE;
 
         } else {
@@ -658,13 +656,13 @@ sub include {
 
     # save the name for your records
     my $base_infile = basename($infile);
-    if ( defined $self->{DependHistogram}{$base_infile} ) {
+    if (defined $self->{DependHistogram}{$base_infile}) {
         $self->{DependHistogram}{$base_infile} = $self->{DependHistogram}{$base_infile} + 1;
     } else {
-        print { $self->{DependHandle} } "inc $base_infile\n" if defined $self->{DependHandle};
+        print {$self->{DependHandle}} "inc $base_infile\n" if defined $self->{DependHandle};
         $self->{DependHistogram}{$base_infile} = 1;
     }
-    $self->parse_file( $infile, $self->{IncludesPath}, "inc" );
+    $self->parse_file($infile, $self->{IncludesPath}, "inc");
 }
 
 ## parse_file:
@@ -674,7 +672,7 @@ sub parse_file {
     local $Genesis2::Manager::infile = shift;
     my $path = shift;
     my $what = shift;
-    my ( $out, $perl_mode, $i, $char, $next_char );
+    my ($out, $perl_mode, $i, $char, $next_char);
     local $Genesis2::Manager::inline;
     my $name = __PACKAGE__ . "->parse_file";
     local (*FILE);
@@ -682,29 +680,29 @@ sub parse_file {
     print STDERR "$name: Starting work on file $Genesis2::Manager::infile\n" if $self->{Debug};
 
     # search directories for the input file and open it
-    $Genesis2::Manager::infile = $self->find_file( $Genesis2::Manager::infile, $path );
-    open( FILE, $Genesis2::Manager::infile )
+    $Genesis2::Manager::infile = $self->find_file($Genesis2::Manager::infile, $path);
+    open(FILE, $Genesis2::Manager::infile)
       || $self->error("$name: Cannot open input file $Genesis2::Manager::infile: $!\n");
 
     # For the main file, also add an header
-    if ( $what =~ /src/i ) {
-        push @{ $self->{ModuleBody} },
+    if ($what =~ /src/i) {
+        push @{$self->{ModuleBody}},
           "	\$self->SUPER::to_verilog(\'$Genesis2::Manager::infile\');\n";
-    } elsif ( $what =~ /inc/i ) {
-        push @{ $self->{ModuleBody} },
+    } elsif ($what =~ /inc/i) {
+        push @{$self->{ModuleBody}},
 "print { \$Genesis2::UniqueModule::myself->{OutfileHandle} } \"\$self->{LineComment} ----- Start Include Of $Genesis2::Manager::infile -----\\n\"; \n";
     }
 
     # Cheat the interpreter error reports about line number and file
     push(
-        @{ $self->{ModuleBody} },
+        @{$self->{ModuleBody}},
         "# START USER CODE FROM $Genesis2::Manager::infile PARSED INTO PACKAGE >>>\n"
     );
-    push( @{ $self->{ModuleBody} }, "# line 1 \"$Genesis2::Manager::infile\"\n" );
+    push(@{$self->{ModuleBody}}, "# line 1 \"$Genesis2::Manager::infile\"\n");
 
     # Now process the file
     my $line = '';
-    while ( $line = <FILE> ) {
+    while ($line = <FILE>) {
         $Genesis2::Manager::inline = $.;
         my $orig_line  = $line;
         my $veri_macro = '';
@@ -712,24 +710,24 @@ sub parse_file {
 
         # first we put a few hooks to catch intersting events that need more handling
         # perl lines
-        if ( $line =~ m/^\s*$self->{PRLESC}/ ) {
+        if ($line =~ m/^\s*$self->{PRLESC}/) {
             $line =~ s/^(\s*)$self->{PRLESC}/$1/g;   # we keep the spaces to allow nicer indentation
 
-            if ( $line =~ m/^\s*include\s*\(/ ) {
+            if ($line =~ m/^\s*include\s*\(/) {
                 $line = "\$self->" . $line;
-                if ( !eval $line ) {
+                if (!eval $line) {
                     $self->error(
 "$name: \"$Genesis2::Manager::infile\", line $Genesis2::Manager::inline: include failed\n"
                     );
                 }
                 push(
-                    @{ $self->{ModuleBody} },
+                    @{$self->{ModuleBody}},
                     "# line "
-                      . ( $Genesis2::Manager::inline + 1 )
+                      . ($Genesis2::Manager::inline + 1)
                       . " \"$Genesis2::Manager::infile\"\n"
                 );
             } else {
-                push( @{ $self->{ModuleBody} }, $line );
+                push(@{$self->{ModuleBody}}, $line);
             }
         }
 
@@ -738,7 +736,7 @@ sub parse_file {
             chomp($line);
             $out       = "";
             $perl_mode = 0;
-            if ( $Genesis2::Manager::inline % 10 == 0 && $self->{Debug} ) {
+            if ($Genesis2::Manager::inline % 10 == 0 && $self->{Debug}) {
                 $out =
 qq/print { \$Genesis2::UniqueModule::myself->{OutfileHandle} } "\$Genesis2::UniqueModule::myself->{LineComment} From $Genesis2::Manager::infile line $Genesis2::Manager::inline\\n"; \n/;
             }
@@ -746,30 +744,30 @@ qq/print { \$Genesis2::UniqueModule::myself->{OutfileHandle} } "\$Genesis2::Uniq
 
             # allow the special verilog compile time `timescale/`default_nettype/`include thingies
             # (and remove it from the line)
-            if ( $line =~ s/^(\s*\/?\/?)(\s*`)(timescale|default_nettype|include) // ) {    #`
+            if ($line =~ s/^(\s*\/?\/?)(\s*`)(timescale|default_nettype|include) //) {    #`
                 $veri_macro = $1 . $2 . $3 . " ";
                 $out .= $veri_macro;
             }
 
             # allow the special verilog compile time uvm (universal verif methodology) thingies
             # (and remove it from the line)
-            if ( $line =~ s/^(\s*\/?\/?)(\s*`)(uvm_)// ) {
+            if ($line =~ s/^(\s*\/?\/?)(\s*`)(uvm_)//) {
                 $veri_macro = $1 . $2 . $3;
                 $out .= $veri_macro;
             }
 
-            for ( $i = 0 ; $i < length($line) ; $i++ ) {
-                $char      = substr( $line, $i, 1 );
+            for ($i = 0 ; $i < length($line) ; $i++) {
+                $char      = substr($line, $i, 1);
                 $next_char = '';
-                $next_char = substr( $line, $i + 1, 1 ) if ( $i + 1 < length($line) );
-                if ( $char . $next_char eq '\`' ) {    # i.e., user is escaping the back-tick
+                $next_char = substr($line, $i + 1, 1) if ($i + 1 < length($line));
+                if ($char . $next_char eq '\`') {    # i.e., user is escaping the back-tick
                     $out .= $next_char;
                     $i++;
                     $warn =
 "You are using an old Verilog style macro. This is not safe and thus highly unrecommended.\n"
                       . "\t\t---> You should be using Genesis2 parameters instead"
                       unless $perl_mode;
-                } elsif ( $char eq "`" ) {
+                } elsif ($char eq "`") {
 
                     # toggle perl mode and text mode
                     $out .=
@@ -780,7 +778,7 @@ qq/print { \$Genesis2::UniqueModule::myself->{OutfileHandle} } "\$Genesis2::Uniq
                 } else {
 
                     # keep the character, but need to quote it in text mode
-                    if ( !$perl_mode && ( $char eq "'" || $char eq "\\" ) ) {
+                    if (!$perl_mode && ($char eq "'" || $char eq "\\")) {
                         $char = "\\$char";
                     }
                     $out .= $char;
@@ -788,16 +786,16 @@ qq/print { \$Genesis2::UniqueModule::myself->{OutfileHandle} } "\$Genesis2::Uniq
             }
             $out .= $perl_mode ? ";" : "';";
             if ($perl_mode) {
-                $self->error( "$name: Missing closing ' (back-tic):\n" . "In Code: " . $orig_line )
-                  if ( $veri_macro eq '' );
-                $self->error( "$name: Missing closing ' (back-tic).\n"
+                $self->error("$name: Missing closing ' (back-tic):\n" . "In Code: " . $orig_line)
+                  if ($veri_macro eq '');
+                $self->error("$name: Missing closing ' (back-tic).\n"
                       . "In Code: "
                       . $orig_line
                       . "Note that this line started with a macro definition $veri_macro so first back-tick was ignored"
-                ) if ( $veri_macro ne '' );
+                ) if ($veri_macro ne '');
             }
 
-            if ( defined $warn ) {
+            if (defined $warn) {
                 print STDERR
 "WARNING: Line ${Genesis2::Manager::inline}, of File $Genesis2::Manager::infile \n"
                   . "WARNING: $warn\n"
@@ -807,16 +805,16 @@ qq/print { \$Genesis2::UniqueModule::myself->{OutfileHandle} } "\$Genesis2::Uniq
 #unshift (@{$self->{ModuleBody}}, $warn);
             }
             $out .= qq/print { \$Genesis2::UniqueModule::myself->{OutfileHandle} } "\\n"; \n/;
-            push( @{ $self->{ModuleBody} }, $out );
+            push(@{$self->{ModuleBody}}, $out);
         }
     }
 
     push(
-        @{ $self->{ModuleBody} },
+        @{$self->{ModuleBody}},
         "# <<< END USER CODE FROM " . $Genesis2::Manager::infile . " PARSED INTO PACKAGE\n\n\n"
     );
-    if ( $what =~ /inc/i ) {
-        push @{ $self->{ModuleBody} },
+    if ($what =~ /inc/i) {
+        push @{$self->{ModuleBody}},
 "print { \$Genesis2::UniqueModule::myself->{OutfileHandle} } \"\$self->{LineComment} ----- End Include Of $Genesis2::Manager::infile -----\\n\"; \n";
     }
     close FILE;
@@ -829,8 +827,8 @@ sub init_perl_module {
     my $orig_suffix  = $self->{CurInfileSuffix};
     my $final_suffix = $orig_suffix;
     $final_suffix =~ s/p$//;    # remove the 'p' from .vp or .svp
-    push @{ $self->{ModuleHead} }, "package $target;\n";
-    push @{ $self->{ModuleHead} }, <<END_OF_HEADER;
+    push @{$self->{ModuleHead}}, "package $target;\n";
+    push @{$self->{ModuleHead}}, <<END_OF_HEADER;
 use strict;
 use vars qw(\$VERSION \@ISA \@EXPORT \@EXPORT_OK);
 
@@ -859,7 +857,7 @@ sub finish_perl_module {
     my $self = shift;
 
     # Create the top of the to_verilog method
-    unshift @{ $self->{ModuleBody} }, <<END_OF_TO_VERILOG_PREFIX;
+    unshift @{$self->{ModuleBody}}, <<END_OF_TO_VERILOG_PREFIX;
   sub to_verilog{ 
       # START PRE-GENERATED TO_VERILOG PREFIX CODE >>>
       my \$self = shift;
@@ -869,7 +867,7 @@ sub finish_perl_module {
       # <<< END PRE-GENERATED TO_VERILOG PREFIX CODE
 END_OF_TO_VERILOG_PREFIX
 
-    push @{ $self->{ModuleBody} }, <<END_OF_TO_VERILOG_SUFFIX;
+    push @{$self->{ModuleBody}}, <<END_OF_TO_VERILOG_SUFFIX;
       # START PRE-GENERATED TO_VERILOG SUFFIX CODE >>>
       print STDERR \"\$self->{BaseModuleName}->to_verilog: Done with user code\\n\" 
 	  if \$self->{Debug} & 8;
@@ -881,9 +879,9 @@ END_OF_TO_VERILOG_PREFIX
   }
 END_OF_TO_VERILOG_SUFFIX
 
-    print { $self->{OutfileHandle} } @{ $self->{ModuleHead} };
-    print { $self->{OutfileHandle} } @{ $self->{ModuleBody} };
-    print { $self->{OutfileHandle} } @{ $self->{ModuleTail} };
+    print {$self->{OutfileHandle}} @{$self->{ModuleHead}};
+    print {$self->{OutfileHandle}} @{$self->{ModuleBody}};
+    print {$self->{OutfileHandle}} @{$self->{ModuleTail}};
 
     1;
 }
@@ -900,49 +898,49 @@ sub gen_verilog {
     $filename = $module . $self->{OutfileSuffix};
 
     # create generated verilog directory
-    unless ( -e $self->{RawDir} && -d $self->{RawDir} ) {
+    unless (-e $self->{RawDir} && -d $self->{RawDir}) {
         mkdir $self->{RawDir}
           or
-          $self->error( "Cannot find and cannot create folder for generated (raw) verilog files: \""
+          $self->error("Cannot find and cannot create folder for generated (raw) verilog files: \""
               . $self->{RawDir}
-              . "\"" );
+              . "\"");
     }
 
     # Now import the top module
-    if ( $INC{$filename} ) {
+    if ($INC{$filename}) {
     } else {
         eval { require $filename };
 
         # Check for errors
         if ($@) {
-            my @errs = split( /\n/, $@ );
+            my @errs = split(/\n/, $@);
 
             # remove the last line of $@ it will always point to UniqueModule.pm
             pop(@errs) if scalar(@errs) > 1;
-            my $err_msg = join( "\n", @errs );
-            $self->error( "$name: Cannot locate/compile module \"${filename}\".\n"
-                  . "Error Message: $err_msg" );
+            my $err_msg = join("\n", @errs);
+            $self->error("$name: Cannot locate/compile module \"${filename}\".\n"
+                  . "Error Message: $err_msg");
         }
         $module->import();
     }
 
     # Instantiate a ConfigHandler
     $self->{CfgHandler} = new Genesis2::ConfigHandler($self);
-    $self->{CfgHandler}->SetDebugLevel( $self->{Debug} );
-    $self->{CfgHandler}->SetConfigsPath( $self->{ConfigsPath} );
-    $self->{CfgHandler}->SetXmlInFileName( $self->{XmlInFileName} );
-    $self->{CfgHandler}->SetXmlOutFileName( $self->{XmlOutFileName} );
-    $self->{CfgHandler}->SetCfgInFileNames( $self->{CfgInFileNames} );
+    $self->{CfgHandler}->SetDebugLevel($self->{Debug});
+    $self->{CfgHandler}->SetConfigsPath($self->{ConfigsPath});
+    $self->{CfgHandler}->SetXmlInFileName($self->{XmlInFileName});
+    $self->{CfgHandler}->SetXmlOutFileName($self->{XmlOutFileName});
+    $self->{CfgHandler}->SetCfgInFileNames($self->{CfgInFileNames});
 
     # Read the input xml file if needed
     $self->{CfgHandler}->ReadCfg();
     $self->{CfgHandler}->ReadXml();
-    $self->{CfgHandler}->SetPrmOverrides( $self->{PrmOverrides} );
+    $self->{CfgHandler}->SetPrmOverrides($self->{PrmOverrides});
 
     # Set some back and forth pointers
     $self->{TopObj} = $module->new($self);
-    $self->{CfgHandler}->SetTopObj( $self->{TopObj} );
-    $self->{CfgHandler}->SetUnqStyle( str_to_unq_style( $self->{UnqStyle} ) );
+    $self->{CfgHandler}->SetTopObj($self->{TopObj});
+    $self->{CfgHandler}->SetUnqStyle(str_to_unq_style($self->{UnqStyle}));
 
     # Start working from the top level
     print STDERR "$name: Starting code generation from module $module\n";
@@ -966,7 +964,7 @@ sub find_file_safe {
     my $file = shift;
     my $name = __PACKAGE__ . "->find_file_safe";
     my $path = [];
-    my ( $dir, $filefound );
+    my ($dir, $filefound);
     if (@_) {
         $path = shift;
     }
@@ -975,32 +973,32 @@ sub find_file_safe {
     $filefound = 0;
     print STDERR "$name: Searching path '$self->{CallDir}:@$path' for file '$file'\n"
       if $self->{Debug} & 2;
-    if ( $file =~ /^\// ) {
+    if ($file =~ /^\//) {
 
         # file is absolute path
-        $filefound = 1 if ( -f $file );
+        $filefound = 1 if (-f $file);
     } else {
-        my ( $filename, $dirs ) = fileparse($file);
-        foreach $dir ( $self->{CallDir}, @{$path} ) {
+        my ($filename, $dirs) = fileparse($file);
+        foreach $dir ($self->{CallDir}, @{$path}) {
 
             # Cannonicalize the path and assign to a new var
             # Assigning to $dir was corrupting $self->{CallDir}
-            my $cdir = canonpath( "$dir/" . $dirs );
+            my $cdir = canonpath("$dir/" . $dirs);
 
             # if relative path, start it from the dir from which the script was called
-            unless ( $cdir =~ /^\// ) { $cdir = $self->{CallDir} . "/" . $cdir; }
+            unless ($cdir =~ /^\//) { $cdir = $self->{CallDir} . "/" . $cdir; }
 
             # Scan directory and cache contents
-            if ( !defined( $ffs_dir_cache{$cdir} ) ) {
+            if (!defined($ffs_dir_cache{$cdir})) {
                 $ffs_dir_cache{$cdir} = {};
                 my @files = map { basename $_ } glob("$cdir/*");
                 foreach my $file (@files) {
-                    $ffs_dir_cache{$cdir}->{$file} = 1 if ( -f "$cdir/$file" );
+                    $ffs_dir_cache{$cdir}->{$file} = 1 if (-f "$cdir/$file");
                 }
             }
 
             # Check if the file is in the directory
-            $filefound = defined( $ffs_dir_cache{$cdir}->{$filename} );
+            $filefound = defined($ffs_dir_cache{$cdir}->{$filename});
             if ($filefound) {
 
                 # Change file path so it is now absolute.
@@ -1012,7 +1010,7 @@ sub find_file_safe {
 
     if ($filefound) {
         $file = abs_path($file);
-        print STDERR "$name: found source: $file\n" if ( $self->{Debug} & 2 );
+        print STDERR "$name: found source: $file\n" if ($self->{Debug} & 2);
     } else {
         $file = undef;
     }
@@ -1032,7 +1030,7 @@ sub find_file {
         $path = shift;
     }
 
-    my $filefound = $self->find_file_safe( $file, $path );
+    my $filefound = $self->find_file_safe($file, $path);
     $self->error("$name: Can not find file $file \n Search Path: @{$path}")
       unless defined $filefound;
     return $filefound;
@@ -1048,16 +1046,16 @@ sub add_suffix {
     my $file = shift;
     my $name = __PACKAGE__ . "->add_suffix";
 
-    foreach my $suffix ( '', @{ $self->{InfileSuffixes} } ) {
+    foreach my $suffix ('', @{$self->{InfileSuffixes}}) {
         my $file_w_suffix = $file . $suffix;
         my $foundfile     = defined $self->{DependHistogram}{$file_w_suffix}
-          || $self->find_file_safe( $file_w_suffix, $self->{SourcesPath} );
-        if ( defined $foundfile ) {
+          || $self->find_file_safe($file_w_suffix, $self->{SourcesPath});
+        if (defined $foundfile) {
             return $file_w_suffix;
         }
     }
     $self->error(
-        "$name: Can not find suffix for file $file\n" . "Search path: @{$self->{SourcesPath}}" );
+        "$name: Can not find suffix for file $file\n" . "Search path: @{$self->{SourcesPath}}");
     return undef;
 }
 
@@ -1087,18 +1085,18 @@ sub error {
     #print to file as well as to stderr
     print "\n" . $prefix . "\n";
 
-    @message_arr = split( /\n/, $message );
+    @message_arr = split(/\n/, $message);
     map { print "\t" . $_ . "\n" } @message_arr;    # print to file
     print "\n" . $suffix1;
 
     print STDERR "\n" . $prefix . "\n";
     map {
-        my @tokens = split( //, $_ );
+        my @tokens = split(//, $_);
         my $len    = scalar(@tokens);
         my $space  = '';
-        $space = ' ' x ( 80 - $len ) if $len < 80;
+        $space = ' ' x (80 - $len) if $len < 80;
         print STDERR "\t";
-        print STDERR colored( $_ . $space, 'bold red on_black' );
+        print STDERR colored($_ . $space, 'bold red on_black');
         print STDERR "\n";
     } @message_arr;                                 # print stderr
 
@@ -1126,7 +1124,7 @@ sub add_perl_modules {
     caller eq __PACKAGE__ or $self->error("$name: Call to a private method is not allowed");
     my $module;
     my $filename;
-    foreach my $item ( @{ $self->{PerlModules} } ) {
+    foreach my $item (@{$self->{PerlModules}}) {
         $module   = $item;
         $filename = $module;
         $filename .= ".pm" unless $filename =~ m/\.pm$/;    # add the .pm suffix to the module name
@@ -1135,18 +1133,18 @@ sub add_perl_modules {
 
         # Check for errors
         if ($@) {
-            my @errs = split( /\n/, $@ );
+            my @errs = split(/\n/, $@);
 
             # remove the last line of $@ it will always point to UniqueModule.pm
             pop(@errs) if scalar(@errs) > 1;
-            my $err_msg = join( "\n", @errs );
-            $self->error( "$name: Cannot locate/compile module \"${filename}\".\n"
-                  . "Error Message: $err_msg" );
+            my $err_msg = join("\n", @errs);
+            $self->error("$name: Cannot locate/compile module \"${filename}\".\n"
+                  . "Error Message: $err_msg");
         }
         $module =~ s/(\.pm)$//;     # getting rid of the .pm suffix if existed
         $module =~ s/^(.*\/)//g;    # getting rid of the /path/to/pkg/loc if existed
-        push( @Genesis2::UniqueModule::ISA, $module );    # push it to the base template class ISA
-                                                          #$module->import();
+        push(@Genesis2::UniqueModule::ISA, $module);    # push it to the base template class ISA
+                                                        #$module->import();
     }
     1;
 }
@@ -1160,7 +1158,7 @@ sub add_perl_libs {
 
     # Add the work dir and user specified libs locations to the include path
     require lib;
-    lib->import( $self->{WorkDir}, @{ $self->{PerlLibs} } );
+    lib->import($self->{WorkDir}, @{$self->{PerlLibs}});
 }
 
 ## sub create_product_lists
@@ -1169,39 +1167,39 @@ sub create_product_lists {
     my $self = shift;
     my $name = __PACKAGE__ . "->create_product_lists";
     caller eq __PACKAGE__
-      or $self->error( "$name: Call to a private method is not allowed " . caller );
+      or $self->error("$name: Call to a private method is not allowed " . caller);
 
     # Any reason to be here?
-    return unless ( $self->{GenMode} && defined $self->{ProductFileName} );
+    return unless ($self->{GenMode} && defined $self->{ProductFileName});
 
     # Open product files
     my $product_fh;
     my $synth_product_fh;
     my $verif_product_fh;
-    open( $product_fh, ">$self->{ProductFileName}" )
+    open($product_fh, ">$self->{ProductFileName}")
       || $self->error("$name: Couldn't open product list file $self->{ProductFileName}: $!");
 
     # for synth
     $self->{SynthProductFileName} = $self->{ProductFileName};
-    if ( $self->{SynthProductFileName} =~ s/(\.[^\.]*)$/.synth/ )
+    if ($self->{SynthProductFileName} =~ s/(\.[^\.]*)$/.synth/)
     {    # replace file extenssion with .synth
         $self->{SynthProductFileName} .= $1;    # add original file extenssion
     } else {
         $self->{SynthProductFileName} .= '.synth';   # no file extenssion found -> add .synth suffix
     }
-    open( $synth_product_fh, ">$self->{SynthProductFileName}" )
+    open($synth_product_fh, ">$self->{SynthProductFileName}")
       || $self->error(
         "$name: Couldn't open synthesis product list file $self->{SynthProductFileName}: $!");
 
     # for verif
     $self->{VerifProductFileName} = $self->{ProductFileName};
-    if ( $self->{VerifProductFileName} =~ s/(\.[^\.]*)$/.verif/ )
+    if ($self->{VerifProductFileName} =~ s/(\.[^\.]*)$/.verif/)
     {    # replace file extenssion with .verif
         $self->{VerifProductFileName} .= $1;    # add original file extenssion
     } else {
         $self->{VerifProductFileName} .= '.verif';   # no file extenssion found -> add .verif suffix
     }
-    open( $verif_product_fh, ">$self->{VerifProductFileName}" )
+    open($verif_product_fh, ">$self->{VerifProductFileName}")
       || $self->error(
         "$name: Couldn't open verifesis product list file $self->{VerifProductFileName}: $!");
 
@@ -1210,7 +1208,7 @@ sub create_product_lists {
     #print { $synth_product_fh } "+incdir+".$self->{SynthDir}."\n";
 
     # Get a list of all instances in REVERSED DFS order
-    my @rev_dfs_list = $self->{TopObj}->search_subinst( Reverse => 1 );
+    my @rev_dfs_list = $self->{TopObj}->search_subinst(Reverse => 1);
 
     # Process the list into synth and verif single appearance file list
     my %seen         = ();
@@ -1219,60 +1217,60 @@ sub create_product_lists {
         my $path = $inst->get_instance_path();
         my $file = $inst->get_out_file_name();
         my $type = 'verif';
-        if ( defined $self->{SynthTop}
-            && ( $path eq $self->{SynthTop} || $path =~ /^$self->{SynthTop}\./ ) )
+        if (defined $self->{SynthTop}
+            && ($path eq $self->{SynthTop} || $path =~ /^$self->{SynthTop}\./))
         {
             $type = 'synth';
         }
 
         # if this file is first seen then add to the list and put the verif/synth tag
-        if ( !defined $seen{$file} ) {
-            push( @product_list, $file );
+        if (!defined $seen{$file}) {
+            push(@product_list, $file);
             $seen{$file} = $type;
         }
 
         # if this file was previously seen we might need to add a tag
-        elsif ( $seen{$file} ne $type ) {
+        elsif ($seen{$file} ne $type) {
             $seen{$file} = 'synth_and_verif';
         }
     }
 
     # Create verif and synth folders for generated verilog
-    unless ( -e $self->{VerifDir} && -d $self->{VerifDir} ) {
+    unless (-e $self->{VerifDir} && -d $self->{VerifDir}) {
         mkdir $self->{VerifDir}
           or $self->error(
                 "Cannot find and cannot create folder for generated (verif) verilog files: \""
               . $self->{VerifDir}
-              . "\"" );
+              . "\"");
     }
-    unless ( -e $self->{SynthDir} && -d $self->{SynthDir} ) {
+    unless (-e $self->{SynthDir} && -d $self->{SynthDir}) {
         mkdir $self->{SynthDir}
           or $self->error(
                 "Cannot find and cannot create folder for generated (synth) verilog files: \""
               . $self->{SynthDir}
-              . "\"" );
+              . "\"");
     }
 
     # Move files to final location; Print the  file lists
     foreach my $file (@product_list) {
-        if ( $seen{$file} eq 'verif' ) {
+        if ($seen{$file} eq 'verif') {
             print STDERR "Move $file from $self->{RawDir} to $self->{VerifDir}\n"
               if \$self->{Debug} & 8;
-            move( catfile( $self->{RawDir}, $file ), catfile( $self->{VerifDir}, $file ) )
+            move(catfile($self->{RawDir}, $file), catfile($self->{VerifDir}, $file))
               or
               $self->error("$name: Couldn't move $file from $self->{RawDir} to $self->{VerifDir}");
-            print {$product_fh} catfile( $self->{VerifDir}, $file ) . "\n";
-            print {$verif_product_fh} catfile( $self->{VerifDir}, $file ) . "\n";
+            print {$product_fh} catfile($self->{VerifDir}, $file) . "\n";
+            print {$verif_product_fh} catfile($self->{VerifDir}, $file) . "\n";
         } else {
             print STDERR "Move $file from $self->{RawDir} to $self->{SynthDir}\n"
               if \$self->{Debug} & 8;
-            move( catfile( $self->{RawDir}, $file ), catfile( $self->{SynthDir}, $file ) )
+            move(catfile($self->{RawDir}, $file), catfile($self->{SynthDir}, $file))
               or
               $self->error("$name: Couldn't move $file from $self->{RawDir} to $self->{SynthDir}");
-            print {$product_fh} catfile( $self->{SynthDir}, $file ) . "\n";
-            print {$synth_product_fh} catfile( $self->{SynthDir}, $file ) . "\n";
-            print {$verif_product_fh} catfile( $self->{SynthDir}, $file ) . "\n"
-              if ( $seen{$file} eq 'synth_and_verif' );
+            print {$product_fh} catfile($self->{SynthDir}, $file) . "\n";
+            print {$synth_product_fh} catfile($self->{SynthDir}, $file) . "\n";
+            print {$verif_product_fh} catfile($self->{SynthDir}, $file) . "\n"
+              if ($seen{$file} eq 'synth_and_verif');
         }
     }
 
@@ -1288,17 +1286,17 @@ sub create_clean_file {
     my $self = shift;
     my $name = __PACKAGE__ . "->create_clean_file";
     caller eq __PACKAGE__
-      or $self->error( "$name: Call to a private method is not allowed " . caller );
+      or $self->error("$name: Call to a private method is not allowed " . caller);
     my $cfh;
 
     # open file
-    open( $cfh, ">genesis_clean.cmd" )
+    open($cfh, ">genesis_clean.cmd")
       or $self->error("$name: Couldn't open file genesis_clean.cmd: $!");
 
-    if ( $self->{ParseMode} && defined $self->{DependFileName} ) {
+    if ($self->{ParseMode} && defined $self->{DependFileName}) {
         print {$cfh} "\\rm -f $self->{DependFileName};\n";
     }
-    if ( $self->{ParseMode} && defined $self->{PathFileName} ) {
+    if ($self->{ParseMode} && defined $self->{PathFileName}) {
         print {$cfh} "\\rm -f $self->{PathFileName};\n";
     }
     print {$cfh} "\\rm -rf $self->{LogFileName};\n";
@@ -1308,20 +1306,20 @@ sub create_clean_file {
     print {$cfh} "\\rm -rf $self->{SynthDir};\n";
     print {$cfh}
 "\\rm -f $self->{XmlOutFileName} small_$self->{XmlOutFileName} tiny_$self->{XmlOutFileName};\n"
-      if ( $self->{GenMode} && defined $self->{XmlOutFileName} );
+      if ($self->{GenMode} && defined $self->{XmlOutFileName});
     print {$cfh} "\\rm -f $self->{ProductFileName};\n"
-      if ( $self->{GenMode} && defined $self->{ProductFileName} );
+      if ($self->{GenMode} && defined $self->{ProductFileName});
     print {$cfh} "\\rm -f $self->{SynthProductFileName};\n"
-      if ( $self->{GenMode} && defined $self->{SynthProductFileName} );
+      if ($self->{GenMode} && defined $self->{SynthProductFileName});
     print {$cfh} "\\rm -f $self->{VerifProductFileName};\n"
-      if ( $self->{GenMode} && defined $self->{VerifProductFileName} );
+      if ($self->{GenMode} && defined $self->{VerifProductFileName});
 
     # remove self
     print {$cfh} "\\rm -f genesis_clean.cmd;\n";
 
     # make the file executable
-    my $perm = ( stat $cfh )[2] & 07777;
-    chmod( $perm | 0700, $cfh );
+    my $perm = (stat $cfh)[2] & 07777;
+    chmod($perm | 0700, $cfh);
 
     # close file
     close $cfh;
@@ -1333,17 +1331,17 @@ sub create_path_file {
     my $self = shift;
     my $name = __PACKAGE__ . "->create_path_file";
     caller eq __PACKAGE__
-      or $self->error( "$name: Call to a private method is not allowed " . caller );
+      or $self->error("$name: Call to a private method is not allowed " . caller);
     my $pfh;
 
-    open( $pfh, ">$self->{PathFileName}" )
+    open($pfh, ">$self->{PathFileName}")
       or $self->error("$name: Couldn't open path list file $self->{PathFileName}: $!");
 
     # TODO: do we need to sort the paths?
     my %paths;
-    foreach my $srcPath ( @{ $self->{SourcesPath} }, @{ $self->{IncludesPath} } ) {
+    foreach my $srcPath (@{$self->{SourcesPath}}, @{$self->{IncludesPath}}) {
         my $absPath = abs_path($srcPath);
-        if ( !defined( $paths{$absPath} ) ) {
+        if (!defined($paths{$absPath})) {
             print {$pfh} "$absPath\n";
             $paths{$absPath} = 1;
         }
@@ -1359,25 +1357,25 @@ sub print_cmdline {
     my @commandline = @_;
     my $name        = __PACKAGE__ . "->print_cmdline";
     caller eq __PACKAGE__
-      or $self->error( "$name: Call to a private method is not allowed " . caller );
+      or $self->error("$name: Call to a private method is not allowed " . caller);
 
-    open( LOG, "> $self->{LogFileName}" );
+    open(LOG, "> $self->{LogFileName}");
     print LOG "\n$name: Your Complete Genesis2 Command Line:\n";
 
     my $cnt = 0;
     foreach my $token (@commandline) {
-        if ( $cnt == 0 || ( $cnt + length($token) < 100 && $token !~ /^-\w+/ ) ) {
+        if ($cnt == 0 || ($cnt + length($token) < 100 && $token !~ /^-\w+/)) {
             print LOG $token . ' ';
             $cnt += length($token) + 1;
         } else {
-            print LOG ' ' x ( 100 - $cnt ) if 100 - $cnt > 0;
+            print LOG ' ' x (100 - $cnt) if 100 - $cnt > 0;
             print LOG "\\\n";
-            print LOG "    "     if ( $token =~ /^-\w+/ );
-            print LOG "        " if ( $token !~ /^-\w+/ );
+            print LOG "    "     if ($token =~ /^-\w+/);
+            print LOG "        " if ($token !~ /^-\w+/);
             print LOG $token . ' ';
             $cnt = length($token) + 1;
             $cnt += 4;
-            $cnt += 4 if ( $token !~ /^-\w+/ );
+            $cnt += 4 if ($token !~ /^-\w+/);
         }
     }
     print LOG "\n";
@@ -1386,13 +1384,13 @@ sub print_cmdline {
 
 sub check_license {
     my $self = shift;
-    if ( -e $self->{LicenseFileName} ) {
-        open( LICENSE_INFO, $self->{LicenseFileName} );    # Open the file
-        @{ $self->{LicenseInfo} } = <LICENSE_INFO>;        # Read it into an array
-        close(LICENSE_INFO);                               # Close the file
+    if (-e $self->{LicenseFileName}) {
+        open(LICENSE_INFO, $self->{LicenseFileName});    # Open the file
+        @{$self->{LicenseInfo}} = <LICENSE_INFO>;        # Read it into an array
+        close(LICENSE_INFO);                             # Close the file
     }
     print STDERR "---------------------------------------------------------------------------\n";
-    print STDERR "  " . join( "  ", @{ $self->{LicenseInfo} } );    # Print to screen/log
+    print STDERR "  " . join("  ", @{$self->{LicenseInfo}});    # Print to screen/log
     print STDERR "---------------------------------------------------------------------------\n";
     1;
 }

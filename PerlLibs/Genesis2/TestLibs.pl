@@ -11,7 +11,7 @@ use lib "$ENV{GENESIS_LIBS}/ExtrasForOldPerlDistributions";
 #BEGIN { push(@INC, "$ENV{GENESIS_LIBS}/ExtrasForOldPerlDistributions") }
 
 # add local per-project perl libraries (only when needed)
-use if ( defined $ENV{GENESIS_PROJECT_LIBS} ), lib => "$ENV{GENESIS_PROJECT_LIBS}";
+use if (defined $ENV{GENESIS_PROJECT_LIBS}), lib => "$ENV{GENESIS_PROJECT_LIBS}";
 
 map { print "Searching in: $_ \n"; } @INC;
 print "\n-------------------------\n\n";
@@ -24,6 +24,6 @@ print "XML::Simple --" . $INC{'XML/Simple.pm'} . "--\n";
 use Getopt::Long;
 print "Getopt::Long --" . $INC{'Getopt/Long.pm'} . "--\n";
 
-print "Rand returned: " . int( rand(10000) ) . " -- " . int( rand(10000) ) . "\n";
+print "Rand returned: " . int(rand(10000)) . " -- " . int(rand(10000)) . "\n";
 
 #print "Time returned: ".time()." -- ".time()."\n";

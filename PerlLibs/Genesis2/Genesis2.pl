@@ -54,7 +54,7 @@ use Genesis2::Manager 1.00;
 use Genesis2::UniqueModule 1.00;
 
 # add local per-project perl libraries (only when needed)
-if ( defined $ENV{GENESIS_PROJECT_LIBS} ) {
+if (defined $ENV{GENESIS_PROJECT_LIBS}) {
     require lib;
     lib->import("$ENV{GENESIS_PROJECT_LIBS}");
 }

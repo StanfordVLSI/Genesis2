@@ -174,13 +174,13 @@ sub new {
     $self->{SubInstanceListUniqueParam} =
       [];                                # List of unique-param sub instances in order of creation
     $self->{ModuleName_NumDerivs} = {};  # non-unique module => count (global across engines!)
-    $self->{UnUniquifiedModules}  = { $package =>
-          $self };    # modules that were generated WITHOUT uniquification (global across engines!)
+    $self->{UnUniquifiedModules}  = {$package =>
+          $self};    # modules that were generated WITHOUT uniquification (global across engines!)
     $self->{OutfileName_ContentCache} =
-      {};             # Outfilename => cache of txt content for the file (global across engines!)
-    $self->{ModuleCache} = { $package => $self };  # Generated module cache (global across engines!)
-    $self->{Parameters}  = {};                     # All the parameters used by this module
-    $self->{ParametersList}     = [];              # List of Parameters in order of creation
+      {};            # Outfilename => cache of txt content for the file (global across engines!)
+    $self->{ModuleCache}    = {$package => $self}; # Generated module cache (global across engines!)
+    $self->{Parameters}     = {};                  # All the parameters used by this module
+    $self->{ParametersList} = [];                  # List of Parameters in order of creation
     $self->{ParametersPriority} = GENESIS2_DECLARATION_PRIORITY;
     $self->{ParamsFromInst}     = [];              # All parameters specified at instantiation
     $self->{ParamsFromXML}      = {};              # All parameters read from xml input file
@@ -188,7 +188,7 @@ sub new {
     $self->{ParamsFromCmdLn}    = {};              # All parameters read from the command line
 
     # Bless this package
-    bless( $self, $package );
+    bless($self, $package);
 }
 
 ## private new_as_son:
@@ -215,7 +215,7 @@ sub new_as_son {
     $self->{SynonymFor} = $package->get_SynonymFor;    # If synonym, what is the (absolute) source?
     my $tmp = $self->{SynonymFor};
 
-    while ( defined $tmp ) {
+    while (defined $tmp) {
         $self->{SynonymFor} = $tmp;
         $tmp = $tmp->get_SynonymFor();
     }
@@ -256,7 +256,7 @@ sub new_as_son {
     $self->{ParamsFromCmdLn}          = {};    # All parameters read from the command line
 
     # Bless this package
-    bless( $self, $package );
+    bless($self, $package);
 }
 
 ## private new_as_clone:
@@ -325,7 +325,7 @@ sub new_as_clone {
     $self->{ParamsFromCmdLn} = {};    # All parameters read from the command line
 
     # Bless this package
-    bless( $self, $package );
+    bless($self, $package);
 }
 
 ################################################################################
@@ -343,7 +343,7 @@ sub get_parent {
 sub get_top {
     my $self = shift;
     my $top  = $self;
-    while ( defined $top->get_parent() ) {
+    while (defined $top->get_parent()) {
         $top = $top->get_parent();
     }
     return $top;
@@ -386,12 +386,12 @@ sub define_param {
     my $self = shift;
     my $name = $self->{BaseModuleName} . "->define_param";
     my %prm_hash;
-    my ( $key, $val, $pri, $str );
+    my ($key, $val, $pri, $str);
 
-    if ( scalar(@_) == 1 ) {
+    if (scalar(@_) == 1) {
         $key = shift;
         $prm_hash{$key} = $val;
-    } elsif ( scalar(@_) == 2 ) {
+    } elsif (scalar(@_) == 2) {
         $key            = shift;
         $val            = shift;
         $prm_hash{$key} = $val;
@@ -409,31 +409,31 @@ sub define_param {
     $self->set_param(%prm_hash);
 
     # Check for additional input from config file
-    if ( exists $self->{ParamsFromCfg}->{$key} ) {
+    if (exists $self->{ParamsFromCfg}->{$key}) {
         my $prev_priority = $self->{ParametersPriority};
         $self->{ParametersPriority} = GENESIS2_EXTERNAL_CONFIG_PRIORITY;
         $prm_hash{$key} = $self->{CfgHandler}
-          ->GetCfgParamVal( $self->{ParamsFromCfg}->{$key}, $self->get_instance_path );
+          ->GetCfgParamVal($self->{ParamsFromCfg}->{$key}, $self->get_instance_path);
         $self->set_param(%prm_hash);
         $self->{ParametersPriority} = $prev_priority;
     }
 
     # Check for additional input from XML
-    if ( exists $self->{ParamsFromXML}->{$key} ) {
+    if (exists $self->{ParamsFromXML}->{$key}) {
         my $prev_priority = $self->{ParametersPriority};
         $self->{ParametersPriority} = GENESIS2_EXTERNAL_XML_PRIORITY;
-        $prm_hash{$key} = $self->{CfgHandler}->GetXmlParamVal( $self->{ParamsFromXML}->{$key},
-            $self->get_instance_path . ':Parameters:ParamItem(' . $key . ')' );
+        $prm_hash{$key} = $self->{CfgHandler}->GetXmlParamVal($self->{ParamsFromXML}->{$key},
+            $self->get_instance_path . ':Parameters:ParamItem(' . $key . ')');
         $self->set_param(%prm_hash);
         $self->{ParametersPriority} = $prev_priority;
     }
 
     # Check for additional input from command line
-    if ( exists $self->{ParamsFromCmdLn}->{$key} ) {
+    if (exists $self->{ParamsFromCmdLn}->{$key}) {
         my $prev_priority = $self->{ParametersPriority};
         $self->{ParametersPriority} = GENESIS2_CMD_LINE_PRIORITY;
         $prm_hash{$key} = $self->{CfgHandler}
-          ->GetCmdLnParamVal( $self->{ParamsFromCmdLn}->{$key}, $self->get_instance_path );
+          ->GetCmdLnParamVal($self->{ParamsFromCmdLn}->{$key}, $self->get_instance_path);
         $self->set_param(%prm_hash);
         $self->{ParametersPriority} = $prev_priority;
     }
@@ -443,10 +443,9 @@ sub define_param {
 
     # read the final value and print to screen
     $val = $self->internal_get_param($key);
-    $str =
-      $self->{CfgHandler}->PrintToString( $val, depth => 1, prefix => "$self->{LineComment}\t" );
+    $str = $self->{CfgHandler}->PrintToString($val, depth => 1, prefix => "$self->{LineComment}\t");
     $pri = $self->get_param_priority($key);
-    print { $self->{OutfileHandle} } $self->{LineComment}
+    print {$self->{OutfileHandle}} $self->{LineComment}
       . " $key ("
       . (GENESIS2_PRIORITY)[$pri] . ") = "
       . $str
@@ -464,7 +463,7 @@ sub define_param_array {
     my $self = shift;
     my $name = $self->{BaseModuleName} . "->define_param_array";
     my $ret  = $self->define_param(@_);
-    if ( ref($ret) ne 'ARRAY' ) {
+    if (ref($ret) ne 'ARRAY') {
         return [$ret];
     } else {
         return $ret;
@@ -479,7 +478,7 @@ sub force_param {
     my $self = shift;
     my $name = $self->{BaseModuleName} . "->force_param";
     my $ret;
-    if ( $self->{ParametersPriority} == GENESIS2_DECLARATION_PRIORITY ) {
+    if ($self->{ParametersPriority} == GENESIS2_DECLARATION_PRIORITY) {
         $self->{ParametersPriority} = GENESIS2_IMMUTABLE_PRIORITY;
         $ret                        = $self->define_param(@_);
         $self->{ParametersPriority} = GENESIS2_DECLARATION_PRIORITY;
@@ -514,7 +513,7 @@ sub exists_param {
 sub list_params {
     my $self = shift;
     my $name = $self->{BaseModuleName} . "->list_params";
-    my @prms = sort keys( %{ $self->{Parameters} } );
+    my @prms = sort keys(%{$self->{Parameters}});
     return @prms;
 }
 
@@ -524,7 +523,7 @@ sub list_params {
 sub get_param {
     my $self = shift;
     my $name = $self->{BaseModuleName} . "->get_param";
-    my ( $prm_name, $prm_val );
+    my ($prm_name, $prm_val);
 
     if (@_) {
         $prm_name = shift;
@@ -533,7 +532,7 @@ sub get_param {
     }
 
     # extract the parameter
-    $prm_val = $self->internal_get_param( $prm_name, check_used => 1 );
+    $prm_val = $self->internal_get_param($prm_name, check_used => 1);
 
     #  # keep record that it is actually used
     #  if ($self->{Parameters}->{$prm_name}->{State} eq 'CreatedNeverUsed') {
@@ -559,18 +558,18 @@ sub doc_param {
     my $name     = $self->{BaseModuleName} . "->doc_param";
     my $prm_name = shift
       or $self->error(
-        "$name: Missing argument(s).\n" . "Usage: \$self->doc_param(prm_name, \"message\")" );
+        "$name: Missing argument(s).\n" . "Usage: \$self->doc_param(prm_name, \"message\")");
     my $msg = shift
       or $self->error(
-        "$name: Missing argument(s).\n" . "Usage: \$self->doc_param(prm_name, \"message\"" );
+        "$name: Missing argument(s).\n" . "Usage: \$self->doc_param(prm_name, \"message\"");
     $self->("$name: Ilegal message. Message must be simple string or scalar.\n"
-          . "Usage: \$self->doc_param(prm_name, \"message\"" )
-      if ( ref($msg) ne '' );
-    $self->error( "$name: Cannot add documentation to un-existing parameter: $prm_name.\n"
-          . "Perhaps you need to first call \$self->define_param($prm_name=>default_value)" )
-      if ( !defined $self->{Parameters}->{$prm_name} );
+          . "Usage: \$self->doc_param(prm_name, \"message\"")
+      if (ref($msg) ne '');
+    $self->error("$name: Cannot add documentation to un-existing parameter: $prm_name.\n"
+          . "Perhaps you need to first call \$self->define_param($prm_name=>default_value)")
+      if (!defined $self->{Parameters}->{$prm_name});
     $self->warning("$name: Re-documentation of parameter $prm_name. Overwriting!")
-      if ( defined $self->{Parameters}->{$prm_name}->{Doc} );
+      if (defined $self->{Parameters}->{$prm_name}->{Doc});
     $self->{Parameters}->{$prm_name}->{Doc} = $msg;
     1;
 }
@@ -584,14 +583,14 @@ sub param_range {
     my $usage =
       "Usage: \$self->param(prm_name, [min=>?, max=>?, step=>?] | [list=>[item, item, ...]]);";
     my $prm_name = shift
-      or $self->error( "$name: Missing argument(s).\n"
+      or $self->error("$name: Missing argument(s).\n"
           . "Usage: \$self->param(prm_name, [min=>?, max=>?, step=>?] | [list=>[item, item, ...]])"
       );
-    $self->error( "$name: Cannot add range to un-existing parameter: $prm_name.\n"
-          . "Perhaps you need to first call \$self->define_param($prm_name=>default_value)" )
-      if ( !defined $self->{Parameters}->{$prm_name} );
+    $self->error("$name: Cannot add range to un-existing parameter: $prm_name.\n"
+          . "Perhaps you need to first call \$self->define_param($prm_name=>default_value)")
+      if (!defined $self->{Parameters}->{$prm_name});
     $self->error("$name: Re-definition of range for parameter $prm_name!")
-      if ( defined $self->{Parameters}->{$prm_name}->{Range} );
+      if (defined $self->{Parameters}->{$prm_name}->{Range});
     my $prm_val = $self->internal_get_param($prm_name);
 
     #my @dbg = keys %{$prm_val};
@@ -603,50 +602,50 @@ sub param_range {
     ) unless ref($prm_val) eq '';
 
     # First we extract the information
-    foreach my $rule ( keys %rules ) {
-        if ( $rule =~ m/^list$/i ) {
+    foreach my $rule (keys %rules) {
+        if ($rule =~ m/^list$/i) {
             $self->{Parameters}->{$prm_name}->{Range}->{List} = $rules{$rule};
-        } elsif ( $rule =~ m/^min$/i ) {
+        } elsif ($rule =~ m/^min$/i) {
             $self->{Parameters}->{$prm_name}->{Range}->{Min} = $rules{$rule};
-        } elsif ( $rule =~ m/^max$/i ) {
+        } elsif ($rule =~ m/^max$/i) {
             $self->{Parameters}->{$prm_name}->{Range}->{Max} = $rules{$rule};
-        } elsif ( $rule =~ m/^step$/i ) {
+        } elsif ($rule =~ m/^step$/i) {
             $self->{Parameters}->{$prm_name}->{Range}->{Step} = $rules{$rule};
         } else {
-            $self->error( "$name: Illegal range rule \'$rule\'!\n" . $usage );
+            $self->error("$name: Illegal range rule \'$rule\'!\n" . $usage);
         }
     }
 
     # Now check for legal combinations
     # 1. List and min/max/step are mutually exclusive
-    if ( defined $self->{Parameters}->{$prm_name}->{Range}->{List} ) {
-        foreach my $rule ( 'Min', 'Max', 'Step' ) {
+    if (defined $self->{Parameters}->{$prm_name}->{Range}->{List}) {
+        foreach my $rule ('Min', 'Max', 'Step') {
             $self->error(
 "$name: Parameter=$prm_name: Range rule \'$rule\' not allowed in combination with \'List\'!\n"
-                  . $usage )
+                  . $usage)
               if defined $self->{Parameters}->{$prm_name}->{Range}->{$rule};
         }
     }
 
     # 2. Step only makes sense if min or max are defined and step!=0
-    if ( defined $self->{Parameters}->{$prm_name}->{Range}->{Step} ) {
+    if (defined $self->{Parameters}->{$prm_name}->{Range}->{Step}) {
         $self->error(
 "$name: Parameter=$prm_name: Range rule \'Step' not allowed unless in combination with \'Min\' or \'Max\'!\n"
-              . $usage )
-          unless ( defined $self->{Parameters}->{$prm_name}->{Range}->{Min}
-            || defined $self->{Parameters}->{$prm_name}->{Range}->{Max} );
-        $self->error( "$name: Range rule \'Step' of size zero not allowed!\n" . $usage )
-          unless ( $self->{Parameters}->{$prm_name}->{Range}->{Step} != 0 );
+              . $usage)
+          unless (defined $self->{Parameters}->{$prm_name}->{Range}->{Min}
+            || defined $self->{Parameters}->{$prm_name}->{Range}->{Max});
+        $self->error("$name: Range rule \'Step' of size zero not allowed!\n" . $usage)
+          unless ($self->{Parameters}->{$prm_name}->{Range}->{Step} != 0);
     }
 
     # 3. min < max
     if (   defined $self->{Parameters}->{$prm_name}->{Range}->{Min}
-        && defined $self->{Parameters}->{$prm_name}->{Range}->{Max} )
+        && defined $self->{Parameters}->{$prm_name}->{Range}->{Max})
     {
         $self->error(
 "$name: Parameter=$prm_name: Range rule \'Min\'=$self->{Parameters}->{$prm_name}->{Range}->{Min} "
               . "must be less then range rule \'Max\'=$self->{Parameters}->{$prm_name}->{Range}->{Max}!\n"
-              . $usage )
+              . $usage)
           unless $self->{Parameters}->{$prm_name}->{Range}->{Min} <=
           $self->{Parameters}->{$prm_name}->{Range}->{Max};
     }
@@ -654,7 +653,7 @@ sub param_range {
     # 4. (max-min)/step = integer
     if (   defined $self->{Parameters}->{$prm_name}->{Range}->{Step}
         && defined $self->{Parameters}->{$prm_name}->{Range}->{Min}
-        && defined $self->{Parameters}->{$prm_name}->{Range}->{Max} )
+        && defined $self->{Parameters}->{$prm_name}->{Range}->{Max})
     {
         my $diff =
           $self->{Parameters}->{$prm_name}->{Range}->{Max} -
@@ -664,60 +663,60 @@ sub param_range {
 "$name: Parameter=$prm_name: Range rule \'Max\'=$self->{Parameters}->{$prm_name}->{Range}->{Max} "
               . "not an integer number of \'Steps\'=$self->{Parameters}->{$prm_name}->{Range}->{Step} "
               . "away from \'Min\'=$self->{Parameters}->{$prm_name}->{Range}->{Min}!\n"
-              . $usage )
-          unless ( $steps == int($steps) );
+              . $usage)
+          unless ($steps == int($steps));
     }
 
     # Now check for legal range
     # 1. List
-    if ( defined $self->{Parameters}->{$prm_name}->{Range}->{List} ) {
+    if (defined $self->{Parameters}->{$prm_name}->{Range}->{List}) {
         my $valid = 0;
-        foreach my $item ( @{ $self->{Parameters}->{$prm_name}->{Range}->{List} } ) {
-            if ( $prm_val eq $item ) {
+        foreach my $item (@{$self->{Parameters}->{$prm_name}->{Range}->{List}}) {
+            if ($prm_val eq $item) {
                 $valid = 1;
                 last;
             }
         }
-        $self->error( "$name: Range check failed. Parameter $prm_name=$prm_val "
+        $self->error("$name: Range check failed. Parameter $prm_name=$prm_val "
               . "not in specified list range!\n"
-              . "List=@{$self->{Parameters}->{$prm_name}->{Range}->{List}}" )
+              . "List=@{$self->{Parameters}->{$prm_name}->{Range}->{List}}")
           unless $valid == 1;
     }
 
     # 2. Min
-    if ( defined $self->{Parameters}->{$prm_name}->{Range}->{Min} ) {
+    if (defined $self->{Parameters}->{$prm_name}->{Range}->{Min}) {
         $self->error(
                 "$name: Range check failed. Parameter $prm_name=$prm_val not greater than or equal "
-              . "to Min=$self->{Parameters}->{$prm_name}->{Range}->{Min} range!" )
-          unless ( $prm_val >= $self->{Parameters}->{$prm_name}->{Range}->{Min} );
+              . "to Min=$self->{Parameters}->{$prm_name}->{Range}->{Min} range!")
+          unless ($prm_val >= $self->{Parameters}->{$prm_name}->{Range}->{Min});
     }
 
     # 3. Max
-    if ( defined $self->{Parameters}->{$prm_name}->{Range}->{Max} ) {
+    if (defined $self->{Parameters}->{$prm_name}->{Range}->{Max}) {
         $self->error(
                 "$name: Range check failed. Parameter $prm_name=$prm_val not less than or equal "
-              . "to Max=$self->{Parameters}->{$prm_name}->{Range}->{Max} range!" )
-          unless ( $prm_val <= $self->{Parameters}->{$prm_name}->{Range}->{Max} );
+              . "to Max=$self->{Parameters}->{$prm_name}->{Range}->{Max} range!")
+          unless ($prm_val <= $self->{Parameters}->{$prm_name}->{Range}->{Max});
     }
 
     # 4. Step
-    if ( defined $self->{Parameters}->{$prm_name}->{Range}->{Step} ) {
-        if ( defined $self->{Parameters}->{$prm_name}->{Range}->{Min} ) {
+    if (defined $self->{Parameters}->{$prm_name}->{Range}->{Step}) {
+        if (defined $self->{Parameters}->{$prm_name}->{Range}->{Min}) {
             my $diff  = $prm_val - $self->{Parameters}->{$prm_name}->{Range}->{Min};
             my $steps = $diff / $self->{Parameters}->{$prm_name}->{Range}->{Step};
             $self->error(
                     "$name: Range check failed. Parameter $prm_name=$prm_val not an integer of "
                   . "Steps=$self->{Parameters}->{$prm_name}->{Range}->{Step} from "
-                  . "Min=$self->{Parameters}->{$prm_name}->{Range}->{Min} range!" )
-              unless ( $steps == int($steps) );
-        } elsif ( defined $self->{Parameters}->{$prm_name}->{Range}->{Max} ) {
+                  . "Min=$self->{Parameters}->{$prm_name}->{Range}->{Min} range!")
+              unless ($steps == int($steps));
+        } elsif (defined $self->{Parameters}->{$prm_name}->{Range}->{Max}) {
             my $diff  = $self->{Parameters}->{$prm_name}->{Range}->{Max} - $prm_val;
             my $steps = $diff / $self->{Parameters}->{$prm_name}->{Range}->{Step};
             $self->error(
                     "$name: Range check failed. Parameter $prm_name=$prm_val not an integer of "
                   . "Steps=$self->{Parameters}->{$prm_name}->{Range}->{Step} from "
-                  . "Max=$self->{Parameters}->{$prm_name}->{Range}->{Max} range!" )
-              unless ( $steps == int($steps) );
+                  . "Max=$self->{Parameters}->{$prm_name}->{Range}->{Max} range!")
+              unless ($steps == int($steps));
         }
     }
     1;
@@ -730,23 +729,23 @@ sub optimize_param {
     my $self     = shift;
     my $name     = $self->{BaseModuleName} . "->optimize_param";
     my $prm_name = shift
-      or $self->error( "$name: Missing argument(s).\n"
-          . "Usage: \$self->optimize_param(prm_name, \"Yes/No/Try\")" );
+      or $self->error("$name: Missing argument(s).\n"
+          . "Usage: \$self->optimize_param(prm_name, \"Yes/No/Try\")");
     my $opt = shift
-      or $self->error( "$name: Missing argument(s).\n"
-          . "Usage: \$self->argument_param(prm_name, \"Yes/No/Try\"" );
+      or $self->error(
+        "$name: Missing argument(s).\n" . "Usage: \$self->argument_param(prm_name, \"Yes/No/Try\"");
     $self->("$name: Ilegal value. Value must be simple Yes/No/Try string.\n"
-          . "Usage: \$self->argument_param(prm_name, \"Yes/No/Try\"" )
-      if ( ref($opt) ne '' );
-    $self->error( "$name: Cannot add optimization attributes to un-existing parameter: $prm_name.\n"
-          . "Perhaps you need to first call \$self->define_param($prm_name=>default_value)" )
-      if ( !defined $self->{Parameters}->{$prm_name} );
+          . "Usage: \$self->argument_param(prm_name, \"Yes/No/Try\"")
+      if (ref($opt) ne '');
+    $self->error("$name: Cannot add optimization attributes to un-existing parameter: $prm_name.\n"
+          . "Perhaps you need to first call \$self->define_param($prm_name=>default_value)")
+      if (!defined $self->{Parameters}->{$prm_name});
     $self->error("$name: Illegal value '$opt'. Allowed values are 'Yes', 'No', 'Try'")
       unless $opt =~ m/^(yes|no|try)$/i;
 
     $self->error(
         "$name: Re-assignment of optimization attributes for parameter $prm_name is not allowed.")
-      if ( defined $self->{Parameters}->{$prm_name}->{Opt} );
+      if (defined $self->{Parameters}->{$prm_name}->{Opt});
     $self->{Parameters}->{$prm_name}->{Opt} = 'Yes' if $opt =~ /yes/i;
     $self->{Parameters}->{$prm_name}->{Opt} = 'No'  if $opt =~ /no/i;
     $self->{Parameters}->{$prm_name}->{Opt} = 'Try' if $opt =~ /try/i;
@@ -761,14 +760,14 @@ sub get_subinst {
     my $name      = $self->{BaseModuleName} . "->get_subinst";
     my $inst_name = shift or $self->error("$name: Missing argument for instance name to lookup");
     my $inst;
-    if ( defined $self->{SubInstance_InstanceObj}{$inst_name} ) {
+    if (defined $self->{SubInstance_InstanceObj}{$inst_name}) {
         $inst = $self->{SubInstance_InstanceObj}{$inst_name};
     } else {
-        $self->error( "$name: "
+        $self->error("$name: "
               . caller()
               . "->Could not find subinst $inst_name in "
               . $self->{BaseModuleName}
-              . " using get_subinst" );
+              . " using get_subinst");
     }
     return $inst;
 }
@@ -780,7 +779,7 @@ sub exists_subinst {
     my $self      = shift;
     my $name      = $self->{BaseModuleName} . "->exists_subinst";
     my $inst_name = shift or $self->error("$name:Missing argument for instance name to lookup");
-    return ( defined $self->{SubInstance_InstanceObj}{$inst_name} ) ? 1 : 0;
+    return (defined $self->{SubInstance_InstanceObj}{$inst_name}) ? 1 : 0;
 }
 
 ## search_subinst
@@ -805,87 +804,87 @@ sub search_subinst {
 
     # get the starting point
     foreach my $key (@keys) {
-        if ( $key =~ m/^From$/i ) {
-            $from = $self->get_instance_obj( $options{$key} );
+        if ($key =~ m/^From$/i) {
+            $from = $self->get_instance_obj($options{$key});
             delete $options{$key};
-        } elsif ( $key =~ m/^Depth$/i ) {
+        } elsif ($key =~ m/^Depth$/i) {
             $depth = $options{$key};
             delete $options{$key};
-        } elsif ( $key =~ m/^Reverse$/i ) {
+        } elsif ($key =~ m/^Reverse$/i) {
             $reverse = $options{$key};
             delete $options{$key};
         }
     }
 
     # get the complete list of subinsts from $from up to depth $depth
-    if ( $depth >= 0 && !$reverse ) {    # DFS
-        push( @results, $from );
+    if ($depth >= 0 && !$reverse) {    # DFS
+        push(@results, $from);
     }
-    if ( $depth >= 1 ) {
+    if ($depth >= 1) {
         my @subinsts = $from->get_subinst_array();
         foreach my $subinst (@subinsts) {
             my @subresults = $subinst->search_subinst(
                 From    => $subinst,
-                Depth   => ( $depth - 1 ),
+                Depth   => ($depth - 1),
                 Reverse => $reverse
             );
-            push( @results, @subresults );
+            push(@results, @subresults);
         }
     }
-    if ( $depth >= 0 && $reverse ) {    # Reverse DFS
-        push( @results, $from );
+    if ($depth >= 0 && $reverse) {    # Reverse DFS
+        push(@results, $from);
     }
 
     # test for instances that don't meet the user criterias
-    @keys = keys %options;              # Take the keys that were not deleted
+    @keys = keys %options;            # Take the keys that were not deleted
     foreach my $key (@keys) {
-        if ( $key =~ m/^PathRegex$/i ) {
+        if ($key =~ m/^PathRegex$/i) {
             my $regex = $options{$key};
             @results = grep {
                 my $subinst  = $_;
                 my $property = $subinst->get_instance_path();
-                my $ret      = ( $property =~ m/$regex/ || $regex eq '' ) ? 1 : 0;
+                my $ret      = ($property =~ m/$regex/ || $regex eq '') ? 1 : 0;
                 $ret;
             } @results;
-        } elsif ( $key =~ m/^INameRegex$/i ) {
+        } elsif ($key =~ m/^INameRegex$/i) {
             my $regex = $options{$key};
             @results = grep {
                 my $subinst  = $_;
                 my $property = $subinst->iname();
-                my $ret      = ( $property =~ m/$regex/ || $regex eq '' ) ? 1 : 0;
+                my $ret      = ($property =~ m/$regex/ || $regex eq '') ? 1 : 0;
                 $ret;
             } @results;
-        } elsif ( $key =~ m/^MNameRegex$/i ) {
+        } elsif ($key =~ m/^MNameRegex$/i) {
             my $regex = $options{$key};
             @results = grep {
                 my $subinst  = $_;
                 my $property = $subinst->mname();
-                my $ret      = ( $property =~ m/$regex/ || $regex eq '' ) ? 1 : 0;
+                my $ret      = ($property =~ m/$regex/ || $regex eq '') ? 1 : 0;
                 $ret;
             } @results;
-        } elsif ( $key =~ m/^BNameRegex$/i ) {
+        } elsif ($key =~ m/^BNameRegex$/i) {
             my $regex = $options{$key};
             @results = grep {
                 my $subinst  = $_;
                 my $property = $subinst->bname();
-                my $ret      = ( $property =~ m/$regex/ || $regex eq '' ) ? 1 : 0;
+                my $ret      = ($property =~ m/$regex/ || $regex eq '') ? 1 : 0;
                 $ret;
             } @results;
-        } elsif ( $key =~ m/^SNameRegex$/i ) {
+        } elsif ($key =~ m/^SNameRegex$/i) {
             my $regex = $options{$key};
             @results = grep {
                 my $subinst  = $_;
                 my $property = $subinst->sname();
-                my $ret      = ( $property =~ m/$regex/ || $regex eq '' ) ? 1 : 0;
+                my $ret      = ($property =~ m/$regex/ || $regex eq '') ? 1 : 0;
                 $ret;
             } @results;
-        } elsif ( $key =~ m/^HasParamRegex$/i ) {
+        } elsif ($key =~ m/^HasParamRegex$/i) {
             my @regexs = ();
-            if ( ref( $options{$key} ) eq 'ARRAY' ) {
+            if (ref($options{$key}) eq 'ARRAY') {
 
                 # array of regex
-                @regexs = @{ $options{$key} };
-            } elsif ( ref( $options{$key} ) eq '' ) {
+                @regexs = @{$options{$key}};
+            } elsif (ref($options{$key}) eq '') {
 
                 # make it look like an array of regex of size 1
                 $regexs[0] = $options{$key};
@@ -899,21 +898,21 @@ sub search_subinst {
                     my $subinst     = $_;
                     my @params      = $subinst->list_params();
                     my $regex_found = grep { m/$regex/ || $regex eq '' } @params;
-                    my $ret         = ( $regex_found > 0 ) ? 1 : 0;
+                    my $ret         = ($regex_found > 0) ? 1 : 0;
                     $ret;
                 } @results;
             }
-        } elsif ( $key =~ m/^ApplyMap$/i ) {
+        } elsif ($key =~ m/^ApplyMap$/i) {
             my $func;
-            if ( ref( $options{$key} ) eq 'CODE' ) {
+            if (ref($options{$key}) eq 'CODE') {
 
                 # this is a function pointer
                 $func = $options{$key};
             } else {
                 $self->error(
                     "$name: Expected type for ApplyMap option must be a function pointer. Found: "
-                      . ref( $options{$key} )
-                      . " \n" );
+                      . ref($options{$key})
+                      . " \n");
             }
             @results = grep { &$func($_); } @results;
         } else {
@@ -933,9 +932,9 @@ sub get_subinst_array {
     $inst_pattern = shift if @_;    # check for user specified pattern
     my $name       = $self->{BaseModuleName} . "->get_subinst_array";
     my @inst_array = ();
-    foreach my $inst_name ( @{ $self->{SubInstanceList} } ) {
-        if ( $inst_name =~ /$inst_pattern/ || $inst_pattern eq '' ) {
-            push( @inst_array, $self->get_subinst($inst_name) );
+    foreach my $inst_name (@{$self->{SubInstanceList}}) {
+        if ($inst_name =~ /$inst_pattern/ || $inst_pattern eq '') {
+            push(@inst_array, $self->get_subinst($inst_name));
         }
     }
     return @inst_array;
@@ -948,13 +947,13 @@ sub get_instance_path {
     my $self = shift;
     my $name = $self->{BaseModuleName} . "->get_instance_path";
 
-    if ( defined $self->{InstancePath} ) {
+    if (defined $self->{InstancePath}) {
         return $self->{InstancePath};
     }
 
     my $string = '';
-    if ( defined $self->{Parent} ) {
-        $string = ( $self->{Parent} )->get_instance_path() . ".";
+    if (defined $self->{Parent}) {
+        $string = ($self->{Parent})->get_instance_path() . ".";
     }
 
     #else{
@@ -978,26 +977,26 @@ sub get_instance_obj {
     my $name      = $self->{BaseModuleName} . "->get_instance_obj";
 
     # if this is an instance object, simply return
-    if ( UNIVERSAL::isa( $inst, 'Genesis2::UniqueModule' ) ) {
+    if (UNIVERSAL::isa($inst, 'Genesis2::UniqueModule')) {
         return $inst;
     }
 
     # if this is not a string that represents an instance path -- error out
     # (this is just a sanity check for structure resembling "top.module.submodule")
     my $top_name = $self->{Top}->get_instance_name();
-    if ( $inst !~ m/^$top_name(\.\w+)*$/ ) {
-        $self->error( "$name: Input must be an instance object or a legal instance path.\n"
-              . "Found -->$inst<-- instead." );
+    if ($inst !~ m/^$top_name(\.\w+)*$/) {
+        $self->error("$name: Input must be an instance object or a legal instance path.\n"
+              . "Found -->$inst<-- instead.");
     }
 
     # else, find the object (start from top)
     $inst =~ s/^$top_name(\.)?//;
-    my @path = split( '\.', $inst );
+    my @path = split('\.', $inst);
 
     # now overwrite $inst with the real inst object
     $inst = $self->{Top};
     foreach my $token (@path) {
-        if ( defined $inst->{SubInstance_InstanceObj}{$token} ) {
+        if (defined $inst->{SubInstance_InstanceObj}{$token}) {
             $inst = $inst->{SubInstance_InstanceObj}{$token};
         } else {
             $self->error("$name: Cannot find subinst $token of $inst_path");
@@ -1012,8 +1011,8 @@ sub get_instance_obj {
 sub unique_inst {
     my $self = shift;
     my $name = $self->{BaseModuleName} . "->unique_inst";
-    my ( $base_module_name, $inst_name, $instance );
-    my ( $other_module, $other_file );
+    my ($base_module_name, $inst_name, $instance);
+    my ($other_module, $other_file);
     my $idx;
     my $iterator;
     my $match  = 0;
@@ -1029,25 +1028,25 @@ sub unique_inst {
     $self->{ParametersPriority} = GENESIS2_ZERO_PRIORITY;
 
     # flush the buffer to be safe for comparisons (important for recursion)
-    $self->{OutfileHandle}->flush if defined( $self->{OutfileHandle} );
+    $self->{OutfileHandle}->flush if defined($self->{OutfileHandle});
 
     #####################
     # Parse Inputs: module base name
     if (@_) {
         $base_module_name = shift;
     } else {
-        $self->error( "$name: Missing base module name.\n" . $usage );
+        $self->error("$name: Missing base module name.\n" . $usage);
     }
 
     # Parse Inputs: instance name
     if (@_) {
         $inst_name = shift;
-        $self->error( "$name: Instance -->$inst_name<-- already exists in module -->"
+        $self->error("$name: Instance -->$inst_name<-- already exists in module -->"
               . caller() . "<--\n"
-              . $usage )
+              . $usage)
           if defined $self->{SubInstance_InstanceObj}{$inst_name};
     } else {
-        $self->error( "$name: Missing instance name.\n" . $usage );
+        $self->error("$name: Missing instance name.\n" . $usage);
     }
 
     # Parse Inputs: parameters
@@ -1064,18 +1063,18 @@ sub unique_inst {
     my $load_module_msg = $self->load_base_module($base_module_name);
     $self->error(
 "$name: Failed to instantiate \"$inst_name\". Cannot locate/compile module \"${base_module_name}\".\n"
-          . "Error Message: $load_module_msg" )
+          . "Error Message: $load_module_msg")
       unless $load_module_msg eq '';
 
     # make an instance:
     $instance = $base_module_name->new_as_son($self);
     $self->{SubInstance_InstanceObj}{$inst_name} = $instance;
-    push( @{ $self->{SubInstanceList} },       $inst_name );
-    push( @{ $self->{SubInstanceListUnique} }, $inst_name );
+    push(@{$self->{SubInstanceList}},       $inst_name);
+    push(@{$self->{SubInstanceListUnique}}, $inst_name);
 
     #####################
     # Decide what the new submodule name and the generated filename will be
-    if ( defined $self->{ModuleName_NumDerivs}{$base_module_name} ) {
+    if (defined $self->{ModuleName_NumDerivs}{$base_module_name}) {
         $self->{ModuleName_NumDerivs}{$base_module_name} =
           $self->{ModuleName_NumDerivs}{$base_module_name} + 1;
     } else {
@@ -1090,8 +1089,8 @@ sub unique_inst {
     #####################
     # Set the values for the sub-pre-processor based on instantiation line
     $instance->{ParametersPriority} = GENESIS2_INHERITANCE_PRIORITY;
-    $instance->set_param(@params)                     if @params;
-    push( @{ $instance->{ParamsFromInst} }, @params ) if @params;
+    $instance->set_param(@params)                 if @params;
+    push(@{$instance->{ParamsFromInst}}, @params) if @params;
     $instance->{ParametersPriority} = GENESIS2_DECLARATION_PRIORITY;
 
     #####################
@@ -1100,10 +1099,10 @@ sub unique_inst {
     $instance->fetch_params();
     my $instance_param_list = $instance->get_mod_param_list();
     my $param_module_name   = $base_module_name . $instance_param_list;
-    if ( defined $self->{ModuleCache}{$param_module_name} ) {
+    if (defined $self->{ModuleCache}{$param_module_name}) {
         my $prev_inst = $self->{ModuleCache}{$param_module_name};
 
-        if ( $self->does_generate_same( $instance, $prev_inst ) ) {
+        if ($self->does_generate_same($instance, $prev_inst)) {
             my $prev_module    = $prev_inst->{UniqueModuleName};
             my $prev_file_name = $prev_inst->{OutputFileName};
 
@@ -1124,8 +1123,8 @@ sub unique_inst {
 
     ########################################
     # Show extensive debug info if requested
-    if ( $self->{Debug} & 8 ) {
-        foreach my $key ( sort keys %{$instance} ) {
+    if ($self->{Debug} & 8) {
+        foreach my $key (sort keys %{$instance}) {
             print STDERR "- instance key '$key' = $instance->{$key}\n";
         }
     }
@@ -1139,18 +1138,18 @@ sub unique_inst {
 
     my $splitfile = qr/(.*)(_unq[0-9]*\.[^.]*)/;
     my $me        = $instance->{OutputFileName};    # E.g. $me='flop_unq2.sv'
-    my ( $root, $suffix ) = $me =~ $splitfile;      # E.g. $root='flop'
+    my ($root, $suffix) = $me =~ $splitfile;        # E.g. $root='flop'
 
     # OutputFileName should be in the form <root>_unq<d>.<sfx> maybe
     # If not, we get root=<null> and no uniquification maybe
-    $self->warning("OutputFileName '$me' != '<root>_unq<num>.<suffix>'") if ( $root eq "" );
+    $self->warning("OutputFileName '$me' != '<root>_unq<num>.<suffix>'") if ($root eq "");
 
     # Find all files in genesis_raw that match 'root_*'
     # e.g. root=flop  =>  rootfiles=( flop_unq2.sv, flop_D_0_T_RFlop_W_4.sv )
     my $rootfiles = `cd genesis_raw; /bin/ls ${root}_*`;
-    print STDERR "Found rootfiles '$rootfiles' maybe\n" if ( $self->{Debug} & 8 );
+    print STDERR "Found rootfiles '$rootfiles' maybe\n" if ($self->{Debug} & 8);
 
-    my @rootfiles = split( /\n/, $rootfiles );
+    my @rootfiles = split(/\n/, $rootfiles);
 
     #####################
     # Compare against previously generated files in dir 'genesis_raw'
@@ -1160,17 +1159,17 @@ sub unique_inst {
     foreach my $rf (@rootfiles) {
 
         # Don't compare to self or there will be trouble!
-        if ( $me eq $rf ) { next; }
+        if ($me eq $rf) { next; }
 
         # Assume module name is just filename with extension stripped off
         # E.g. other_file="flop_unq2.sv" => other_module="flop_unq2"
-        my ( $f, $suffix ) = $rf =~ /(.*)[.]([^.]*)/;
+        my ($f, $suffix) = $rf =~ /(.*)[.]([^.]*)/;
 
         # Assign to non-local homes for later
         $other_module = $f;
         $other_file   = $rf;
 
-        if ( $self->{Debug} & 8 ) {
+        if ($self->{Debug} & 8) {
             print STDERR "I am instance '$instance->{OutputFileName}'\n";
             print STDERR "-- OutputFileName   = $instance->{OutputFileName}\n";
             print STDERR "-- UniqueModuleName = $instance->{UniqueModuleName}\n";
@@ -1192,14 +1191,14 @@ sub unique_inst {
         # NumDerivs not used anymore, but that's okay, right?
         $self->{ModuleName_NumDerivs}{$base_module_name}--;
         $instance->{UniqueModuleName} = $other_module;  # instead, use the previously created module
-        unlink( catfile( $instance->{RawDir}, $instance->{OutputFileName} ) )
+        unlink(catfile($instance->{RawDir}, $instance->{OutputFileName}))
           ;                                             # remove the newly created file
-        delete $self->{OutfileName_ContentCache}{ $instance->{OutputFileName} }
+        delete $self->{OutfileName_ContentCache}{$instance->{OutputFileName}}
           ;                                             # Clean the file from the cache
         $instance->{OutputFileName} = $other_file;      # instead, use the previously created file
     }
 
-    if ( !defined $self->{ModuleCache}{$param_module_name} ) {
+    if (!defined $self->{ModuleCache}{$param_module_name}) {
         $self->{ModuleCache}{$param_module_name} = $instance;
     }
 
@@ -1217,8 +1216,8 @@ sub unique_inst {
 sub unique_inst_param {
     my $self = shift;
     my $name = $self->{BaseModuleName} . "->unique_inst_param";
-    my ( $base_module_name, $inst_name, $instance );
-    my ( $other_module, $other_file );
+    my ($base_module_name, $inst_name, $instance);
+    my ($other_module, $other_file);
     state $idx = 0;
     my $match  = 0;
     my @params = ();
@@ -1233,25 +1232,25 @@ sub unique_inst_param {
     $self->{ParametersPriority} = GENESIS2_ZERO_PRIORITY;
 
     # flush the buffer to be safe for comparisons (important for recursion)
-    $self->{OutfileHandle}->flush if defined( $self->{OutfileHandle} );
+    $self->{OutfileHandle}->flush if defined($self->{OutfileHandle});
 
     #####################
     # Parse Inputs: module base name
     if (@_) {
         $base_module_name = shift;
     } else {
-        $self->error( "$name: Missing base module name.\n" . $usage );
+        $self->error("$name: Missing base module name.\n" . $usage);
     }
 
     # Parse Inputs: instance name
     if (@_) {
         $inst_name = shift;
-        $self->error( "$name: Instance -->$inst_name<-- already exists in module -->"
+        $self->error("$name: Instance -->$inst_name<-- already exists in module -->"
               . caller() . "<--\n"
-              . $usage )
+              . $usage)
           if defined $self->{SubInstance_InstanceObj}{$inst_name};
     } else {
-        $self->error( "$name: Missing instance name.\n" . $usage );
+        $self->error("$name: Missing instance name.\n" . $usage);
     }
 
     # Parse Inputs: parameters
@@ -1268,14 +1267,14 @@ sub unique_inst_param {
     my $load_module_msg = $self->load_base_module($base_module_name);
     $self->error(
 "$name: Failed to instantiate \"$inst_name\". Cannot locate/compile module \"${base_module_name}\".\n"
-          . "Error Message: $load_module_msg" )
+          . "Error Message: $load_module_msg")
       unless $load_module_msg eq '';
 
     # make an instance:
     $instance = $base_module_name->new_as_son($self);
     $self->{SubInstance_InstanceObj}{$inst_name} = $instance;
-    push( @{ $self->{SubInstanceList} },            $inst_name );
-    push( @{ $self->{SubInstanceListUniqueParam} }, $inst_name );
+    push(@{$self->{SubInstanceList}},            $inst_name);
+    push(@{$self->{SubInstanceListUniqueParam}}, $inst_name);
 
     #####################
     # Decide what the new submodule name and the generated filename will be
@@ -1287,8 +1286,8 @@ sub unique_inst_param {
     #####################
     # Set the values for the sub-pre-processor based on instantiation line
     $instance->{ParametersPriority} = GENESIS2_INHERITANCE_PRIORITY;
-    $instance->set_param(@params)                     if @params;
-    push( @{ $instance->{ParamsFromInst} }, @params ) if @params;
+    $instance->set_param(@params)                 if @params;
+    push(@{$instance->{ParamsFromInst}}, @params) if @params;
     $instance->{ParametersPriority} = GENESIS2_DECLARATION_PRIORITY;
 
     #####################
@@ -1297,10 +1296,10 @@ sub unique_inst_param {
     $instance->fetch_params();
     my $instance_param_list = $instance->get_mod_param_list();
     my $tgt_module_name     = $base_module_name . $instance_param_list;
-    if ( defined $self->{ModuleCache}{$tgt_module_name} ) {
+    if (defined $self->{ModuleCache}{$tgt_module_name}) {
         my $prev_inst = $self->{ModuleCache}{$tgt_module_name};
 
-        if ( $self->does_generate_same( $instance, $prev_inst ) ) {
+        if ($self->does_generate_same($instance, $prev_inst)) {
             my $prev_module    = $prev_inst->{UniqueModuleName};
             my $prev_file_name = $prev_inst->{OutputFileName};
 
@@ -1322,7 +1321,7 @@ sub unique_inst_param {
     #####################
     # Compare against previously generated files
     my $tgt_file_name = $tgt_module_name . $instance->{OutfileSuffix};
-    if ( defined( $self->{OutfileName_ContentCache}{$tgt_file_name} ) ) {
+    if (defined($self->{OutfileName_ContentCache}{$tgt_file_name})) {
         $match = $self->compare_generated_files(
             $instance->{OutputFileName},        # newly generated file
             $tgt_file_name,                     # existing file
@@ -1331,27 +1330,27 @@ sub unique_inst_param {
         );
 
         # The files should match -- we've got a problem if they don't
-        $self->error( "$name: Newly generated parameter-uniquified $base_module_name does not\n"
+        $self->error("$name: Newly generated parameter-uniquified $base_module_name does not\n"
               . "match previous parameter-uniquified generation!\n"
-              . "Compare $instance->{OutputFileName} and previously generated $tgt_file_name" )
+              . "Compare $instance->{OutputFileName} and previously generated $tgt_file_name")
           unless $match;
 
         # Use the existing file since they match and delete
         # the newly generated file
         $instance->{UniqueModuleName} = $tgt_module_name;
-        unlink( catfile( $instance->{RawDir}, $instance->{OutputFileName} ) );
-        delete $self->{OutfileName_ContentCache}{ $instance->{OutputFileName} };
+        unlink(catfile($instance->{RawDir}, $instance->{OutputFileName}));
+        delete $self->{OutfileName_ContentCache}{$instance->{OutputFileName}};
         $instance->{OutputFileName} = $tgt_file_name;
     } else {
 
         # This is the only copy of the module
-        my $orig_file_path = catfile( $instance->{RawDir}, $instance->{OutputFileName} );
-        my $new_file_path  = catfile( $instance->{RawDir}, $tgt_file_name );
+        my $orig_file_path = catfile($instance->{RawDir}, $instance->{OutputFileName});
+        my $new_file_path  = catfile($instance->{RawDir}, $tgt_file_name);
 
-        my ( $fhi, $fho );
-        open( $fhi, "<$orig_file_path" )
+        my ($fhi, $fho);
+        open($fhi, "<$orig_file_path")
           || $self->error("$name: Couldn't open input file $orig_file_path: $!");
-        open( $fho, ">$new_file_path" )
+        open($fho, ">$new_file_path")
           || $self->error("$name: Couldn't open output file $new_file_path: $!");
 
         # Read the file and replace the temporary module name
@@ -1368,14 +1367,14 @@ sub unique_inst_param {
 
         $self->{OutfileName_ContentCache}{$tgt_file_name} = \@content;
         unlink($orig_file_path);    # remove the newly created file
-        delete $self->{OutfileName_ContentCache}{ $instance->{OutputFileName} }
+        delete $self->{OutfileName_ContentCache}{$instance->{OutputFileName}}
           ;                         # Clean the file from the cache
 
         $instance->{UniqueModuleName} = $tgt_module_name;    # Update the module name
         $instance->{OutputFileName}   = $tgt_file_name;      # Update the module filename
     }
 
-    if ( !defined $self->{ModuleCache}{$tgt_module_name} ) {
+    if (!defined $self->{ModuleCache}{$tgt_module_name}) {
         $self->{ModuleCache}{$tgt_module_name} = $instance;
     }
 
@@ -1395,7 +1394,7 @@ sub unique_inst_param {
 sub clone_inst {
     my $self = shift;
     my $name = $self->{BaseModuleName} . "->clone_inst";
-    my ( $src_inst, $base_module_name, $inst_name, $instance );
+    my ($src_inst, $base_module_name, $inst_name, $instance);
     my $match  = 0;
     my @params = ();
     my $usage =
@@ -1410,22 +1409,22 @@ sub clone_inst {
         $src_inst         = $self->get_instance_obj($src_inst);
         $base_module_name = $src_inst->{BaseModuleName};
     } else {
-        $self->error( "$name: Missing source instance path.\n" . $usage );
+        $self->error("$name: Missing source instance path.\n" . $usage);
     }
 
     # Parse Inputs: instance name
     if (@_) {
         $inst_name = shift;
-        $self->error( "$name: Instance -->$inst_name<-- already exists in module -->"
+        $self->error("$name: Instance -->$inst_name<-- already exists in module -->"
               . caller() . "<--\n"
-              . $usage )
+              . $usage)
           if defined $self->{SubInstance_InstanceObj}{$inst_name};
     } else {
-        $self->error( "$name: Missing instance name.\n" . $usage );
+        $self->error("$name: Missing instance name.\n" . $usage);
     }
 
     if (@_) {
-        $self->error( "$name: Too many arguments\n" . $usage );
+        $self->error("$name: Too many arguments\n" . $usage);
     }
 
     # debuf print:
@@ -1435,21 +1434,20 @@ sub clone_inst {
 
     # Make sure there is no weird case of a module instantiating it's antecessor
     my $parent = $self;
-    while ( defined $parent ) {
-        $self->error( "$name: Instance "
+    while (defined $parent) {
+        $self->error("$name: Instance "
               . $self->get_instance_path()
               . ": is trying to instantiate a clone of itself or its antecessor ("
-              . $parent->get_instance_path()
-              . ") !" )
-          if ( $src_inst->{UniqueModuleName} eq $parent->{UniqueModuleName} );
+              . $parent->get_instance_path() . ") !")
+          if ($src_inst->{UniqueModuleName} eq $parent->{UniqueModuleName});
         $parent = $parent->{Parent};
     }
 
     #####################
     # make an instance:
-    $instance = $base_module_name->new_as_clone( $self, $src_inst );
+    $instance = $base_module_name->new_as_clone($self, $src_inst);
     $self->{SubInstance_InstanceObj}{$inst_name} = $instance;
-    push( @{ $self->{SubInstanceList} }, $inst_name );
+    push(@{$self->{SubInstanceList}}, $inst_name);
     $instance->{InstanceName} = $inst_name;
 
     return $instance;
@@ -1461,8 +1459,8 @@ sub clone_inst {
 sub ununique_inst {
     my $self = shift;
     my $name = $self->{BaseModuleName} . "->ununique_inst";
-    my ( $base_module_name, $inst_name, $instance );
-    my ( $other_module, $other_file );
+    my ($base_module_name, $inst_name, $instance);
+    my ($other_module, $other_file);
     my $rnd;
     my $match  = 0;
     my @params = ();
@@ -1477,25 +1475,25 @@ sub ununique_inst {
     $self->{ParametersPriority} = GENESIS2_ZERO_PRIORITY;
 
     # flush the buffer to be safe for comparisons (important for recursion)
-    $self->{OutfileHandle}->flush if defined( $self->{OutfileHandle} );
+    $self->{OutfileHandle}->flush if defined($self->{OutfileHandle});
 
     #####################
     # Parse Inputs: module base name
     if (@_) {
         $base_module_name = shift;
     } else {
-        $self->error( "$name: Missing base module name.\n" . $usage );
+        $self->error("$name: Missing base module name.\n" . $usage);
     }
 
     # Parse Inputs: instance name
     if (@_) {
         $inst_name = shift;
-        $self->error( "$name: Instance -->$inst_name<-- already exists in module -->"
+        $self->error("$name: Instance -->$inst_name<-- already exists in module -->"
               . caller() . "<--\n"
-              . $usage )
+              . $usage)
           if defined $self->{SubInstance_InstanceObj}{$inst_name};
     } else {
-        $self->error( "$name: Missing instance name.\n" . $usage );
+        $self->error("$name: Missing instance name.\n" . $usage);
     }
 
     # Parse Inputs: parameters
@@ -1512,22 +1510,22 @@ sub ununique_inst {
     my $load_module_msg = $self->load_base_module($base_module_name);
     $self->error(
 "$name: Failed to instantiate \"$inst_name\". Cannot locate/compile module \"${base_module_name}\".\n"
-          . "Error Message: $load_module_msg" )
+          . "Error Message: $load_module_msg")
       unless $load_module_msg eq '';
 
     # make an instance:
     $instance = $base_module_name->new_as_son($self);
     $self->{SubInstance_InstanceObj}{$inst_name} = $instance;
-    push( @{ $self->{SubInstanceList} },         $inst_name );
-    push( @{ $self->{SubInstanceListUnunique} }, $inst_name );
+    push(@{$self->{SubInstanceList}},         $inst_name);
+    push(@{$self->{SubInstanceListUnunique}}, $inst_name);
 
     #####################
     # Decide what the new submodule name and the generated filename will be
-    if ( defined $self->{UnUniquifiedModules}{$base_module_name} ) {
+    if (defined $self->{UnUniquifiedModules}{$base_module_name}) {
 
         #$time = Time::HiRes::time();
         #$time =~ s/\.//; # remove that annoying decimal point
-        $rnd = int( rand(10000) );
+        $rnd = int(rand(10000));
         $instance->{UniqueModuleName} = $base_module_name . "_tmp" . $rnd;
     } else {
         $instance->{UniqueModuleName} = $base_module_name;
@@ -1538,8 +1536,8 @@ sub ununique_inst {
     #####################
     # Set the values for the sub-pre-processor based on instantiation line
     $instance->{ParametersPriority} = GENESIS2_INHERITANCE_PRIORITY;
-    $instance->set_param(@params)                     if @params;
-    push( @{ $instance->{ParamsFromInst} }, @params ) if @params;
+    $instance->set_param(@params)                 if @params;
+    push(@{$instance->{ParamsFromInst}}, @params) if @params;
     $instance->{ParametersPriority} = GENESIS2_DECLARATION_PRIORITY;
 
     #####################
@@ -1547,10 +1545,10 @@ sub ununique_inst {
     #  -> Check if an identical module has already been generated
     $instance->fetch_params();
     my $instance_param_list = $instance->get_mod_param_list();
-    if ( defined $self->{ModuleCache}{$base_module_name} ) {
+    if (defined $self->{ModuleCache}{$base_module_name}) {
         my $prev_inst = $self->{ModuleCache}{$base_module_name};
 
-        if ( $self->does_generate_same( $instance, $prev_inst ) ) {
+        if ($self->does_generate_same($instance, $prev_inst)) {
             $other_module = $base_module_name;
             $other_file   = $other_module . $instance->{OutfileSuffix};
 
@@ -1576,7 +1574,7 @@ sub ununique_inst {
 
     #####################
     # Compare against previously generated files
-    if ( defined $self->{UnUniquifiedModules}{$base_module_name} ) {
+    if (defined $self->{UnUniquifiedModules}{$base_module_name}) {
         $match        = 0;
         $other_module = $base_module_name;
         $other_file   = $other_module . $instance->{OutfileSuffix};
@@ -1587,28 +1585,28 @@ sub ununique_inst {
         );
 
         # If the files did not match, we're in a big problem so error out
-        $self->error( "$name: Newly generated UN-uniquified $base_module_name does not\n"
+        $self->error("$name: Newly generated UN-uniquified $base_module_name does not\n"
               . "match previous UN-uniquified generation!\n"
-              . "Compare $instance->{OutputFileName} and previously generated $other_file" )
+              . "Compare $instance->{OutputFileName} and previously generated $other_file")
           unless $match;
     }
 
     # if a module already exists, ignore new version (since we already established that they match)
-    if ( defined $self->{UnUniquifiedModules}{$base_module_name} ) {
+    if (defined $self->{UnUniquifiedModules}{$base_module_name}) {
         $instance->{UniqueModuleName} = $other_module;  # instead, use the previously created module
-        unlink( catfile( $instance->{RawDir}, $instance->{OutputFileName} ) )
+        unlink(catfile($instance->{RawDir}, $instance->{OutputFileName}))
           ;                                             # remove the newly created file
-        delete $self->{OutfileName_ContentCache}{ $instance->{OutputFileName} }
+        delete $self->{OutfileName_ContentCache}{$instance->{OutputFileName}}
           ;                                             # Clean the file from the cache
         $instance->{OutputFileName} = $other_file;      # instead, use the previously created file
     }
 
     # if a module did not already exists, mark that it exists now.
-    if ( !defined $self->{UnUniquifiedModules}{$base_module_name} ) {
+    if (!defined $self->{UnUniquifiedModules}{$base_module_name}) {
         $self->{UnUniquifiedModules}{$base_module_name} = 1;
     }
 
-    if ( !defined $self->{ModuleCache}{$base_module_name} ) {
+    if (!defined $self->{ModuleCache}{$base_module_name}) {
         $self->{ModuleCache}{$base_module_name} = $instance;
     }
 
@@ -1629,7 +1627,7 @@ sub synonym {
     my $name = $self->{BaseModuleName} . "->synonym";
     $self->error("$name->synonym: Called without arguments")
       unless @_;
-    if ( check_if_self( $_[0] ) ) {
+    if (check_if_self($_[0])) {
 
         # This was a "method call"
         shift;
@@ -1645,8 +1643,8 @@ sub synonym {
     my $found_it       = 0;
 
 # See if target package was already called cause we don't want to overwrite it and funky stuff may happen...
-    if ( $INC{$trgt_file_name} ) {
-        if ( $INC{$trgt_file_name} eq $INC{$src_file_name} ) {
+    if ($INC{$trgt_file_name}) {
+        if ($INC{$trgt_file_name} eq $INC{$src_file_name}) {
 
             # The user called synonym one too many times?   Just ignore...
             return 1;
@@ -1662,17 +1660,17 @@ sub synonym {
     # See if the package, although not used already, already exsists in the INC path
     foreach my $inc_path (@INC) {
         $full_file_name = "$inc_path/$trgt_file_name";
-        $full_file_name = abs_path($full_file_name) if ( -e $full_file_name );
-        $self->error( "$name: Cannot create synonym \"$trgt_name\" for module template \n"
-              . "\"$src_name\" because similar module already exists: $full_file_name" )
-          if ( -f $full_file_name );
+        $full_file_name = abs_path($full_file_name) if (-e $full_file_name);
+        $self->error("$name: Cannot create synonym \"$trgt_name\" for module template \n"
+              . "\"$src_name\" because similar module already exists: $full_file_name")
+          if (-f $full_file_name);
     }
 
     # target does not exits. This is good. But does the source package exits? Does it compile?
     my $load_module_msg = $self->load_base_module($src_name);
-    $self->error( "$name: Cannot create synonym \"$trgt_name\" for \"${src_name}\" "
+    $self->error("$name: Cannot create synonym \"$trgt_name\" for \"${src_name}\" "
           . "because I cannot locate/compile module \"${src_name}\".\n"
-          . "Error Message: $load_module_msg" )
+          . "Error Message: $load_module_msg")
       unless $load_module_msg eq '';
 
     #print STDERR "DEBUG: src for $trgt_file_name comes from $INC{$src_file_name} --\n";
@@ -1695,7 +1693,7 @@ END_OF_SYNONYM
     eval $synonym;
     $self->error(
 "$name: Synonym for \"${src_name}\" failed compilation... Not sure why... Needs further debugging...\n"
-          . "Error message: $@" )
+          . "Error message: $@")
       if ($@);
 
     # this is where we cheat to create a synonym of a synonym
@@ -1749,11 +1747,11 @@ sub iname {
 sub generate {
     my $arg1 = shift
       or $Genesis2::UniqueModule::myself->error(
-        $Genesis2::UniqueModule::myself->{BaseModuleName} . "generate: Called without arguments" );
-    if ( check_if_self($arg1) ) {
+        $Genesis2::UniqueModule::myself->{BaseModuleName} . "generate: Called without arguments");
+    if (check_if_self($arg1)) {
 
         # This was a "method call" of this object, that's good.
-        if ( $arg1->{CfgHandler}->{UnqStyle} == GENESIS2_UNQ_NUMERIC ) {
+        if ($arg1->{CfgHandler}->{UnqStyle} == GENESIS2_UNQ_NUMERIC) {
             return $arg1->generate_unq_numeric(@_);
         } else {
             return $arg1->generate_unq_param(@_);
@@ -1761,39 +1759,39 @@ sub generate {
     } else {
 
         # this was a "function call" (pass all arguments forward to the method)
-        return $Genesis2::UniqueModule::myself->generate( $arg1, @_ );
+        return $Genesis2::UniqueModule::myself->generate($arg1, @_);
     }
 }
 
 # Syntactic sugar for $self->unique_inst
 sub generate_unq_numeric {
     my $arg1 = shift
-      or $Genesis2::UniqueModule::myself->error( $Genesis2::UniqueModule::myself->{BaseModuleName}
-          . "generate_unq_numeric: Called without arguments" );
-    if ( check_if_self($arg1) ) {
+      or $Genesis2::UniqueModule::myself->error($Genesis2::UniqueModule::myself->{BaseModuleName}
+          . "generate_unq_numeric: Called without arguments");
+    if (check_if_self($arg1)) {
 
         # This was a "method call" of this object, that's good.
         return $arg1->unique_inst(@_);
     } else {
 
         # this was a "function call" (pass all arguments forward to the method)
-        return $Genesis2::UniqueModule::myself->unique_inst( $arg1, @_ );
+        return $Genesis2::UniqueModule::myself->unique_inst($arg1, @_);
     }
 }
 
 # Syntactic sugar for $self->unique_inst_param
 sub generate_unq_param {
     my $arg1 = shift
-      or $Genesis2::UniqueModule::myself->error( $Genesis2::UniqueModule::myself->{BaseModuleName}
-          . "generate_unq_param Called without arguments" );
-    if ( check_if_self($arg1) ) {
+      or $Genesis2::UniqueModule::myself->error($Genesis2::UniqueModule::myself->{BaseModuleName}
+          . "generate_unq_param Called without arguments");
+    if (check_if_self($arg1)) {
 
         # This was a "method call" of this object, that's good.
         return $arg1->unique_inst_param(@_);
     } else {
 
         # this was a "function call" (pass all arguments forward to the method)
-        return $Genesis2::UniqueModule::myself->unique_inst_param( $arg1, @_ );
+        return $Genesis2::UniqueModule::myself->unique_inst_param($arg1, @_);
     }
 }
 
@@ -1806,31 +1804,31 @@ sub generate_unq_param {
 sub clone {
     my $arg1 = shift
       or $Genesis2::UniqueModule::myself->error(
-        $Genesis2::UniqueModule::myself->{BaseModuleName} . "->clone: Called without arguments" );
-    if ( check_if_self($arg1) ) {
+        $Genesis2::UniqueModule::myself->{BaseModuleName} . "->clone: Called without arguments");
+    if (check_if_self($arg1)) {
 
         # This was a "method call"
         return $Genesis2::UniqueModule::myself->clone_inst(@_);
     } else {
 
         # This was a "function call" (pass all arguments forward to the method)
-        return $Genesis2::UniqueModule::myself->clone_inst( $arg1, @_ );
+        return $Genesis2::UniqueModule::myself->clone_inst($arg1, @_);
     }
 }
 
 # Syntactic sugar for $self->ununique_inst
 sub generate_base {
     my $arg1 = shift
-      or $Genesis2::UniqueModule::myself->error( $Genesis2::UniqueModule::myself->{BaseModuleName}
-          . "generate_base: Called without arguments" );
-    if ( check_if_self($arg1) ) {
+      or $Genesis2::UniqueModule::myself->error($Genesis2::UniqueModule::myself->{BaseModuleName}
+          . "generate_base: Called without arguments");
+    if (check_if_self($arg1)) {
 
         # This was a "method call" of this object, that's good.
         return $arg1->ununique_inst(@_);
     } else {
 
         # this was a "function call" (pass all arguments forward to the method)
-        return $Genesis2::UniqueModule::myself->ununique_inst( $arg1, @_ );
+        return $Genesis2::UniqueModule::myself->ununique_inst($arg1, @_);
     }
 }
 
@@ -1842,26 +1840,26 @@ sub generate_base {
 ## //;                                                prm2 => val2, ...]);
 sub generate_w_name {
     my $arg1 = shift
-      or $Genesis2::UniqueModule::myself->error( $Genesis2::UniqueModule::myself->{BaseModuleName}
-          . "generate_w_name: Called without arguments" );
-    if ( check_if_self($arg1) ) {
+      or $Genesis2::UniqueModule::myself->error($Genesis2::UniqueModule::myself->{BaseModuleName}
+          . "generate_w_name: Called without arguments");
+    if (check_if_self($arg1)) {
 
         # This was a "method call" of this object, that's good.
         my $base_module_name = shift
           or
-          $Genesis2::UniqueModule::myself->error( $Genesis2::UniqueModule::myself->{BaseModuleName}
-              . "generate_w_name: Called without base module name." );
+          $Genesis2::UniqueModule::myself->error($Genesis2::UniqueModule::myself->{BaseModuleName}
+              . "generate_w_name: Called without base module name.");
         my $gen_module_name = shift
           or
-          $Genesis2::UniqueModule::myself->error( $Genesis2::UniqueModule::myself->{BaseModuleName}
-              . "generate_w_name: Called without generated module name." );
+          $Genesis2::UniqueModule::myself->error($Genesis2::UniqueModule::myself->{BaseModuleName}
+              . "generate_w_name: Called without generated module name.");
 
-        synonym( $base_module_name, $gen_module_name );
-        return $arg1->ununique_inst( $gen_module_name, @_ );
+        synonym($base_module_name, $gen_module_name);
+        return $arg1->ununique_inst($gen_module_name, @_);
     } else {
 
         # this was a "function call" (pass all arguments forward to the method)
-        return $Genesis2::UniqueModule::myself->generate_w_name( $arg1, @_ );
+        return $Genesis2::UniqueModule::myself->generate_w_name($arg1, @_);
     }
 }
 
@@ -1886,16 +1884,16 @@ sub parameter {
     my $name = $self->{BaseModuleName} . "->parameter";
     $self->error("$name->parameter: Called without arguments")
       unless @_;
-    if ( ref($self) eq ref( $_[0] ) && $self == $_[0] ) {
+    if (ref($self) eq ref($_[0]) && $self == $_[0]) {
 
         # This was a "method call"
         shift;
     }
-    $self->error( "Illegal parameter declaration: Un-even argument list.\n"
+    $self->error("Illegal parameter declaration: Un-even argument list.\n"
           . "Expected list of optionName=>optionValue. \n"
           . "Note -- If specifying 'Val' which is array or hash, remember to pass a pointer:\n"
           . "E.g.: Val=>[1,2,3] for an array, and Val=>{key1=>val1, key2=>val2} for a hash.\n"
-          . "For empty arrays/hashes use Val=>[] and Val=>{} and not Val=>()" )
+          . "For empty arrays/hashes use Val=>[] and Val=>{} and not Val=>()")
       unless @_ % 2 == 0;
     my %args       = @_;
     my $prm_name   = '';
@@ -1908,60 +1906,60 @@ sub parameter {
     my $val_seen = 0;
     my $opt;
 
-    foreach my $key ( keys %args ) {
-        if ( $key =~ m/^name$/i ) {
-            $self->error( "$name: Only one argument of type 'Name' allowed per "
-                  . "parameter definition call!" )
+    foreach my $key (keys %args) {
+        if ($key =~ m/^name$/i) {
+            $self->error("$name: Only one argument of type 'Name' allowed per "
+                  . "parameter definition call!")
               unless $prm_name eq '';
             $prm_name = $args{$key};
-            $self->error( "$name: Illegal argument '$prm_name' for field 'Name' in parameter "
-                  . "definition call! (Name must consist of alphanumeric characters only)" )
+            $self->error("$name: Illegal argument '$prm_name' for field 'Name' in parameter "
+                  . "definition call! (Name must consist of alphanumeric characters only)")
               if $prm_name !~ m/^\w+$/i;
-        } elsif ( $key =~ m/^force$/i ) {
-            $self->error( "$name: Only one argument of type 'Force' allowed per "
-                  . "parameter definition call!" )
+        } elsif ($key =~ m/^force$/i) {
+            $self->error("$name: Only one argument of type 'Force' allowed per "
+                  . "parameter definition call!")
               if $force_seen != 0;
             $force = $args{$key};
             $force_seen++;
-            $self->error( "$name: Illegal value for argument of type 'Force' at "
-                  . "parameter definition call!" )
+            $self->error("$name: Illegal value for argument of type 'Force' at "
+                  . "parameter definition call!")
               unless $force =~ m/^(0|1|on|off)$/i;
 
-        } elsif ( $key =~ m/val/i ) {
-            $self->error( "$name: Only one argument of type 'Val' allowed per "
-                  . "parameter definition call!" )
+        } elsif ($key =~ m/val/i) {
+            $self->error("$name: Only one argument of type 'Val' allowed per "
+                  . "parameter definition call!")
               if $val_seen != 0;
             $val = $args{$key};
             $val_seen++;
-        } elsif ( $key =~ m/doc/i ) {
-            $self->error( "$name: Only one argument of type 'Doc' allowed per "
-                  . "parameter definition call!" )
+        } elsif ($key =~ m/doc/i) {
+            $self->error("$name: Only one argument of type 'Doc' allowed per "
+                  . "parameter definition call!")
               if $doc_seen != 0;
             $doc = $args{$key};
             $doc_seen++;
-        } elsif ( $key =~ m/list/i ) {
-            $self->error( "$name: Only one argument of type 'List' allowed per "
-                  . "parameter definition call!" )
+        } elsif ($key =~ m/list/i) {
+            $self->error("$name: Only one argument of type 'List' allowed per "
+                  . "parameter definition call!")
               if defined $range{List};
             $range{List} = $args{$key};
-        } elsif ( $key =~ m/min/i ) {
-            $self->error( "$name: Only one argument of type 'Min' allowed per "
-                  . "parameter definition call!" )
+        } elsif ($key =~ m/min/i) {
+            $self->error("$name: Only one argument of type 'Min' allowed per "
+                  . "parameter definition call!")
               if defined $range{Min};
             $range{Min} = $args{$key};
-        } elsif ( $key =~ m/max/i ) {
-            $self->error( "$name: Only one argument of type 'Max' allowed per "
-                  . "parameter definition call!" )
+        } elsif ($key =~ m/max/i) {
+            $self->error("$name: Only one argument of type 'Max' allowed per "
+                  . "parameter definition call!")
               if defined $range{Max};
             $range{Max} = $args{$key};
-        } elsif ( $key =~ m/step/i ) {
-            $self->error( "$name: Only one argument of type 'Step' allowed per "
-                  . "parameter definition call!" )
+        } elsif ($key =~ m/step/i) {
+            $self->error("$name: Only one argument of type 'Step' allowed per "
+                  . "parameter definition call!")
               if defined $range{Step};
             $range{Step} = $args{$key};
-        } elsif ( $key =~ m/^opt$/i ) {
-            $self->error( "$name: Only one argument of type 'Opt' allowed per "
-                  . "parameter definition call!" )
+        } elsif ($key =~ m/^opt$/i) {
+            $self->error("$name: Only one argument of type 'Opt' allowed per "
+                  . "parameter definition call!")
               if defined $opt;
             $opt = $args{$key};
         }
@@ -1969,27 +1967,27 @@ sub parameter {
 
     # Check for minimal conditions for a parameter definition
     $self->error(
-        "$name: One argument of type 'Name' is required per " . "parameter definition call!" )
+        "$name: One argument of type 'Name' is required per " . "parameter definition call!")
       if $prm_name eq '';
     $self->error(
-        "$name: One argument of type 'Val' is required per " . "parameter definition call!" )
+        "$name: One argument of type 'Val' is required per " . "parameter definition call!")
       if $val_seen != 1;
 
     # Define the parameter:
-    if ( $force =~ m/^(0|off)$/i ) {
-        $val = $self->define_param( $prm_name => $val );
+    if ($force =~ m/^(0|off)$/i) {
+        $val = $self->define_param($prm_name => $val);
     } else {
-        $val = $self->force_param( $prm_name => $val );
+        $val = $self->force_param($prm_name => $val);
     }
 
     # Documentation:
-    $self->doc_param( $prm_name, $doc ) if $doc ne '';
+    $self->doc_param($prm_name, $doc) if $doc ne '';
 
     # Range:
-    $self->param_range( $prm_name, %range ) if keys %range >= 1;
+    $self->param_range($prm_name, %range) if keys %range >= 1;
 
     # Optimize
-    $self->optimize_param( $prm_name, $opt ) if defined $opt;
+    $self->optimize_param($prm_name, $opt) if defined $opt;
 
     return $val;
 }
@@ -2002,7 +2000,7 @@ sub fetch_params {
     local $Genesis2::UniqueModule::myself = $self;
     my $name = $self->{BaseModuleName} . "->fetch_params";
     caller eq __PACKAGE__ || caller eq 'Genesis2::Manager'
-      or $self->error( "$name: access restricted to " . __PACKAGE__ . " or Genesis2::Manager" );
+      or $self->error("$name: access restricted to " . __PACKAGE__ . " or Genesis2::Manager");
 
     # parse the xml input to actual parameters
     my $path = $self->get_instance_path();
@@ -2018,7 +2016,7 @@ sub execute {
     local $Genesis2::UniqueModule::myself = $self;
     my $name = $self->{BaseModuleName} . "->execute";
     caller eq __PACKAGE__ || caller eq 'Genesis2::Manager'
-      or $self->error( "$name: access restricted to " . __PACKAGE__ . " or Genesis2::Manager" );
+      or $self->error("$name: access restricted to " . __PACKAGE__ . " or Genesis2::Manager");
 
     my $prev_outfile_handle;
     my $prev_priority;
@@ -2030,18 +2028,18 @@ sub execute {
     $self->{ParamsFromCmdLn} = $self->{CfgHandler}->GetCmdLnParamList($path);
 
     # open the output file (save the previous file handle for later)
-    my $fullFileName = catfile( $self->{RawDir}, $self->{OutputFileName} );
-    open( $self->{OutfileHandle}, ">$fullFileName" )
+    my $fullFileName = catfile($self->{RawDir}, $self->{OutputFileName});
+    open($self->{OutfileHandle}, ">$fullFileName")
       || $self->error("$name: Couldn't open output file $fullFileName: $!");
     $prev_outfile_handle = select $self->{OutfileHandle};
 
     # Print the Verilog
     eval {
-        if ( $self->{Debug} & 8 ) {
+        if ($self->{Debug} & 8) {
             my $t0 = time;
             $self->to_verilog;
             my $t1 = time;
-            print STDERR "$name: Spent " . ( $t1 - $t0 ) . " seconds on call to 'to_verilog'\n";
+            print STDERR "$name: Spent " . ($t1 - $t0) . " seconds on call to 'to_verilog'\n";
         } else {
             $self->to_verilog;
         }
@@ -2049,35 +2047,35 @@ sub execute {
 
     # Check for errors
     if ($@) {
-        my @errs = split( /\n/, $@ );
+        my @errs = split(/\n/, $@);
 
         # remove the last line of $@ it will always point to UniqueModule.pm
         pop(@errs) if scalar(@errs) > 1;
-        my $err_msg = join( "\n", @errs );
+        my $err_msg = join("\n", @errs);
         $self->error($err_msg);
     }
 
     # check for unused parameters
-    foreach my $param ( @{ $self->{ParametersList} } ) {
-        $self->warning( "Parameter '$param' was passed to "
+    foreach my $param (@{$self->{ParametersList}}) {
+        $self->warning("Parameter '$param' was passed to "
               . $self->get_instance_path()
               . " but it was never actually declared/used in "
-              . $self->iname() )
-          if ( $self->{Parameters}->{$param}->{State} =~ /NeverUsed/i );
+              . $self->iname())
+          if ($self->{Parameters}->{$param}->{State} =~ /NeverUsed/i);
     }
 
     # revert back to the previous file handle
     select $prev_outfile_handle;
-    close( $self->{OutfileHandle} )
+    close($self->{OutfileHandle})
       or $self->error("$name: Can not close file \"$fullFileName\"");
 
     # cache the file
-    if ( !exists $self->{OutfileName_ContentCache}{ $self->{OutputFileName} } ) {
+    if (!exists $self->{OutfileName_ContentCache}{$self->{OutputFileName}}) {
         my $filename = $self->{OutputFileName};
         my $fh;
-        open( $fh, "<$fullFileName" )
+        open($fh, "<$fullFileName")
           || $self->error("$name: Couldn't open output file $fullFileName: $!");
-        @{ $self->{OutfileName_ContentCache}{$filename} } = <$fh>;
+        @{$self->{OutfileName_ContentCache}{$filename}} = <$fh>;
         close($fh)
           or $self->error("$name: Can not close file \"$fullFileName\"");
     } else {
@@ -2091,7 +2089,7 @@ sub get_out_file_name {
     my $self = shift;
     my $name = $self->{BaseModuleName} . "->get_out_file_name";
     caller eq __PACKAGE__ || caller eq 'Genesis2::Manager'
-      or $self->error( "$name: access restricted to " . __PACKAGE__ . " or Genesis2::Manager" );
+      or $self->error("$name: access restricted to " . __PACKAGE__ . " or Genesis2::Manager");
     return $self->{OutputFileName};
 }
 
@@ -2100,7 +2098,7 @@ sub get_out_file_name {
 sub get_unq_styles {
     my $name = __PACKAGE__ . "->get_unq_styles";
     caller eq __PACKAGE__ || caller eq 'Genesis2::Manager'
-      or error( "$name: access restricted to " . __PACKAGE__ . " or Genesis2::Manager" );
+      or error("$name: access restricted to " . __PACKAGE__ . " or Genesis2::Manager");
     return sort keys(%UNQ_STYLES);
 }
 
@@ -2109,7 +2107,7 @@ sub get_unq_styles {
 sub default_unq_style {
     my $name = __PACKAGE__ . "->default_unq_style";
     caller eq __PACKAGE__ || caller eq 'Genesis2::Manager'
-      or error( "$name: access restricted to " . __PACKAGE__ . " or Genesis2::Manager" );
+      or error("$name: access restricted to " . __PACKAGE__ . " or Genesis2::Manager");
     return DEFAULT_UNQ_STYLE;
 }
 
@@ -2118,10 +2116,10 @@ sub default_unq_style {
 sub str_to_unq_style {
     my $name = __PACKAGE__ . "->str_to_unq_style";
     caller eq __PACKAGE__ || caller eq 'Genesis2::Manager'
-      or error( "$name: access restricted to " . __PACKAGE__ . " or Genesis2::Manager" );
+      or error("$name: access restricted to " . __PACKAGE__ . " or Genesis2::Manager");
 
     my $style = shift;
-    return $UNQ_STYLES{$style} if defined( $UNQ_STYLES{$style} );
+    return $UNQ_STYLES{$style} if defined($UNQ_STYLES{$style});
     return undef;
 }
 
@@ -2136,7 +2134,7 @@ sub internal_get_param {
     caller eq __PACKAGE__
       or $self->error("$name: Call to a base class private method is not allowed");
 
-    my ( $prm_name, $prm_val );
+    my ($prm_name, $prm_val);
     my %options = ();
     if (@_) {
         $prm_name = shift;
@@ -2147,25 +2145,24 @@ sub internal_get_param {
         %options = @_;
     }
 
-    $self->error( "$name: Trying to extract the value of an undefined parameter\n"
+    $self->error("$name: Trying to extract the value of an undefined parameter\n"
           . "Parameter -->$prm_name<-- does not exists in instance -->"
           . $self->get_instance_name
           . "<-- of module -->"
-          . $self->get_module_name
-          . "<--" )
+          . $self->get_module_name . "<--")
       unless defined $self->{Parameters}->{$prm_name};
 
-    foreach my $opt ( keys %options ) {
-        if ( $opt =~ /check_used/i ) {
-            $self->error( "$name: Trying to extract the value of a parameter that was never "
+    foreach my $opt (keys %options) {
+        if ($opt =~ /check_used/i) {
+            $self->error("$name: Trying to extract the value of a parameter that was never "
                   . "explicitely declared. Use the \"parameter(Name=>'$prm_name', Val=>...)\" "
-                  . "notation to declare a parameter with its default value" )
+                  . "notation to declare a parameter with its default value")
               unless $self->{Parameters}->{$prm_name}->{State} eq 'Used' || !$options{$opt};
         }
     }
 
     # extract the parameter
-    $prm_val = $self->deep_copy( $self->{Parameters}->{$prm_name}->{Val}, $prm_name );
+    $prm_val = $self->deep_copy($self->{Parameters}->{$prm_name}->{Val}, $prm_name);
 
     return $prm_val;
 }
@@ -2178,7 +2175,7 @@ sub get_param_priority {
     caller eq __PACKAGE__
       or $self->error("$name: Call to a base class private method is not allowed");
 
-    my ( $prm_name, $prm_pri );
+    my ($prm_name, $prm_pri);
     if (@_) {
         $prm_name = shift;
     } else {
@@ -2186,13 +2183,13 @@ sub get_param_priority {
     }
 
     # extract the parameter
-    if ( defined $self->{Parameters}->{$prm_name} ) {
+    if (defined $self->{Parameters}->{$prm_name}) {
         $prm_pri = $self->{Parameters}->{$prm_name}->{Pri};
     } else {
-        $self->error( "$name: Trying to extract the priority of an undefined parameter\n"
+        $self->error("$name: Trying to extract the priority of an undefined parameter\n"
               . "Parameter -->$prm_name<-- does not exists in module -->"
               . caller()
-              . "<--" );
+              . "<--");
     }
 
     return $prm_pri;
@@ -2206,8 +2203,8 @@ sub set_param_priority {
     caller eq __PACKAGE__
       or $self->error("$name: Call to a base class private method is not allowed");
 
-    my ( $prm_name, $prm_pri );
-    if ( scalar(@_) == 2 ) {
+    my ($prm_name, $prm_pri);
+    if (scalar(@_) == 2) {
         $prm_name = shift;
         $prm_pri  = shift;
     } else {
@@ -2215,13 +2212,13 @@ sub set_param_priority {
     }
 
     # extract the parameter
-    if ( defined $self->{Parameters}->{$prm_name} ) {
+    if (defined $self->{Parameters}->{$prm_name}) {
         $self->{Parameters}->{$prm_name}->{Pri} = $prm_pri;
     } else {
-        $self->error( "$name: Trying to set the priority of an undefined parameter\n"
+        $self->error("$name: Trying to set the priority of an undefined parameter\n"
               . "Parameter -->$prm_name<-- does not exists in module -->"
               . caller()
-              . "<--" );
+              . "<--");
     }
     return 1;
 }
@@ -2245,19 +2242,19 @@ sub set_param {
     }
 
     print STDERR "$name: Called at priority -->"
-      . (GENESIS2_PRIORITY)[ $self->{ParametersPriority} ] . "="
+      . (GENESIS2_PRIORITY)[$self->{ParametersPriority}] . "="
       . $self->{ParametersPriority} . "<--\n"
       if $self->{Debug} & 4;
-    foreach $prm_name ( sort keys %prm_hash ) {
-        if ( !defined $self->{Parameters}->{$prm_name} ) {
+    foreach $prm_name (sort keys %prm_hash) {
+        if (!defined $self->{Parameters}->{$prm_name}) {
             $self->{Parameters}->{$prm_name}->{Val} =
-              $self->deep_copy( $prm_hash{$prm_name}, $prm_name );
-            $self->set_param_priority( $prm_name, $self->{ParametersPriority} );
+              $self->deep_copy($prm_hash{$prm_name}, $prm_name);
+            $self->set_param_priority($prm_name, $self->{ParametersPriority});
             $self->{Parameters}->{$prm_name}->{State} =
               "NeverUsed";    # We add the param to the DB but
                               # mark it as not used for now, until
                               # we see an explicit definition
-            push( @{ $self->{ParametersList} }, $prm_name )
+            push(@{$self->{ParametersList}}, $prm_name)
               ;               # this helps us keep the chronological order of params
             print STDERR
               "$name: New param -->$prm_name<-- first seen. Setting -->$prm_name<-- to -->"
@@ -2269,28 +2266,28 @@ sub set_param {
         # a. if seen with a higher priority priority, ignore the new deinition
         # b. if seen with lower priority priority, overwrite it
         # c. if seen with the same priority priority, error-out
-        elsif ( $self->get_param_priority($prm_name) > $self->{ParametersPriority} ) {
+        elsif ($self->get_param_priority($prm_name) > $self->{ParametersPriority}) {
 
             # do nothing
             print STDERR "$name: Param -->$prm_name<-- already defined with higher priority\n\t"
               . "Current priority: "
-              . (GENESIS2_PRIORITY)[ $self->{ParametersPriority} ] . "="
+              . (GENESIS2_PRIORITY)[$self->{ParametersPriority}] . "="
               . $self->{ParametersPriority} . "\n\t"
               . "Previous priority: "
-              . (GENESIS2_PRIORITY)[ $self->get_param_priority($prm_name) ] . "="
+              . (GENESIS2_PRIORITY)[$self->get_param_priority($prm_name)] . "="
               . $self->get_param_priority($prm_name)
               . "\n\t-->Ignoring new definition.\n"
               if $self->{Debug} & 4;
-        } elsif ( $self->get_param_priority($prm_name) < $self->{ParametersPriority} ) {
+        } elsif ($self->get_param_priority($prm_name) < $self->{ParametersPriority}) {
             $self->{Parameters}->{$prm_name}->{Val} =
-              $self->deep_copy( $prm_hash{$prm_name}, $prm_name );
-            $self->set_param_priority( $prm_name, $self->{ParametersPriority} );
+              $self->deep_copy($prm_hash{$prm_name}, $prm_name);
+            $self->set_param_priority($prm_name, $self->{ParametersPriority});
             print STDERR "$name: Param -->$prm_name<-- already defined but with lower priority.\n\t"
               . "Current priority: "
-              . (GENESIS2_PRIORITY)[ $self->{ParametersPriority} ] . "="
+              . (GENESIS2_PRIORITY)[$self->{ParametersPriority}] . "="
               . $self->{ParametersPriority} . "\n\t"
               . "Previous priority: "
-              . (GENESIS2_PRIORITY)[ $self->get_param_priority($prm_name) ] . "="
+              . (GENESIS2_PRIORITY)[$self->get_param_priority($prm_name)] . "="
               . $self->{ParametersPriority}
               . "\n\tSetting -->$prm_name<-- to -->"
               . $self->internal_get_param($prm_name) . "<--\n"
@@ -2301,14 +2298,14 @@ sub set_param {
         }
 
         # Was this parameter already seen at the current level?
-        if ( defined $self->{Parameters}->{$prm_name}->{SeenAt}->{ $self->{ParametersPriority} } ) {
-            $self->error( "$name: Parameter $prm_name already declared/seen at the same priority "
-                  . (GENESIS2_PRIORITY)[ $self->{ParametersPriority} ]
-                  . "($self->{ParametersPriority})" );
+        if (defined $self->{Parameters}->{$prm_name}->{SeenAt}->{$self->{ParametersPriority}}) {
+            $self->error("$name: Parameter $prm_name already declared/seen at the same priority "
+                  . (GENESIS2_PRIORITY)[$self->{ParametersPriority}]
+                  . "($self->{ParametersPriority})");
         } else {
 
             # Keep record for future re-definitions
-            $self->{Parameters}->{$prm_name}->{SeenAt}->{ $self->{ParametersPriority} } = 1;
+            $self->{Parameters}->{$prm_name}->{SeenAt}->{$self->{ParametersPriority}} = 1;
         }
     }
     1;
@@ -2332,19 +2329,19 @@ sub split_param_name {
     my $prev_uscore = 1;
     my $prev_num    = 0;
     my $prev_uc     = 0;
-    foreach my $c ( split //, $param ) {
+    foreach my $c (split //, $param) {
         my $is_uscore = $c eq "_";
         my $is_num    = $c =~ /[0-9]/;
         my $is_uc     = $c =~ /[A-Z]/;
 
-        if ( !$is_uscore ) {
+        if (!$is_uscore) {
 
             # Transitions: lowercase to uppercase, alpha to number, number to alpha
             if (
                 !$prev_uscore
                 && (   $is_num && !$prev_num
                     || !$is_num && $prev_num
-                    || !$prev_num && $is_uc && !$prev_uc )
+                    || !$prev_num && $is_uc && !$prev_uc)
               )
             {
                 push @$words, uc($curr) if $curr ne "";
@@ -2381,7 +2378,7 @@ sub get_initial_regions {
 
     my $regions = [];
     foreach my $word (@$words) {
-        if ( $word =~ /^[0-9]/ ) {
+        if ($word =~ /^[0-9]/) {
             push @$regions, length($word);
         } else {
             push @$regions, 1;
@@ -2405,13 +2402,13 @@ sub get_abbrev_from_regions {
     my $words   = shift;
     my $regions = shift;
 
-    if ( scalar(@$words) != scalar(@$regions) ) {
+    if (scalar(@$words) != scalar(@$regions)) {
         error("$name: words/regions are different lengths\n");
     }
 
     my $abbrev = "";
-    for ( my $i = 0 ; $i < scalar(@$words) ; $i++ ) {
-        $abbrev .= substr( $words->[$i], 0, $regions->[$i] );
+    for (my $i = 0 ; $i < scalar(@$words) ; $i++) {
+        $abbrev .= substr($words->[$i], 0, $regions->[$i]);
     }
 
     return $abbrev;
@@ -2431,21 +2428,21 @@ sub gen_param_abbrevs {
       or $self->error("$name: Call to a base class private method is not allowed");
 
     # Check if we already have the abbreviation cached
-    if ( !exists $self->{SortedParameterString} ) {
-        $self->{SortedParameterString} = join( ' ', sort @{ $self->{ParametersList} } );
+    if (!exists $self->{SortedParameterString}) {
+        $self->{SortedParameterString} = join(' ', sort @{$self->{ParametersList}});
     }
 
-    if ( exists $abbrev_cache{ $self->{SortedParameterString} } ) {
-        return $abbrev_cache{ $self->{SortedParameterString} };
+    if (exists $abbrev_cache{$self->{SortedParameterString}}) {
+        return $abbrev_cache{$self->{SortedParameterString}};
     }
 
     # Calculate the starting word/region pairs
     my %wr_pairs;
-    foreach my $param ( @{ $self->{ParametersList} } ) {
+    foreach my $param (@{$self->{ParametersList}}) {
         my $words   = split_param_name($param);
         my $regions = get_initial_regions($words);
 
-        $wr_pairs{$param} = [ $words, $regions ];
+        $wr_pairs{$param} = [$words, $regions];
     }
 
     # Repeatedly generate the abbreviations and adjust the regions until we have
@@ -2454,7 +2451,7 @@ sub gen_param_abbrevs {
     my %abbrevs;
     my $done = 0;
     my $iter = 0;
-    while ( !$done ) {
+    while (!$done) {
         $done = 1;
         $iter++;
         print STDERR "$name: Iteration $iter:\n" if $self->{Debug} & 2;
@@ -2462,64 +2459,62 @@ sub gen_param_abbrevs {
         print STDERR "  Abbreviations:\n" if $self->{Debug} & 2;
         my %abbrev_srcs;
         map { delete $abbrevs{$_} } keys %abbrevs;
-        foreach my $param ( @{ $self->{ParametersList} } ) {
-            my ( $words, $regions ) = @{ $wr_pairs{$param} };
-            my $abbrev = get_abbrev_from_regions( $words, $regions );
+        foreach my $param (@{$self->{ParametersList}}) {
+            my ($words, $regions) = @{$wr_pairs{$param}};
+            my $abbrev = get_abbrev_from_regions($words, $regions);
             print STDERR "    $param -> $abbrev\n" if $self->{Debug} & 2;
             $abbrevs{$param} = $abbrev;
-            if ( !exists $abbrev_srcs{$abbrev} ) {
+            if (!exists $abbrev_srcs{$abbrev}) {
                 $abbrev_srcs{$abbrev} = [];
             }
-            push @{ $abbrev_srcs{$abbrev} }, $param;
+            push @{$abbrev_srcs{$abbrev}}, $param;
         }
 
-        while ( my ( $abbrev, $params ) = each(%abbrev_srcs) ) {
-            next if ( scalar(@$params) <= 1 );
+        while (my ($abbrev, $params) = each(%abbrev_srcs)) {
+            next if (scalar(@$params) <= 1);
 
-            print STDERR "  Conflicting parameters: " . join( ' ', @$params ) . "\n"
+            print STDERR "  Conflicting parameters: " . join(' ', @$params) . "\n"
               if $self->{Debug} & 2;
             $done = 0;
             my $i_idx    = each @$params;
             my $i_param  = $params->[$i_idx];
             my $i_abbrev = $abbrevs{$i_param};
-            my ( $i_words, $i_regions ) = @{ $wr_pairs{$i_param} };
-            while ( my $j_idx = each @$params ) {
+            my ($i_words, $i_regions) = @{$wr_pairs{$i_param}};
+            while (my $j_idx = each @$params) {
                 my $j_param = $params->[$j_idx];
                 print STDERR "  Disabmiguating $i_param and $j_param\n"
                   if $self->{Debug} & 2;
 
                 my $j_abbrev = $abbrevs{$j_param};
-                my ( $j_words, $j_regions ) = @{ $wr_pairs{$j_param} };
+                my ($j_words, $j_regions) = @{$wr_pairs{$j_param}};
 
-                my $w_max   = min( scalar(@$i_words), scalar(@$j_words) );
+                my $w_max   = min(scalar(@$i_words), scalar(@$j_words));
                 my $updated = 0;
-                for ( my $w_num = 0 ; $w_num < $w_max ; $w_num++ ) {
+                for (my $w_num = 0 ; $w_num < $w_max ; $w_num++) {
                     my $i_word = $i_words->[$w_num];
                     my $j_word = $j_words->[$w_num];
 
-                    if ( $i_word ne $j_word ) {
+                    if ($i_word ne $j_word) {
                         for (
                             my $w_idx = 0 ;
                             $w_idx < length($i_word) || $w_idx < length($j_word) ;
                             $w_idx++
                           )
                         {
-                            if ( substr( $i_word, $w_idx, 1 ) ne substr( $j_word, $w_idx, 1 ) ) {
+                            if (substr($i_word, $w_idx, 1) ne substr($j_word, $w_idx, 1)) {
                                 my $i_region = $i_regions->[$w_num];
                                 my $j_region = $j_regions->[$w_num];
 
-                                if ( $w_idx + 1 > $i_region && $w_idx < length($i_word) ) {
+                                if ($w_idx + 1 > $i_region && $w_idx < length($i_word)) {
                                     $i_regions->[$w_num] = $w_idx + 1;
                                     $updated = 1;
-                                    print STDERR "  $i_param: $w_num set to "
-                                      . ( $w_idx + 1 ) . "\n"
+                                    print STDERR "  $i_param: $w_num set to " . ($w_idx + 1) . "\n"
                                       if $self->{Debug} & 2;
                                 }
-                                if ( $w_idx + 1 > $j_region && $w_idx < length($j_word) ) {
+                                if ($w_idx + 1 > $j_region && $w_idx < length($j_word)) {
                                     $j_regions->[$w_num] = $w_idx + 1;
                                     $updated = 1;
-                                    print STDERR "  $j_param: $w_num set to "
-                                      . ( $w_idx + 1 ) . "\n"
+                                    print STDERR "  $j_param: $w_num set to " . ($w_idx + 1) . "\n"
                                       if $self->{Debug} & 2;
                                 }
 
@@ -2529,7 +2524,7 @@ sub gen_param_abbrevs {
                     }
                     last if ($updated);
                 }
-                if ( !$updated ) {
+                if (!$updated) {
                     error(
                         "$name: could not disambiguate abbreviations for $i_param and $j_param\n");
                 }
@@ -2561,20 +2556,20 @@ sub get_mod_param_list {
 
     # Create a list of non-default parameters
     my @nondef_params;
-    foreach my $param ( @{ $self->{ParametersList} } ) {
+    foreach my $param (@{$self->{ParametersList}}) {
         push @nondef_params, $param
-          if ( $self->get_param_priority($param) > GENESIS2_DECLARATION_PRIORITY );
+          if ($self->get_param_priority($param) > GENESIS2_DECLARATION_PRIORITY);
     }
 
     # Generate the parameter list string
     my $ret = "";
-    foreach my $param ( sort(@nondef_params) ) {
+    foreach my $param (sort(@nondef_params)) {
         next if $param =~ /^__/;
         my $abbrev = $abbrevs->{$param};
         my $val    = $self->internal_get_param($param);
         $val = $self->internal_get_ref_param_hash($val) if ref $val;
 
-        if ( defined $val ) {
+        if (defined $val) {
             $val =~ s/\./_/g;
             $val =~ s/\'/_/g;
             $val = 'FALSE_OR_EMPTY' if $val eq "";
@@ -2613,21 +2608,21 @@ sub does_generate_same {
 
     # Step 2: check that the parameters of all child modules match
     foreach my $ref (
-        [ "SubInstanceListUnunique",    \&Genesis2::UniqueModule::ununique_inst ],
-        [ "SubInstanceListUnique",      \&Genesis2::UniqueModule::unique_inst ],
-        [ "SubInstanceListUniqueParam", \&Genesis2::UniqueModule::unique_inst_param ]
+        ["SubInstanceListUnunique",    \&Genesis2::UniqueModule::ununique_inst],
+        ["SubInstanceListUnique",      \&Genesis2::UniqueModule::unique_inst],
+        ["SubInstanceListUniqueParam", \&Genesis2::UniqueModule::unique_inst_param]
       )
     {
-        my ( $list, $func ) = @{$ref};
+        my ($list, $func) = @{$ref};
         if ($match) {
-            for my $child_name ( @{ $old_inst->{$list} } ) {
+            for my $child_name (@{$old_inst->{$list}}) {
                 my $old_child_inst = $old_inst->{SubInstance_InstanceObj}->{$child_name};
 
                 my @params = ();
                 push @params, $old_child_inst->{BaseModuleName}, $old_child_inst->{InstanceName};
-                push @params, @{ $old_child_inst->{ParamsFromInst} }
-                  if scalar( @{ $old_child_inst->{ParamsFromInst} } );
-                my $my_child_inst = $func->( $new_inst, @params );
+                push @params, @{$old_child_inst->{ParamsFromInst}}
+                  if scalar(@{$old_child_inst->{ParamsFromInst}});
+                my $my_child_inst = $func->($new_inst, @params);
 
                 $match &= $old_child_inst->{InstanceName} eq $my_child_inst->{InstanceName};
             }
@@ -2635,7 +2630,7 @@ sub does_generate_same {
     }
 
     # Remove sub instance info if the modules differ
-    if ( !$match ) {
+    if (!$match) {
         $new_inst->{SubInstance_InstanceObj}    = {};
         $new_inst->{SubInstanceList}            = [];
         $new_inst->{SubInstanceListUnunique}    = [];
@@ -2652,10 +2647,10 @@ sub error {
     my $self    = $Genesis2::UniqueModule::myself;
     my $message = 'No error message found!';
 
-    if ( scalar(@_) == 0 ) {
+    if (scalar(@_) == 0) {
 
         # nothing to do, use defult self and message
-    } elsif ( scalar(@_) == 1 ) {
+    } elsif (scalar(@_) == 1) {
         $message = shift;
     } else {    # two args or more
         $self    = shift;
@@ -2663,14 +2658,14 @@ sub error {
     }
 
     my @message_arr = ();
-    my ( $prefix, $prefix0, $prefix1, $prefix2, $prefix3, $perlmsg, $suffix1, $suffix2 );
-    my ( $package, $filename, $line, $subroutine );
+    my ($prefix, $prefix0, $prefix1, $prefix2, $prefix3, $perlmsg, $suffix1, $suffix2);
+    my ($package, $filename, $line, $subroutine);
 
     my $i = 0;
-    while ( ( $package, $filename, $line, $subroutine ) = caller( $i++ ) ) {
+    while (($package, $filename, $line, $subroutine) = caller($i++)) {
 
         # print STDERR "DEBUG: Caller($i): $package, $filename, $line, $subroutine\n";
-        last if ( $package ne "Genesis2::UniqueModule" && $package ne "Genesis2::Manager" );
+        last if ($package ne "Genesis2::UniqueModule" && $package ne "Genesis2::Manager");
     }
 
     # add a tab before the message:
@@ -2687,15 +2682,15 @@ sub error {
     print "\n" . $prefix . "\n";
     print STDERR "\n" . $prefix . "\n";
 
-    @message_arr = split( /\n/, $message );
+    @message_arr = split(/\n/, $message);
     map { print "\t" . $_ . "\n" } @message_arr;    # print to file
     map {
-        my @tokens = split( //, $_ );
+        my @tokens = split(//, $_);
         my $len    = scalar(@tokens);
         my $space  = '';
-        $space = ' ' x ( 80 - $len ) if $len < 80;
+        $space = ' ' x (80 - $len) if $len < 80;
         print STDERR "\t";
-        print STDERR colored( $_ . $space, 'bold red on_black' );
+        print STDERR colored($_ . $space, 'bold red on_black');
         print STDERR "\n";
     } @message_arr;                                 # print stderr
 
@@ -2712,24 +2707,24 @@ sub warning {
     my $self    = $Genesis2::UniqueModule::myself;
     my $message = 'No warning message found!';
 
-    if ( scalar(@_) == 0 ) {
+    if (scalar(@_) == 0) {
 
         # nothing to do, use defult self and message
-    } elsif ( scalar(@_) == 1 ) {
+    } elsif (scalar(@_) == 1) {
         $message = shift;
     } else {    # two args or more
         $self    = shift;
         $message = shift;
     }
 
-    my ( $prefix0, $prefix1, $prefix2, $prefix3, $perlmsg, $suffix1, $suffix2 );
-    my ( $package, $filename, $line, $subroutine );
+    my ($prefix0, $prefix1, $prefix2, $prefix3, $perlmsg, $suffix1, $suffix2);
+    my ($package, $filename, $line, $subroutine);
 
     my $i = 0;
-    while ( ( $package, $filename, $line, $subroutine ) = caller( $i++ ) ) {
+    while (($package, $filename, $line, $subroutine) = caller($i++)) {
 
         # print STDERR "DEBUG: Caller($i): $package, $filename, $line, $subroutine\n";
-        last if ( $package ne "Genesis2::UniqueModule" && $package ne "Genesis2::Manager" );
+        last if ($package ne "Genesis2::UniqueModule" && $package ne "Genesis2::Manager");
     }
 
     # add a tab before the message:
@@ -2764,7 +2759,7 @@ sub to_string {
     $self->error("$name: Expected a data structure to print. Found no arguments.") unless @_;
     my $str = '';
     foreach my $elem (@_) {
-        $str .= $self->{CfgHandler}->PrintToString( $elem, depth => 1, prefix => "" ) . "\n";
+        $str .= $self->{CfgHandler}->PrintToString($elem, depth => 1, prefix => "") . "\n";
     }
     chomp($str);
     return $str;
@@ -2782,20 +2777,20 @@ sub to_verilog {
     print STDERR "$name: Generating " . $self->get_instance_path() . "\n"
       if $self->{Debug};
     print STDERR "$name: Started printing to "
-      . catfile( $self->{RawDir}, $self->{OutputFileName} ) . "\n"
+      . catfile($self->{RawDir}, $self->{OutputFileName}) . "\n"
       if $self->{Debug} & 1;
 
     $self->error("Internal error: Why is VersionInfo not defined?")
       unless defined $self->{VersionInfo};
-    my $version = join( $self->{LineComment} . "\t", @{ $self->{VersionInfo} } );
+    my $version = join($self->{LineComment} . "\t", @{$self->{VersionInfo}});
     chomp($version);
 
     $self->error("Internal error: Why is LicenseInfo not defined?")
       unless defined $self->{LicenseInfo};
-    my $license = join( $self->{LineComment} . "  ", @{ $self->{LicenseInfo} } );
+    my $license = join($self->{LineComment} . "  ", @{$self->{LicenseInfo}});
     chomp($license);
 
-    print { $self->{OutfileHandle} } <<END_OF_MESSAGE;
+    print {$self->{OutfileHandle}} <<END_OF_MESSAGE;
 $self->{LineComment}
 $self->{LineComment}--------------------------------------------------------------------------------
 $self->{LineComment}          THIS FILE WAS AUTOMATICALLY GENERATED BY THE GENESIS2 ENGINE        
@@ -2810,73 +2805,73 @@ $self->{LineComment}  Source template: $self->{BaseModuleName}
 $self->{LineComment}
 END_OF_MESSAGE
 
-    print { $self->{OutfileHandle} } $self->{LineComment}
+    print {$self->{OutfileHandle}} $self->{LineComment}
       . " --------------- Begin Pre-Generation Parameters Status Report ---------------\n";
-    print { $self->{OutfileHandle} } $self->{LineComment} . "\n";
+    print {$self->{OutfileHandle}} $self->{LineComment} . "\n";
 
     # GENESIS2_INHERITANCE_PRIORITY
-    print { $self->{OutfileHandle} } $self->{LineComment}
+    print {$self->{OutfileHandle}} $self->{LineComment}
       . "\tFrom 'generate' statement (priority="
       . GENESIS2_INHERITANCE_PRIORITY . "):\n";
-    foreach my $prm ( sort keys %{ $self->{Parameters} } ) {
-        print { $self->{OutfileHandle} } $self->{LineComment} . " Parameter $prm \t= undef\n"
+    foreach my $prm (sort keys %{$self->{Parameters}}) {
+        print {$self->{OutfileHandle}} $self->{LineComment} . " Parameter $prm \t= undef\n"
           if !defined $self->{Parameters}->{$prm}->{Val};
-        my $type = ref( $self->{Parameters}->{$prm}->{Val} );
-        print { $self->{OutfileHandle} } $self->{LineComment}
+        my $type = ref($self->{Parameters}->{$prm}->{Val});
+        print {$self->{OutfileHandle}} $self->{LineComment}
           . " Parameter $prm \t= $self->{Parameters}->{$prm}->{Val}\n"
           if $type eq '';
-        print { $self->{OutfileHandle} } $self->{LineComment}
+        print {$self->{OutfileHandle}} $self->{LineComment}
           . " Parameter $prm \t= Data structure of type $type\n"
           if $type ne '';
     }
-    print { $self->{OutfileHandle} } $self->{LineComment} . "\n";
-    print { $self->{OutfileHandle} } $self->{LineComment}
+    print {$self->{OutfileHandle}} $self->{LineComment} . "\n";
+    print {$self->{OutfileHandle}} $self->{LineComment}
       . "\t\t---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----\n";
-    print { $self->{OutfileHandle} } $self->{LineComment} . "\n";
+    print {$self->{OutfileHandle}} $self->{LineComment} . "\n";
 
     # GENESIS2_CMD_LINE_PRIORITY
-    print { $self->{OutfileHandle} } $self->{LineComment}
+    print {$self->{OutfileHandle}} $self->{LineComment}
       . "\tFrom Command Line input (priority="
       . GENESIS2_CMD_LINE_PRIORITY . "):\n";
-    foreach my $prm ( sort keys %{ $self->{ParamsFromCmdLn} } ) {
-        my $prm_val = $self->{CfgHandler}->GetCmdLnParamBrief( $self->{ParamsFromCmdLn}->{$prm},
-            $self->get_instance_path . ':Parameters:ParamItem(' . $prm . ')' );
+    foreach my $prm (sort keys %{$self->{ParamsFromCmdLn}}) {
+        my $prm_val = $self->{CfgHandler}->GetCmdLnParamBrief($self->{ParamsFromCmdLn}->{$prm},
+            $self->get_instance_path . ':Parameters:ParamItem(' . $prm . ')');
         $prm_val = 'undef' if !defined $prm_val;
-        print { $self->{OutfileHandle} } $self->{LineComment} . " Parameter $prm \t= $prm_val\n";
+        print {$self->{OutfileHandle}} $self->{LineComment} . " Parameter $prm \t= $prm_val\n";
     }
-    print { $self->{OutfileHandle} } $self->{LineComment} . "\n";
-    print { $self->{OutfileHandle} } $self->{LineComment}
+    print {$self->{OutfileHandle}} $self->{LineComment} . "\n";
+    print {$self->{OutfileHandle}} $self->{LineComment}
       . "\t\t---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----\n";
-    print { $self->{OutfileHandle} } $self->{LineComment} . "\n";
+    print {$self->{OutfileHandle}} $self->{LineComment} . "\n";
 
     # GENESIS2_EXTERNAL_XML_PRIORITY
-    print { $self->{OutfileHandle} } $self->{LineComment}
+    print {$self->{OutfileHandle}} $self->{LineComment}
       . "\tFrom XML input (priority="
       . GENESIS2_EXTERNAL_XML_PRIORITY . "):\n";
-    foreach my $prm ( sort keys %{ $self->{ParamsFromXML} } ) {
-        my $prm_val = $self->{CfgHandler}->GetXmlParamBrief( $self->{ParamsFromXML}->{$prm},
-            $self->get_instance_path . ':Parameters:ParamItem(' . $prm . ')' );
+    foreach my $prm (sort keys %{$self->{ParamsFromXML}}) {
+        my $prm_val = $self->{CfgHandler}->GetXmlParamBrief($self->{ParamsFromXML}->{$prm},
+            $self->get_instance_path . ':Parameters:ParamItem(' . $prm . ')');
         $prm_val = 'undef' if !defined $prm_val;
-        print { $self->{OutfileHandle} } $self->{LineComment} . " Parameter $prm \t= $prm_val\n";
+        print {$self->{OutfileHandle}} $self->{LineComment} . " Parameter $prm \t= $prm_val\n";
     }
-    print { $self->{OutfileHandle} } $self->{LineComment} . "\n";
-    print { $self->{OutfileHandle} } $self->{LineComment}
+    print {$self->{OutfileHandle}} $self->{LineComment} . "\n";
+    print {$self->{OutfileHandle}} $self->{LineComment}
       . "\t\t---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----\n";
-    print { $self->{OutfileHandle} } $self->{LineComment} . "\n";
+    print {$self->{OutfileHandle}} $self->{LineComment} . "\n";
 
     # GENESIS2_EXTERNAL_CONFIG_PRIORITY
-    print { $self->{OutfileHandle} } $self->{LineComment}
+    print {$self->{OutfileHandle}} $self->{LineComment}
       . "\tFrom Config File input (priority="
       . GENESIS2_EXTERNAL_CONFIG_PRIORITY . "):\n";
-    foreach my $prm ( sort keys %{ $self->{ParamsFromCfg} } ) {
-        my $prm_val = $self->{CfgHandler}->GetCfgParamBrief( $self->{ParamsFromCfg}->{$prm},
-            $self->get_instance_path . ':Parameters:ParamItem(' . $prm . ')' );
+    foreach my $prm (sort keys %{$self->{ParamsFromCfg}}) {
+        my $prm_val = $self->{CfgHandler}->GetCfgParamBrief($self->{ParamsFromCfg}->{$prm},
+            $self->get_instance_path . ':Parameters:ParamItem(' . $prm . ')');
         $prm_val = 'undef' if !defined $prm_val;
-        print { $self->{OutfileHandle} } $self->{LineComment} . " Parameter $prm \t= $prm_val\n";
+        print {$self->{OutfileHandle}} $self->{LineComment} . " Parameter $prm \t= $prm_val\n";
     }
 
-    print { $self->{OutfileHandle} } $self->{LineComment} . "\n";
-    print { $self->{OutfileHandle} } $self->{LineComment}
+    print {$self->{OutfileHandle}} $self->{LineComment} . "\n";
+    print {$self->{OutfileHandle}} $self->{LineComment}
       . " ---------------- End Pre-Generation Pramameters Status Report ----------------\n\n";
     1;
 }
@@ -2906,10 +2901,10 @@ sub internal_deep_copy {
     my $type = ref($src);
     my $trgt;
 
-    if ( !defined $src ) {
+    if (!defined $src) {
         $trgt = $src;
-    } elsif ( $type eq '' ) {    # not a reference
-                                 # Check special numeric formats
+    } elsif ($type eq '') {    # not a reference
+                               # Check special numeric formats
         if (
             $src =~ /^\s*0x([0-9,a-f])+\s*$/i ||    # special case for hex numbers
             $src =~ /^\s*0b([0,1])+\s*$/i
@@ -2919,49 +2914,49 @@ sub internal_deep_copy {
         } else {
             $trgt = $src;
         }
-    } elsif ( defined $Genesis2::UniqueModule::deep_copy_hash->{$src} ) {
+    } elsif (defined $Genesis2::UniqueModule::deep_copy_hash->{$src}) {
 
         # If this pointer was seen already, don't copy again (avoid infinite loops)
         $trgt = $Genesis2::UniqueModule::deep_copy_hash->{$src};
-    } elsif ( $type eq 'SCALAR' ) {
-        my $tmp = $self->internal_deep_copy( ${$src}, $msg );    # get the unreferenced version
-        $trgt = \$tmp;                                           # create a referenced version
-    } elsif ( $type eq 'ARRAY' ) {
+    } elsif ($type eq 'SCALAR') {
+        my $tmp = $self->internal_deep_copy(${$src}, $msg);    # get the unreferenced version
+        $trgt = \$tmp;                                         # create a referenced version
+    } elsif ($type eq 'ARRAY') {
         $trgt = [];
         $Genesis2::UniqueModule::deep_copy_hash->{$src} = $trgt;    # keep for your records
-        foreach my $element ( @{$src} ) {
-            push( @{$trgt}, $self->internal_deep_copy( $element, $msg ) );
+        foreach my $element (@{$src}) {
+            push(@{$trgt}, $self->internal_deep_copy($element, $msg));
         }
         delete $Genesis2::UniqueModule::deep_copy_hash->{$src};
-    } elsif ( $type eq 'HASH' ) {
+    } elsif ($type eq 'HASH') {
         $trgt = {};
         $Genesis2::UniqueModule::deep_copy_hash->{$src} = $trgt;    # keep for your records
-        foreach my $key ( keys %{$src} ) {
-            $trgt->{$key} = $self->internal_deep_copy( $src->{$key}, $msg );
+        foreach my $key (keys %{$src}) {
+            $trgt->{$key} = $self->internal_deep_copy($src->{$key}, $msg);
         }
         delete $Genesis2::UniqueModule::deep_copy_hash->{$src};
-    } elsif ( $src == $self ) {
+    } elsif ($src == $self) {
         $trgt = $src;
-    } elsif ( UNIVERSAL::can( $src, 'can' ) ) {
+    } elsif (UNIVERSAL::can($src, 'can')) {
 
         # if this is a blessed ref it might have a deep_copy method
-        if ( $src->can('deep_copy') ) {
-            $trgt = $src->deep_copy( $src, $msg );
+        if ($src->can('deep_copy')) {
+            $trgt = $src->deep_copy($src, $msg);
         } else {
 
             # I guess it does not have a deep_copy method...
-            $self->error( "$name: src of type "
+            $self->error("$name: src of type "
                   . ref($src)
                   . " is not supported (perhaps add a "
                   . ref($src)
-                  . "->deep_copy method?)" );
+                  . "->deep_copy method?)");
         }
     } else {
-        $self->error( "$name: src of type "
+        $self->error("$name: src of type "
               . ref($src)
               . " is not supported (perhaps add a "
               . ref($src)
-              . "->deep_copy method?)" );
+              . "->deep_copy method?)");
     }
     return $trgt;
 }
@@ -2993,12 +2988,12 @@ sub compare_generated_files {
     print STDERR "$name: Comparing $filenameA to $filenameB\n" if $self->{Debug} & 4;
 
     # check that all files are already in cache
-    if ( !exists $self->{OutfileName_ContentCache}{$filenameA} ) {
+    if (!exists $self->{OutfileName_ContentCache}{$filenameA}) {
 
         # This is a bad sign... a file we just finished generating should be in the cache...
         $self->error("$name: Can't find $filenameA in the cache");
     }
-    if ( !exists $self->{OutfileName_ContentCache}{$filenameB} ) {
+    if (!exists $self->{OutfileName_ContentCache}{$filenameB}) {
 
         # this is a sign of recursion because it means a file we started generating
         # earlier was not yet finalized --> They cannot match or this is a never ending recursion
@@ -3010,26 +3005,26 @@ sub compare_generated_files {
     my $idxB   = 0;
     my $linesA = $self->{OutfileName_ContentCache}{$filenameA};
     my $linesB = $self->{OutfileName_ContentCache}{$filenameB};
-    while ( $idxA < scalar( @{$linesA} ) && $idxB < scalar( @{$linesB} ) && $match == 1 ) {
-        $lineA = ${$linesA}[ $idxA++ ];
-        $lineB = ${$linesB}[ $idxB++ ];
+    while ($idxA < scalar(@{$linesA}) && $idxB < scalar(@{$linesB}) && $match == 1) {
+        $lineA = ${$linesA}[$idxA++];
+        $lineB = ${$linesB}[$idxB++];
 
         # remove full line comments and empty lines
         while ($lineA =~ /^\s*$self->{LineComment}.*$/
-            || $lineA =~ /^\s*$/ )
+            || $lineA =~ /^\s*$/)
         {
-            if ( $idxA < scalar( @{$linesA} ) ) {
-                $lineA = ${$linesA}[ $idxA++ ];
+            if ($idxA < scalar(@{$linesA})) {
+                $lineA = ${$linesA}[$idxA++];
             } else {
                 $lineA = undef;
                 last;
             }
         }
         while ($lineB =~ /^\s*$self->{LineComment}.*$/
-            || $lineB =~ /^\s*$/ )
+            || $lineB =~ /^\s*$/)
         {
-            if ( $idxB < scalar( @{$linesB} ) ) {
-                $lineB = ${$linesB}[ $idxB++ ];
+            if ($idxB < scalar(@{$linesB})) {
+                $lineB = ${$linesB}[$idxB++];
             } else {
                 $lineB = undef;
                 last;
@@ -3037,18 +3032,18 @@ sub compare_generated_files {
         }
 
         # Do the mapping of words as requested
-        foreach my $key ( sort keys %options ) {
+        foreach my $key (sort keys %options) {
             $lineA =~ s/(^|\W)$key(?=\W|$)/$1$options{$key}/g if defined $lineA;
         }
-        if ( defined $lineA && defined $lineB ) {
-            $match = ( $lineA =~ /^\Q$lineB\E$/ ) ? 1 : 0;
-        } elsif ( !defined $lineA && !defined $lineB ) {
+        if (defined $lineA && defined $lineB) {
+            $match = ($lineA =~ /^\Q$lineB\E$/) ? 1 : 0;
+        } elsif (!defined $lineA && !defined $lineB) {
             $match = 1;
         } else {
             $match = 0;
         }
     }
-    print STDERR "$name: Match is $match\n" if ( ( $self->{Debug} & 4 ) );
+    print STDERR "$name: Match is $match\n" if (($self->{Debug} & 4));
     return $match;
 }
 
@@ -3065,7 +3060,7 @@ sub load_base_module {
     my $base_module_file = $base_module_name . $self->{InfileSuffix};    # E.g. 'jtag.pm'
     my $err_msg          = '';
 
-    if ( $INC{$base_module_file} ) {
+    if ($INC{$base_module_file}) {
         return $err_msg;
     } else {
         my $base_module_name_adj = $self->{Manager}->add_suffix($base_module_name);
@@ -3074,11 +3069,11 @@ sub load_base_module {
 
         # Check for errors
         if ($@) {
-            my @errs = split( /\n/, $@ );
+            my @errs = split(/\n/, $@);
 
             # remove the last line of $@ it will always point to UniqueModule.pm
             pop(@errs) if scalar(@errs) > 1;
-            $err_msg = join( "\n", @errs );
+            $err_msg = join("\n", @errs);
             return $err_msg;
         }
         $base_module_name->import();
@@ -3096,13 +3091,13 @@ sub get_SynonymFor {
 ## sub private_to_me
 ## A subroutine that errors if the caller of the parent sub was not UniqueModule
 sub private_to_me {
-    my ( $package, $filename, $line, $subroutine ) = caller(1);
+    my ($package, $filename, $line, $subroutine) = caller(1);
     $subroutine =~ s/(\w+::)*//;
     $package eq __PACKAGE__
-      or confess( "ERROR ERROR ERROR\n"
+      or confess("ERROR ERROR ERROR\n"
           . $package . "->"
           . $subroutine
-          . ": Call to a base class private method is not allowed\n" );
+          . ": Call to a base class private method is not allowed\n");
     1;
 }
 
@@ -3110,8 +3105,8 @@ sub private_to_me {
 sub check_if_self {
     my $arg = shift;
     return 1
-      if ( ref($arg) eq ref($Genesis2::UniqueModule::myself)
-        && $arg == $Genesis2::UniqueModule::myself );
+      if (ref($arg) eq ref($Genesis2::UniqueModule::myself)
+        && $arg == $Genesis2::UniqueModule::myself);
     return 0;
 }
 
@@ -3124,7 +3119,7 @@ sub internal_get_ref_param_hash {
       or $self->error("$name: Call to a base class private method is not allowed");
 
     my $ref = shift;
-    if ( !ref $ref ) {
+    if (!ref $ref) {
         $self->error("$name: expects a reference parameter");
     }
 
@@ -3136,7 +3131,7 @@ sub internal_get_ref_param_hash {
     my $dump = Dumper($ref);
     my $hash = sha256_hex($dump);
 
-    my $hash32b = substr( $hash, 0, 8 );
+    my $hash32b = substr($hash, 0, 8);
     return "R$hash32b";
 }
 

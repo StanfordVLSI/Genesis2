@@ -57,7 +57,7 @@ system("clear");
 print "\nGENESIS2 MAKE EXECUTABLE WARNING: THIS SCRIPTS OVERRIDES THE GENESIS2 EXECUTABLE!!!\n";
 print "GENESIS2 MAKE EXECUTABLE WARNING: ARE YOU SURE YOU KNOW WHAT YOU ARE DOING? (NO):  ";
 my $continue = <STDIN>;
-if ( $continue !~ /^y(es)?$/i ) {
+if ($continue !~ /^y(es)?$/i) {
     print "\nGENESIS2 MAKE EXECUTABLE ABORTS\n\n";
     exit;
 }
@@ -74,12 +74,12 @@ print "\t (2) I found that \$CHIPGEN/bin/Genesis2Tools=${chipgen_home}/bin/Genes
 print "WHICH LOCATION DO YOU PREFER? (abort):  ";
 $continue = <STDIN>;
 
-if ( $continue !~ /^\d$/ ) {
+if ($continue !~ /^\d$/) {
     print "\nGENESIS2 MAKE EXECUTABLE ABORTS\n\n";
     exit;
-} elsif ( $continue =~ /1/ && defined $genesis_home ) {
+} elsif ($continue =~ /1/ && defined $genesis_home) {
     $perllibs = "$genesis_home/PerlLibs";
-} elsif ( $continue =~ /2/ && defined $chipgen_home && -e "${chipgen_home}/bin/Genesis2Tools" ) {
+} elsif ($continue =~ /2/ && defined $chipgen_home && -e "${chipgen_home}/bin/Genesis2Tools") {
     $perllibs = "${chipgen_home}/bin/Genesis2Tools/PerlLibs";
 } else {
     print "\nGENESIS2 MAKE EXECUTABLE ABORTS\n\n";
