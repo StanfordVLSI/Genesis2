@@ -9,8 +9,6 @@
 # ** $Author: shacham $
 # *************************************************************************
 
-
-
 ###################################################################################
 # Copyright (c) 2013, Ofer Shacham and Stanford University                        #
 # All rights reserved.                                                            #
@@ -44,9 +42,6 @@
 #   Professor Mark Horowitz (Stanford Univ.)     horowitz@stanford.edu            #
 ###################################################################################
 
-
-
-
 use strict;
 use warnings;
 
@@ -54,21 +49,19 @@ use warnings;
 #use lib "$ENV{GENESIS_HOME}/PerlLibs/Genesis2/Auxiliary";
 #use lib "$ENV{GENESIS_HOME}/PerlLibs/ExtrasForOldPerlDistributions";
 
-
 # Now include the key genesis2 packages
 use Genesis2::Manager 1.00;
 use Genesis2::UniqueModule 1.00;
 
 # add local per-project perl libraries (only when needed)
-if (defined $ENV{GENESIS_PROJECT_LIBS}){
+if (defined $ENV{GENESIS_PROJECT_LIBS}) {
     require lib;
     lib->import("$ENV{GENESIS_PROJECT_LIBS}");
 }
 
-
 # check for Perl installation version
-eval {require v5.8.5}; 
-if ($@){
+eval { require v5.8.5 };
+if ($@) {
     my $ver = $];
     $ver =~ s/00//;
     $ver =~ s/00/\./;
@@ -78,9 +71,4 @@ if ($@){
 # Now instantiate the manager and let's run...
 my $manager = new Genesis2::Manager;
 $manager->execute or die "ERROR: Genesis2 run encountered some errors:\n $@";
-
-
-
-
-
 

@@ -39,3 +39,13 @@ You might need to do this:
 
 Also see Genesis2 installation instructions here:
 https://github.com/StanfordVLSI/Genesis2/wiki#user-content-Download_and_Install_Genesis2
+
+
+## Contributing
+
+Perl code must be formatted according to the perltidy rules. Please use perltidy v20260204.
+
+To reformat with perltidy, run this command from the root of the repository:
+```
+make format
+```

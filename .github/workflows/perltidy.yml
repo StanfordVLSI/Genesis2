@@ -1,0 +1,52 @@
+name: Perltidy Format Check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  perltidy:
+    runs-on: ubuntu-latest
+    name: Check Perl formatting
+    container:
+      image: perl:5.32  # Use a container with Perl pre-installed
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install Perl::Tidy
+        run: cpanm -n Perl::Tidy@20260204
+
+      - name: Run perltidy check
+        run: |
+          EXIT_CODE=0
+          FILES=$(find ./bin ./PerlLibs/Genesis2 -type f \( -name '*.pl' -o -name '*.pm' -o -name '*.t' \) 2>/dev/null)
+
+          if [ -z "$FILES" ]; then
+            echo "No Perl files found."
+            exit 0
+          fi
+
+          for file in $FILES; do
+            # Run perltidy and output to a temp file
+            perltidy --profile=.perltidyrc "$file" -o "$file.tdy"
+
+            if ! diff -u "$file" "$file.tdy" > "$file.diff" 2>&1; then
+              echo "::error file=${file}::${file} is not correctly formatted"
+              echo "--- Diff for $file ---"
+              cat "$file.diff"
+              echo ""
+              EXIT_CODE=1
+            fi
+
+            rm -f "$file.tdy" "$file.diff"
+          done
+
+          if [ "$EXIT_CODE" -ne 0 ]; then
+            echo ""
+            echo "::error::Some Perl files are not formatted correctly. Please run perltidy."
+            exit 1
+          fi
+
+          echo "All Perl files are correctly formatted."
