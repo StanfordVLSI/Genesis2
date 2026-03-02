@@ -807,6 +807,7 @@ sub parse_file {
                               : "'; print { \$Genesis2::UniqueModule::myself->{OutfileHandle} } ";
                             $perl_mode = !$perl_mode;
                         }
+                        $prev_backslash = 0;
                     } else {
                         if ($char eq "\\") {
                             $prev_backslash = 1;
