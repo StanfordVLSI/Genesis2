@@ -649,6 +649,7 @@ sub extract_stats {
 #if($unq_module->{Parameters}->{$param}->{Pri} >= GENESIS2_INHERITANCE_PRIORITY || $param_is_recursive == 1){
             else {
                 $ParameterItem->{Doc}   = $unq_module->{Parameters}->{$param}->{Doc};
+                $ParameterItem->{Doc}   = '' if !defined $ParameterItem->{Doc};
                 $ParameterItem->{Range} = $unq_module->{Parameters}->{$param}->{Range}
                   if defined $unq_module->{Parameters}->{$param}->{Range};
                 $ParameterItem->{Opt} = $unq_module->{Parameters}->{$param}->{Opt}
