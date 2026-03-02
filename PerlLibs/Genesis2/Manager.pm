@@ -717,12 +717,14 @@ sub parse_file {
         # expression (//; or `). Do more throrough processing only if this
         # regex matches.
         if ($line =~ m/$self->{PRLESC}|`/) {
+
             # Performance optimization:
             #
             # Original code did a match followed by a substitution.
             # Optimized code only does the substition, relying on the
             # substition to return false on a failed match.
             if ($line =~ s/^(\s*)$self->{PRLESC}//) {
+
                 # Keep the leading whitespace to allow nicer indentation
                 my $lead_ws = $1;
 
@@ -751,12 +753,12 @@ sub parse_file {
                 $perl_mode = 0;
                 if ($Genesis2::Manager::inline % 10 == 0 && $self->{Debug}) {
                     $out =
-    qq/print { \$Genesis2::UniqueModule::myself->{OutfileHandle} } "\$Genesis2::UniqueModule::myself->{LineComment} From $Genesis2::Manager::infile line $Genesis2::Manager::inline\\n"; \n/;
+qq/print { \$Genesis2::UniqueModule::myself->{OutfileHandle} } "\$Genesis2::UniqueModule::myself->{LineComment} From $Genesis2::Manager::infile line $Genesis2::Manager::inline\\n"; \n/;
                 }
                 $out .= qq/print { \$Genesis2::UniqueModule::myself->{OutfileHandle} } \'/;
 
-                # allow the special verilog compile time `timescale/`default_nettype/`include thingies
-                # (and remove it from the line)
+                # allow the special verilog compile time `timescale/`default_nettype/`include
+                # thingies (and remove it from the line)
                 if ($line =~ s/^(\s*\/?\/?)(\s*`)(timescale|default_nettype|include) //) {    #`
                     $veri_macro = $1 . $2 . $3 . " ";
                     $out .= $veri_macro;
@@ -789,17 +791,19 @@ sub parse_file {
                 # track of whether the previous character was a backslash,
                 # eliminating the need for the second substr.
                 my $prev_backslash = 0;
-                foreach my $i (0..length($line)) {
+                foreach my $i (0 .. length($line)) {
                     $char = substr($line, $i, 1);
 
-                    if ($char eq '`') {  # have a backtick
+                    if ($char eq '`') {    # have a backtick
                         if ($prev_backslash) {    # i.e., user is escaping the back-tick
                             $out .= $char;
-                            $warn = "You are using an old Verilog style macro."
+                            $warn =
+                                "You are using an old Verilog style macro."
                               . " This is not safe and thus highly unrecommended.\n"
                               . "\t\t---> You should be using Genesis2 parameters instead"
                               unless $perl_mode;
                         } else {
+
                             # toggle perl mode and text mode
                             $out .=
                               $perl_mode
@@ -835,7 +839,8 @@ sub parse_file {
 
                 $out .= $perl_mode ? ";" : "';";
                 if ($perl_mode) {
-                    $self->error("$name: Missing closing ' (back-tic):\n" . "In Code: " . $orig_line)
+                    $self->error(
+                        "$name: Missing closing ' (back-tic):\n" . "In Code: " . $orig_line)
                       if ($veri_macro eq '');
                     $self->error("$name: Missing closing ' (back-tic).\n"
                           . "In Code: "
@@ -845,7 +850,8 @@ sub parse_file {
                 }
 
                 if (defined $warn) {
-                    print STDERR "WARNING: Line ${Genesis2::Manager::inline}, of File $Genesis2::Manager::infile \n"
+                    print STDERR
+"WARNING: Line ${Genesis2::Manager::inline}, of File $Genesis2::Manager::infile \n"
                       . "WARNING: $warn\n"
                       if defined $warn;
 
@@ -857,11 +863,13 @@ sub parse_file {
             }
         } else {
             chomp($line);
+
             # Still need to escape backslashes and single quotes in text lines,
             # even if they don't contain perl expressions, since they will be
             # part of strings in the generated perl code.
             $line =~ s/\\|'/\\$&/g;
-            $out = qq/print { \$Genesis2::UniqueModule::myself->{OutfileHandle} } \'$line\' . "\\n";\n/;
+            $out =
+              qq/print { \$Genesis2::UniqueModule::myself->{OutfileHandle} } \'$line\' . "\\n";\n/;
             push(@{$self->{ModuleBody}}, $out);
         }
     }
