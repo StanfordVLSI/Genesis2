@@ -46,6 +46,7 @@
 package Genesis2::Manager;
 use warnings;
 use strict;
+use 5.010;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
 use Exporter;
@@ -710,101 +711,156 @@ sub parse_file {
 
         # first we put a few hooks to catch intersting events that need more handling
         # perl lines
-        if ($line =~ m/^\s*$self->{PRLESC}/) {
-            $line =~ s/^(\s*)$self->{PRLESC}/$1/g;   # we keep the spaces to allow nicer indentation
+        #
+        # Performance optimization:
+        # Run a "fast" regex to see if a line contains a potential perl
+        # expression (//; or `). Do more throrough processing only if this
+        # regex matches.
+        if ($line =~ m/$self->{PRLESC}|`/) {
+            # Performance optimization:
+            #
+            # Original code did a match followed by a substitution.
+            # Optimized code only does the substition, relying on the
+            # substition to return false on a failed match.
+            if ($line =~ s/^(\s*)$self->{PRLESC}//) {
+                # Keep the leading whitespace to allow nicer indentation
+                my $lead_ws = $1;
 
-            if ($line =~ m/^\s*include\s*\(/) {
-                $line = "\$self->" . $line;
-                if (!eval $line) {
-                    $self->error(
+                if ($line =~ m/^\s*include\s*\(/) {
+                    $line = "\$self->" . $line;
+                    if (!eval $line) {
+                        $self->error(
 "$name: \"$Genesis2::Manager::infile\", line $Genesis2::Manager::inline: include failed\n"
-                    );
-                }
-                push(
-                    @{$self->{ModuleBody}},
-                    "# line "
-                      . ($Genesis2::Manager::inline + 1)
-                      . " \"$Genesis2::Manager::infile\"\n"
-                );
-            } else {
-                push(@{$self->{ModuleBody}}, $line);
-            }
-        }
-
-        # text lines (potentially with perl escapes)
-        else {
-            chomp($line);
-            $out       = "";
-            $perl_mode = 0;
-            if ($Genesis2::Manager::inline % 10 == 0 && $self->{Debug}) {
-                $out =
-qq/print { \$Genesis2::UniqueModule::myself->{OutfileHandle} } "\$Genesis2::UniqueModule::myself->{LineComment} From $Genesis2::Manager::infile line $Genesis2::Manager::inline\\n"; \n/;
-            }
-            $out .= qq/print { \$Genesis2::UniqueModule::myself->{OutfileHandle} } \'/;
-
-            # allow the special verilog compile time `timescale/`default_nettype/`include thingies
-            # (and remove it from the line)
-            if ($line =~ s/^(\s*\/?\/?)(\s*`)(timescale|default_nettype|include) //) {    #`
-                $veri_macro = $1 . $2 . $3 . " ";
-                $out .= $veri_macro;
-            }
-
-            # allow the special verilog compile time uvm (universal verif methodology) thingies
-            # (and remove it from the line)
-            if ($line =~ s/^(\s*\/?\/?)(\s*`)(uvm_)//) {
-                $veri_macro = $1 . $2 . $3;
-                $out .= $veri_macro;
-            }
-
-            for ($i = 0 ; $i < length($line) ; $i++) {
-                $char      = substr($line, $i, 1);
-                $next_char = '';
-                $next_char = substr($line, $i + 1, 1) if ($i + 1 < length($line));
-                if ($char . $next_char eq '\`') {    # i.e., user is escaping the back-tick
-                    $out .= $next_char;
-                    $i++;
-                    $warn =
-"You are using an old Verilog style macro. This is not safe and thus highly unrecommended.\n"
-                      . "\t\t---> You should be using Genesis2 parameters instead"
-                      unless $perl_mode;
-                } elsif ($char eq "`") {
-
-                    # toggle perl mode and text mode
-                    $out .=
-                      $perl_mode
-                      ? "; print { \$Genesis2::UniqueModule::myself->{OutfileHandle} } '"
-                      : "'; print { \$Genesis2::UniqueModule::myself->{OutfileHandle} } ";
-                    $perl_mode = !$perl_mode;
-                } else {
-
-                    # keep the character, but need to quote it in text mode
-                    if (!$perl_mode && ($char eq "'" || $char eq "\\")) {
-                        $char = "\\$char";
+                        );
                     }
-                    $out .= $char;
+                    push(
+                        @{$self->{ModuleBody}},
+                        "# line "
+                          . ($Genesis2::Manager::inline + 1)
+                          . " \"$Genesis2::Manager::infile\"\n"
+                    );
+                } else {
+                    push(@{$self->{ModuleBody}}, $lead_ws . $line);
                 }
             }
-            $out .= $perl_mode ? ";" : "';";
-            if ($perl_mode) {
-                $self->error("$name: Missing closing ' (back-tic):\n" . "In Code: " . $orig_line)
-                  if ($veri_macro eq '');
-                $self->error("$name: Missing closing ' (back-tic).\n"
-                      . "In Code: "
-                      . $orig_line
-                      . "Note that this line started with a macro definition $veri_macro so first back-tick was ignored"
-                ) if ($veri_macro ne '');
-            }
 
-            if (defined $warn) {
-                print STDERR
-"WARNING: Line ${Genesis2::Manager::inline}, of File $Genesis2::Manager::infile \n"
-                  . "WARNING: $warn\n"
-                  if defined $warn;
+            # text lines with potential perl escapes
+            else {
+                chomp($line);
+                $out       = "";
+                $perl_mode = 0;
+                if ($Genesis2::Manager::inline % 10 == 0 && $self->{Debug}) {
+                    $out =
+    qq/print { \$Genesis2::UniqueModule::myself->{OutfileHandle} } "\$Genesis2::UniqueModule::myself->{LineComment} From $Genesis2::Manager::infile line $Genesis2::Manager::inline\\n"; \n/;
+                }
+                $out .= qq/print { \$Genesis2::UniqueModule::myself->{OutfileHandle} } \'/;
+
+                # allow the special verilog compile time `timescale/`default_nettype/`include thingies
+                # (and remove it from the line)
+                if ($line =~ s/^(\s*\/?\/?)(\s*`)(timescale|default_nettype|include) //) {    #`
+                    $veri_macro = $1 . $2 . $3 . " ";
+                    $out .= $veri_macro;
+                }
+
+                # allow the special verilog compile time uvm (universal verif methodology) thingies
+                # (and remove it from the line)
+                if ($line =~ s/^(\s*\/?\/?)(\s*`)(uvm_)//) {
+                    $veri_macro = $1 . $2 . $3;
+                    $out .= $veri_macro;
+                }
+
+                # Performance optimization:
+                #
+                # Original code
+                #
+                #     for ($i = 0 ; $i < length($line) ; $i++) {
+                #         $char      = substr($line, $i, 1);
+                #         $next_char = '';
+                #         $next_char = substr($line, $i + 1, 1) if ($i + 1 < length($line));
+                #         ...
+                #     }
+                #
+                # Problems:
+                #  - line length is evaluated every iteration
+                #  - double call to substr
+                #
+                # Optimized code evaluates the length once, and only does a
+                # single substr per iteration. The prev_backslash variable keeps
+                # track of whether the previous character was a backslash,
+                # eliminating the need for the second substr.
+                my $prev_backslash = 0;
+                foreach my $i (0..length($line)) {
+                    $char = substr($line, $i, 1);
+
+                    if ($char eq '`') {  # have a backtick
+                        if ($prev_backslash) {    # i.e., user is escaping the back-tick
+                            $out .= $char;
+                            $warn = "You are using an old Verilog style macro."
+                              . " This is not safe and thus highly unrecommended.\n"
+                              . "\t\t---> You should be using Genesis2 parameters instead"
+                              unless $perl_mode;
+                        } else {
+                            # toggle perl mode and text mode
+                            $out .=
+                              $perl_mode
+                              ? "; print { \$Genesis2::UniqueModule::myself->{OutfileHandle} } '"
+                              : "'; print { \$Genesis2::UniqueModule::myself->{OutfileHandle} } ";
+                            $perl_mode = !$perl_mode;
+                        }
+                    } else {
+                        if ($char eq "\\") {
+                            $prev_backslash = 1;
+                        } else {
+                            if ($prev_backslash) {
+                                $out .= $perl_mode ? "\\" : "\\\\";
+                            }
+
+                            # keep the character, but need to quote it in text mode
+                            if (!$perl_mode && $char eq "'") {
+                                $out .= "\\";
+                            }
+                            $out .= $char;
+
+                            $prev_backslash = 0;
+                        }
+
+                    }
+                }
+
+                # Handle finishing a line with a backslash
+                if ($prev_backslash) {
+                    $out .= $perl_mode ? "\\" : "\\\\";
+                }
+
+                $out .= $perl_mode ? ";" : "';";
+                if ($perl_mode) {
+                    $self->error("$name: Missing closing ' (back-tic):\n" . "In Code: " . $orig_line)
+                      if ($veri_macro eq '');
+                    $self->error("$name: Missing closing ' (back-tic).\n"
+                          . "In Code: "
+                          . $orig_line
+                          . "Note that this line started with a macro definition $veri_macro so first back-tick was ignored"
+                    ) if ($veri_macro ne '');
+                }
+
+                if (defined $warn) {
+                    print STDERR "WARNING: Line ${Genesis2::Manager::inline}, of File $Genesis2::Manager::infile \n"
+                      . "WARNING: $warn\n"
+                      if defined $warn;
 
 #$warn = qq/print { \$Genesis2::UniqueModule::myself->{OutfileHandle} } \"\\n\\nWARNING: In This File: $warn \\n\\n\"; \n/;
 #unshift (@{$self->{ModuleBody}}, $warn);
+                }
+                $out .= qq/print { \$Genesis2::UniqueModule::myself->{OutfileHandle} } "\\n";\n/;
+                push(@{$self->{ModuleBody}}, $out);
             }
-            $out .= qq/print { \$Genesis2::UniqueModule::myself->{OutfileHandle} } "\\n"; \n/;
+        } else {
+            chomp($line);
+            # Still need to escape backslashes and single quotes in text lines,
+            # even if they don't contain perl expressions, since they will be
+            # part of strings in the generated perl code.
+            $line =~ s/\\|'/\\$&/g;
+            $out = qq/print { \$Genesis2::UniqueModule::myself->{OutfileHandle} } \'$line\' . "\\n";\n/;
             push(@{$self->{ModuleBody}}, $out);
         }
     }
