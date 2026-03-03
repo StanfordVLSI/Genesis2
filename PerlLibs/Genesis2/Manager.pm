@@ -290,6 +290,7 @@ Generating Options:
 
 	[-unqstyle style]		# Preferred module uniquification style [$unq_styles]
 	[-pathfile filename]		# Generate a path file (list of directories processed)
+	[-no_module_cache]		# Disable the generated module cache: do not skip any generates
 
 Help and Debuging Options:
 	[-log filename]			# Name of log file for genesis2 and user stderr messages
