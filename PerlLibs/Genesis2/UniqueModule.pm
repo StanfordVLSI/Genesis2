@@ -3138,7 +3138,7 @@ sub is_module_cache_enabled {
     caller eq __PACKAGE__
       or $self->error("$name: Call to a base class private method is not allowed");
 
-    return !$self->{Manager}->{ModuleCacheDisabled};
+    return !$self->{Manager}->{DisableModuleCache};
 }
 
 1;
