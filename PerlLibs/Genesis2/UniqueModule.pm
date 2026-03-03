@@ -936,6 +936,36 @@ sub get_subinst_array {
     return @inst_array;
 }
 
+## get_all_insts
+## Get an array of all instances and subinstances, obtained via
+## a DFS traversal. Reduced fuctionality compared with search_subinst.
+sub get_all_insts {
+    my $self    = shift;
+    my @results = ();
+
+    $self->_get_all_insts(\@results, 1000);
+    return @results;
+}
+
+## _get_all_insts
+## Internal function used to constrtuct the lists of all instances via
+## a DFS traversal. The result array is passed as a reference to aovid
+## unnecessary copying.
+sub _get_all_insts {
+    my $self    = shift;
+    my $results = shift;
+    my $depth   = shift;
+
+    if ($depth > 0) {
+        foreach my $inst_name (@{$self->{SubInstanceList}}) {
+            my $subinst = $self->get_subinst($inst_name);
+            $subinst->_get_all_insts($results, $depth - 1);
+        }
+    }
+
+    push(@$results, $self);
+}
+
 ## get_instance_path
 ## API method that returns a complete path to the instance object given
 ## Usage: my $inst_path = $inst_obj->get_instance_path();
