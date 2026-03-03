@@ -714,7 +714,7 @@ sub parse_file {
         #
         # Performance optimization:
         # Run a "fast" regex to see if a line contains a potential perl
-        # expression (//; or `). Do more throrough processing only if this
+        # expression (//; or `). Do more thorough processing only if this
         # regex matches.
         if ($line =~ m/$self->{PRLESC}|`/) {
 
