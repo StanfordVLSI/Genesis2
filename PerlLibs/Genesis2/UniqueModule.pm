@@ -792,24 +792,25 @@ sub search_subinst {
     my $self    = shift;
     my $name    = $self->{BaseModuleName} . "->search_subinst";
     my %options = @_;
-    my @keys    = sort keys %options;
     my @results = ();
-    my $from    = $self->get_top();
+    my $from    = undef;
     my $depth   = 10000;
     my $reverse = 0;
 
     # get the starting point
-    foreach my $key (@keys) {
-        if ($key =~ m/^From$/i) {
-            $from = $self->get_instance_obj($options{$key});
-            delete $options{$key};
-        } elsif ($key =~ m/^Depth$/i) {
-            $depth = $options{$key};
-            delete $options{$key};
-        } elsif ($key =~ m/^Reverse$/i) {
-            $reverse = $options{$key};
-            delete $options{$key};
-        }
+    if (exists $options{From}) {
+        $from = $self->get_instance_obj($options{From});
+        delete $options{From};
+    } else {
+        $from = $self->get_top();
+    }
+    if (exists $options{Depth}) {
+        $depth = $options{Depth};
+        delete $options{Depth};
+    }
+    if (exists $options{Reverse}) {
+        $reverse = $options{Reverse};
+        delete $options{Reverse};
     }
 
     # get the complete list of subinsts from $from up to depth $depth
@@ -832,7 +833,7 @@ sub search_subinst {
     }
 
     # test for instances that don't meet the user criterias
-    @keys = keys %options;            # Take the keys that were not deleted
+    my @keys = keys %options;         # Take the keys that were not deleted
     foreach my $key (@keys) {
         if ($key =~ m/^PathRegex$/i) {
             my $regex = $options{$key};
