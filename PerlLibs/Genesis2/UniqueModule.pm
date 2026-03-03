@@ -1194,7 +1194,7 @@ sub unique_inst {
         $instance->{OutputFileName} = $other_file;      # instead, use the previously created file
     }
 
-    if (!defined $self->{ModuleCache}{$param_module_name}) {
+    if ($self->is_module_cache_enabled() && !defined $self->{ModuleCache}{$param_module_name}) {
         $self->{ModuleCache}{$param_module_name} = $instance;
     }
 
@@ -1370,7 +1370,7 @@ sub unique_inst_param {
         $instance->{OutputFileName}   = $tgt_file_name;      # Update the module filename
     }
 
-    if (!defined $self->{ModuleCache}{$tgt_module_name}) {
+    if ($self->is_module_cache_enabled() && !defined $self->{ModuleCache}{$tgt_module_name}) {
         $self->{ModuleCache}{$tgt_module_name} = $instance;
     }
 
@@ -1602,7 +1602,7 @@ sub ununique_inst {
         $self->{UnUniquifiedModules}{$base_module_name} = 1;
     }
 
-    if (!defined $self->{ModuleCache}{$base_module_name}) {
+    if ($self->is_module_cache_enabled() && !defined $self->{ModuleCache}{$base_module_name}) {
         $self->{ModuleCache}{$base_module_name} = $instance;
     }
 
@@ -3129,6 +3129,16 @@ sub internal_get_ref_param_hash {
 
     my $hash32b = substr($hash, 0, 8);
     return "R$hash32b";
+}
+
+# Check if the module cache is enabled
+sub is_module_cache_enabled {
+    my $self = shift;
+    my $name = $self->{BaseModuleName} . "->is_module_cache_enabled ";
+    caller eq __PACKAGE__
+      or $self->error("$name: Call to a base class private method is not allowed");
+
+    return !$self->{Manager}->{DisableModuleCache};
 }
 
 1;

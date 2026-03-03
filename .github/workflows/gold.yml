@@ -34,6 +34,16 @@ jobs:
     - name: Run the test
       run: cd test/glctest; ./test.sh -debug 15
 
+  module_cache_5s:
+    # This test shows an issue with the module cache: parameter overrides are
+    # currently ignored. Requires the module cache to be disabled.
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository code
+      uses: actions/checkout@v2
+    - name: Run the test
+      run: cd test/module_cache; ./test.sh -debug 15
+
   func_fail_1m:
     runs-on: ubuntu-latest
     steps:

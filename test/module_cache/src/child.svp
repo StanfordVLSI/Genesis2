@@ -1,0 +1,11 @@
+// Child module
+
+//; my $val = parameter(Name=>'out_val', Val=>1, Doc=>'Value for output');
+
+module `mname` (
+    output logic [7:0] out
+);
+
+out = 8'd`$val`;
+
+endmodule : `mname`

@@ -158,6 +158,13 @@ sub new {
     $self->{ParseMode} = 0;    # should we parse input file to generate perl modules?
     $self->{GenMode}   = 0;    # should we generate a verilog hierarchy?
 
+    # Disable the module cache
+    # Duplicate module detection code doesn't currently handle case where a
+    # parent module is generated multiple times with the same parameters, but a
+    # child module parameter is overridden (e.g., via command line or XML).
+    # This is an escape hatch until that logic is enhanced.
+    $self->{DisableModuleCache} = 0;
+
     # Bless this package
     bless($self, $package);
 }
@@ -283,6 +290,7 @@ Generating Options:
 
 	[-unqstyle style]		# Preferred module uniquification style [$unq_styles]
 	[-pathfile filename]		# Generate a path file (list of directories processed)
+	[-no_module_cache]		# Disable the generated module cache: do not skip any generates
 
 Help and Debuging Options:
 	[-log filename]			# Name of log file for genesis2 and user stderr messages
@@ -341,7 +349,8 @@ sub parse_command_line {
         "help"    => \$help,                # prints this message
         "man:s"   => \$man,                 # prints the complete man page for Genesis2
                                             # or the specified extenssion
-        "license=s" => \$self->{LicenseFileName}    # Pointer to license file
+        "license=s"       => \$self->{LicenseFileName},      # Pointer to license file
+        "no_module_cache" => \$self->{DisableModuleCache}    # Disable the module cache
     );
 
     my $res = GetOptions(%options);
