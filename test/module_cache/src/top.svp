@@ -1,0 +1,13 @@
+// Top-level dummy file
+
+wire [7:0] a, b;
+
+//; my $child1 = generate('child', 'child1');
+`$child1->instantiate`(
+    .out(a)
+);
+
+//; my $child2 = generate('child', 'child2');
+`$child2->instantiate`(
+    .out(b)
+);
