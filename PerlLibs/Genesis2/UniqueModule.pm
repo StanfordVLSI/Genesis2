@@ -342,11 +342,7 @@ sub get_parent {
 ## Usage: my $top_module = $self->get_top();
 sub get_top {
     my $self = shift;
-    my $top  = $self;
-    while (defined $top->get_parent()) {
-        $top = $top->get_parent();
-    }
-    return $top;
+    return $self->{Top};
 }
 
 ## sub get_instance_name
