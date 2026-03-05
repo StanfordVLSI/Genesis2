@@ -8,11 +8,10 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
-      - name: Pip install genesis2
-        uses: docker/build-push-action@v6
-        file: Dockerfile.genesis
-        with:
-          call: check
+      - name: Pip install genesis2 from docker
+        run: |
+          pwd; ls -l
+          docker build --file Dockerfile.genesis .
 
   pip-install:
     runs-on: ubuntu-latest
