@@ -52,7 +52,7 @@ class Genesis2Build(build_ext):
 
 setup(
     name='genesis2',
-    version='0.0.9',
+    version='0.0.10',
     packages=[
         "genesis2"
     ],
@@ -63,4 +63,8 @@ setup(
     ext_modules=[Genesis2Extension('genesis2')],
     scripts=["bin/Genesis2.pl"],
     cmdclass=dict(build_ext=Genesis2Build),
+    install_requires = [
+        'wheel',
+    ],
+
 )
