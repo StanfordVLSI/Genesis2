@@ -1,0 +1,15 @@
+name: Pip Install
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  pip-install:
+    runs-on: ubuntu-latest
+    name: Check 'pip install genesis2'
+
+    steps:
+      - name: Pip install genesis2
+        run: |
+          pip install genesis2
