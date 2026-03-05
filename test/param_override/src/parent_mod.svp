@@ -1,0 +1,15 @@
+// Parent module
+
+//; my $val = parameter(Name=>'out_val', Val=>1, Doc=>'Value for output');
+
+module `mname` (
+    output logic [7:0] out
+);
+
+//; my $child = generate('child', 'child');
+`$child->instantiate`(
+    .out(out)
+);
+
+endmodule : `mname`
+

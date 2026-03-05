@@ -20,4 +20,4 @@ format:
 test:
 	@echo "Running tests..."
 	cd test/glctest && ./test.sh -debug 15
-	cd test/module_cache && ./test.sh -debug 15
+	cd test/param_override && ./test.sh -debug 15
