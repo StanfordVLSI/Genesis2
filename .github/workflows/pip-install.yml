@@ -8,10 +8,13 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+
       - name: Pip install genesis2 from docker
         run: |
           pwd; ls -l
-          docker build --file Dockerfile.genesis .
+          docker build --file .github/workflows/Dockerfile.genesis .
 
   pip-install:
     runs-on: ubuntu-latest
