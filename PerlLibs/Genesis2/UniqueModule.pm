@@ -1325,11 +1325,8 @@ sub unique_inst_param {
     push(@{$self->{SubInstanceListUniqueParam}}, $inst_name);
 
     #####################
-    # Decide what the new submodule name and the generated filename will be
-    $idx++;
-    $instance->{InstanceName}     = $inst_name;
-    $instance->{UniqueModuleName} = $base_module_name . PARAM_UNQ_STR . "_tmp" . $idx;
-    $instance->{OutputFileName}   = $instance->{UniqueModuleName} . $instance->{OutfileSuffix};
+    # Set the instance name (module/file name done soon)
+    $instance->{InstanceName} = $inst_name;
 
     #####################
     # Set the values for the sub-pre-processor based on instantiation line
@@ -1355,25 +1352,20 @@ sub unique_inst_param {
     my $tgt_module_name     = $base_module_name . $instance_param_list;
     $tgt_module_name .= $self->gen_override_path_ext($base_module_name) if ($on_override_path);
 
+    $instance->{InstanceName}     = $inst_name;
+    $instance->{UniqueModuleName} = $tgt_module_name;
+    $instance->{OutputFileName}   = $instance->{UniqueModuleName} . $instance->{OutfileSuffix};
+
     #####################
     # Avoid regenerating the same module multiple times
-    #  -> Check if an identical module has already been generated
+    #  -> identical module names should _always_ generate the same code with
+    #     param-name uniquification
     if (   !$has_overrides
         && !$on_override_path
         && $self->{ModuleCache}{$tgt_module_name})
     {
-        my $prev_inst = $self->{ModuleCache}{$tgt_module_name};
-
-        if ($self->does_generate_same($instance, $prev_inst)) {
-            my $prev_module    = $prev_inst->{UniqueModuleName};
-            my $prev_file_name = $prev_inst->{OutputFileName};
-
-            $instance->{UniqueModuleName} = $prev_module;       # use previously created module
-            $instance->{OutputFileName}   = $prev_file_name;    # use previously created file
-
-            $self->{ParametersPriority} = $prev_priority;
-            return $instance;
-        }
+        $self->{ParametersPriority} = $prev_priority;
+        return $instance;
     }
 
     #####################
@@ -1384,61 +1376,9 @@ sub unique_inst_param {
     $instance->{ParametersPriority} = GENESIS2_ZERO_PRIORITY;
 
     #####################
-    # Compare against previously generated files
-    my $tgt_file_name = $tgt_module_name . $instance->{OutfileSuffix};
-    if (defined($self->{OutfileName_ContentCache}{$tgt_file_name})) {
-        $match = $self->compare_generated_files(
-            $instance->{OutputFileName},        # newly generated file
-            $tgt_file_name,                     # existing file
-            $instance->{UniqueModuleName} =>    # new instance name
-              $tgt_module_name                  # existing instance name
-        );
-
-        # The files should match -- we've got a problem if they don't
-        $self->error("$name: Newly generated parameter-uniquified $base_module_name does not\n"
-              . "match previous parameter-uniquified generation!\n"
-              . "Compare $instance->{OutputFileName} and previously generated $tgt_file_name")
-          unless $match;
-
-        # Use the existing file since they match and delete
-        # the newly generated file
-        $instance->{UniqueModuleName} = $tgt_module_name;
-        unlink(catfile($instance->{RawDir}, $instance->{OutputFileName}));
-        delete $self->{OutfileName_ContentCache}{$instance->{OutputFileName}};
-        $instance->{OutputFileName} = $tgt_file_name;
-    } else {
-
-        # This is the only copy of the module
-        my $orig_file_path = catfile($instance->{RawDir}, $instance->{OutputFileName});
-        my $new_file_path  = catfile($instance->{RawDir}, $tgt_file_name);
-
-        my ($fhi, $fho);
-        open($fhi, "<$orig_file_path")
-          || $self->error("$name: Couldn't open input file $orig_file_path: $!");
-        open($fho, ">$new_file_path")
-          || $self->error("$name: Couldn't open output file $new_file_path: $!");
-
-        # Read the file and replace the temporary module name
-        my $inpat   = $instance->{UniqueModuleName};
-        my @content = map { s/$inpat/$tgt_module_name/g; $_; } <$fhi>;
-
-        # Write the output file
-        map { print $fho $_; } @content;
-
-        close($fhi)
-          or $self->error("$name: Can not close file \"$orig_file_path\"");
-        close($fho)
-          or $self->error("$name: Can not close file \"$new_file_path\"");
-
-        $self->{OutfileName_ContentCache}{$tgt_file_name} = \@content;
-        unlink($orig_file_path);    # remove the newly created file
-        delete $self->{OutfileName_ContentCache}{$instance->{OutputFileName}}
-          ;                         # Clean the file from the cache
-
-        $instance->{UniqueModuleName} = $tgt_module_name;    # Update the module name
-        $instance->{OutputFileName}   = $tgt_file_name;      # Update the module filename
-    }
-
+    # Don't need to check against previously generated files: param-name
+    # uniquification should ensure that identically-named modules always
+    # produce the same RTL.
     if (   !$has_overrides
         && !$on_override_path
         && $self->is_module_cache_enabled()
