@@ -3,8 +3,10 @@ RUN apt-get update && \
     apt-get install -y \
     git python3 python3-venv && \
     update-alternatives --install /usr/bin/python python /usr/bin/python3 100 && \
-    update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 100 && \
     echo DONE
+
+#    update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 100 && \
+
 
 # Switch shell to bash
 SHELL ["/bin/bash", "--login", "-c"]
