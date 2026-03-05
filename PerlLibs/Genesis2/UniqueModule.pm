@@ -2133,10 +2133,13 @@ sub execute {
     $self->{ParamsFromCfg}   = $self->{CfgHandler}->GetCfgParamList($path);
     $self->{ParamsFromCmdLn} = $self->{CfgHandler}->GetCmdLnParamList($path);
 
-    # open the output file (save the previous file handle for later)
-    my $fullFileName = catfile($self->{RawDir}, $self->{OutputFileName});
-    open($self->{OutfileHandle}, ">$fullFileName")
-      || $self->error("$name: Couldn't open output file $fullFileName: $!");
+    # open a file handle to a string, to avoid having to write to a file then
+    # re-read to cache it.
+    my $content = "";
+    open($self->{OutfileHandle}, ">", \$content)
+      || $self->error("$name: Couldn't open in-memory string: $!");
+
+    # Set stdout to go to the file handle, and record the previous stdout handle
     $prev_outfile_handle = select $self->{OutfileHandle};
 
     # Print the Verilog
@@ -2170,20 +2173,23 @@ sub execute {
           if ($self->{Parameters}->{$param}->{State} =~ /NeverUsed/i);
     }
 
-    # revert back to the previous file handle
+    # revert back to the previous file handle and close the file
     select $prev_outfile_handle;
     close($self->{OutfileHandle})
+      or $self->error("$name: Can not close in-memory string");
+
+    # write the content to the actual target file
+    my $fullFileName = catfile($self->{RawDir}, $self->{OutputFileName});
+    open(my $fh, ">", $fullFileName)
+      or $self->error("$name: Couldn't open output file $fullFileName: $!");
+    print $fh $content;
+    close($fh)
       or $self->error("$name: Can not close file \"$fullFileName\"");
 
     # cache the file
     if (!exists $self->{OutfileName_ContentCache}{$self->{OutputFileName}}) {
         my $filename = $self->{OutputFileName};
-        my $fh;
-        open($fh, "<$fullFileName")
-          || $self->error("$name: Couldn't open output file $fullFileName: $!");
-        @{$self->{OutfileName_ContentCache}{$filename}} = <$fh>;
-        close($fh)
-          or $self->error("$name: Can not close file \"$fullFileName\"");
+        @{$self->{OutfileName_ContentCache}{$filename}} = $content;
     } else {
         $self->error("INTRNAL ERROR: \"$fullFileName\" already cached");
     }
