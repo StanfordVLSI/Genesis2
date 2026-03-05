@@ -6,6 +6,9 @@ RUN apt-get update && \
     update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 100 && \
     echo DONE
 
+# Switch shell to bash
+SHELL ["/bin/bash", "--login", "-c"]
+
 RUN \
   mkdir -p /aha && cd /aha && python -m venv . && source bin/activate && \
   pip install genesis2
