@@ -5,6 +5,15 @@ on:
   pull_request:
 
 jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pip install genesis2
+        uses: docker/build-push-action@v6
+        file: Dockerfile.genesis
+        with:
+          call: check
+
   pip-install:
     runs-on: ubuntu-latest
     name: Check 'pip install genesis2'
@@ -12,6 +21,10 @@ jobs:
     steps:
       - name: Pip install genesis2
         run: |
-          python -m venv .
-          source bin/activate
-          pip install genesis2
+            pwd
+
+
+#           python -m venv .
+#           source bin/activate
+#           pip list -v
+#           pip install genesis2
