@@ -1326,6 +1326,7 @@ sub unique_inst_param {
 
     #####################
     # Set the instance name (module/file name done soon)
+    # Needed for the call to $instance->get_instance_path()
     $instance->{InstanceName} = $inst_name;
 
     #####################
@@ -1352,7 +1353,6 @@ sub unique_inst_param {
     my $tgt_module_name     = $base_module_name . $instance_param_list;
     $tgt_module_name .= $self->gen_override_path_ext($base_module_name) if ($on_override_path);
 
-    $instance->{InstanceName}     = $inst_name;
     $instance->{UniqueModuleName} = $tgt_module_name;
     $instance->{OutputFileName}   = $instance->{UniqueModuleName} . $instance->{OutfileSuffix};
 
