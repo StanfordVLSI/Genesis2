@@ -1,0 +1,16 @@
+// Top-level file
+//
+// Config:
+//  - 2 children, each of depth 2
+
+wire [7:0] a, b;
+
+//; my $parent1 = generate('parent_mod', 'parent1');
+`$parent1->instantiate`(
+    .out(a)
+);
+
+//; my $parent2 = generate('parent_mod', 'parent2');
+`$parent2->instantiate`(
+    .out(b)
+);

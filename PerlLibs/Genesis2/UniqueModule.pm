@@ -186,6 +186,8 @@ sub new {
     $self->{ParamsFromXML}      = {};              # All parameters read from xml input file
     $self->{ParamsFromCfg}      = {};              # All parameters read from config input file
     $self->{ParamsFromCmdLn}    = {};              # All parameters read from the command line
+    $self->{PreExecParameters} =
+      {};    # All the parameters passed to this module (eval prior to execution)
 
     # Bless this package
     bless($self, $package);
@@ -254,6 +256,8 @@ sub new_as_son {
     $self->{ParamsFromXML}            = {};    # All parameters read from xml input file
     $self->{ParamsFromCfg}            = {};    # All parameters read from config input file
     $self->{ParamsFromCmdLn}          = {};    # All parameters read from the command line
+    $self->{PreExecParameters} =
+      {};    # All the parameters passed to this module (eval prior to execution)
 
     # Bless this package
     bless($self, $package);
@@ -323,6 +327,8 @@ sub new_as_clone {
     $self->{ParamsFromXML}  = {};                          # All parameters read from xml input file
     $self->{ParamsFromCfg}   = {};    # All parameters read from config input file
     $self->{ParamsFromCmdLn} = {};    # All parameters read from the command line
+    $self->{PreExecParameters} =
+      {};    # All the parameters passed to this module (eval prior to execution)
 
     # Bless this package
     bless($self, $package);
@@ -1121,12 +1127,23 @@ sub unique_inst {
     $instance->{ParametersPriority} = GENESIS2_DECLARATION_PRIORITY;
 
     #####################
+    # Check if the instance has parameter overrides/is on the path to parameter
+    # overrides.
+    my $instance_path    = $instance->get_instance_path();
+    my $has_overrides    = $self->{CfgHandler}->InstHasOverride($instance_path);
+    my $on_override_path = $self->{CfgHandler}->IsInstOnOverridePath($instance_path);
+
+    #####################
     # Avoid regenerating the same module multiple times
     #  -> Check if an identical module has already been generated
     $instance->fetch_params();
+    $instance->populate_pre_exec_params();
     my $instance_param_list = $instance->get_mod_param_list();
     my $param_module_name   = $base_module_name . $instance_param_list;
-    if (defined $self->{ModuleCache}{$param_module_name}) {
+    if (   !$has_overrides
+        && !$on_override_path
+        && defined $self->{ModuleCache}{$param_module_name})
+    {
         my $prev_inst = $self->{ModuleCache}{$param_module_name};
 
         if ($self->does_generate_same($instance, $prev_inst)) {
@@ -1225,7 +1242,11 @@ sub unique_inst {
         $instance->{OutputFileName} = $other_file;      # instead, use the previously created file
     }
 
-    if ($self->is_module_cache_enabled() && !defined $self->{ModuleCache}{$param_module_name}) {
+    if (   !$has_overrides
+        && !$on_override_path
+        && $self->is_module_cache_enabled()
+        && !defined $self->{ModuleCache}{$param_module_name})
+    {
         $self->{ModuleCache}{$param_module_name} = $instance;
     }
 
@@ -1318,12 +1339,29 @@ sub unique_inst_param {
     $instance->{ParametersPriority} = GENESIS2_DECLARATION_PRIORITY;
 
     #####################
-    # Avoid regenerating the same module multiple times
-    #  -> Check if an identical module has already been generated
+    # Check if the instance has parameter overrides/is on the path to parameter
+    # overrides.
+    my $instance_path    = $instance->get_instance_path();
+    my $has_overrides    = $self->{CfgHandler}->InstHasOverride($instance_path);
+    my $on_override_path = $self->{CfgHandler}->IsInstOnOverridePath($instance_path);
+
+    #####################
+    # Generate the target module name, taking into account that if the
+    # instance is on the path to an instance with parameter overrides
+    # (xml/config/command line), then the instance needs to be unique.
     $instance->fetch_params();
+    $instance->populate_pre_exec_params();
     my $instance_param_list = $instance->get_mod_param_list();
     my $tgt_module_name     = $base_module_name . $instance_param_list;
-    if (defined $self->{ModuleCache}{$tgt_module_name}) {
+    $tgt_module_name .= $self->gen_override_path_ext($base_module_name) if ($on_override_path);
+
+    #####################
+    # Avoid regenerating the same module multiple times
+    #  -> Check if an identical module has already been generated
+    if (   !$has_overrides
+        && !$on_override_path
+        && $self->{ModuleCache}{$tgt_module_name})
+    {
         my $prev_inst = $self->{ModuleCache}{$tgt_module_name};
 
         if ($self->does_generate_same($instance, $prev_inst)) {
@@ -1401,7 +1439,11 @@ sub unique_inst_param {
         $instance->{OutputFileName}   = $tgt_file_name;      # Update the module filename
     }
 
-    if ($self->is_module_cache_enabled() && !defined $self->{ModuleCache}{$tgt_module_name}) {
+    if (   !$has_overrides
+        && !$on_override_path
+        && $self->is_module_cache_enabled()
+        && !defined $self->{ModuleCache}{$tgt_module_name})
+    {
         $self->{ModuleCache}{$tgt_module_name} = $instance;
     }
 
@@ -1568,11 +1610,22 @@ sub ununique_inst {
     $instance->{ParametersPriority} = GENESIS2_DECLARATION_PRIORITY;
 
     #####################
+    # Check if the instance has parameter overrides/is on the path to parameter
+    # overrides.
+    my $instance_path    = $instance->get_instance_path();
+    my $has_overrides    = $self->{CfgHandler}->InstHasOverride($instance_path);
+    my $on_override_path = $self->{CfgHandler}->IsInstOnOverridePath($instance_path);
+
+    #####################
     # Avoid regenerating the same module multiple times
     #  -> Check if an identical module has already been generated
     $instance->fetch_params();
+    $instance->populate_pre_exec_params();
     my $instance_param_list = $instance->get_mod_param_list();
-    if (defined $self->{ModuleCache}{$base_module_name}) {
+    if (   !$has_overrides
+        && !$on_override_path
+        && defined $self->{ModuleCache}{$base_module_name})
+    {
         my $prev_inst = $self->{ModuleCache}{$base_module_name};
 
         if ($self->does_generate_same($instance, $prev_inst)) {
@@ -1633,7 +1686,11 @@ sub ununique_inst {
         $self->{UnUniquifiedModules}{$base_module_name} = 1;
     }
 
-    if ($self->is_module_cache_enabled() && !defined $self->{ModuleCache}{$base_module_name}) {
+    if (   !$has_overrides
+        && !$on_override_path
+        && $self->is_module_cache_enabled()
+        && !defined $self->{ModuleCache}{$base_module_name})
+    {
         $self->{ModuleCache}{$base_module_name} = $instance;
     }
 
@@ -2038,6 +2095,28 @@ sub fetch_params {
     1;
 }
 
+sub populate_pre_exec_params {
+    my $self = shift;
+    local $Genesis2::UniqueModule::myself = $self;
+    my $name = $self->{BaseModuleName} . "->populate_pre_exec_params";
+    caller eq __PACKAGE__ || caller eq 'Genesis2::Manager'
+      or $self->error("$name: access restricted to " . __PACKAGE__ . " or Genesis2::Manager");
+
+    foreach my $prm_hash (
+        $self->{Parameters},    $self->{ParamsFromXML},
+        $self->{ParamsFromCfg}, $self->{ParamsFromCmdLn}
+      )
+    {
+        next if !defined($prm_hash);
+        foreach my $prm_name (keys %{$prm_hash}) {
+            $self->{PreExecParameters}->{$prm_name} =
+              $self->deep_copy($prm_hash->{$prm_name}, $prm_name);
+        }
+    }
+
+    1;
+}
+
 sub execute {
     my $self = shift;
     local $Genesis2::UniqueModule::myself = $self;
@@ -2172,24 +2251,36 @@ sub internal_get_param {
         %options = @_;
     }
 
+    my $param = undef;
+    if (exists $options{pre_exec} && $options{pre_exec}) {
+        if (exists $self->{PreExecParameters}->{$prm_name}) {
+            $param = $self->{PreExecParameters}->{$prm_name};
+        }
+    }
+    if (!defined $param) {
+        if (exists $self->{Parameters}->{$prm_name}) {
+            $param = $self->{Parameters}->{$prm_name};
+        }
+    }
+
     $self->error("$name: Trying to extract the value of an undefined parameter\n"
           . "Parameter -->$prm_name<-- does not exists in instance -->"
           . $self->get_instance_name
           . "<-- of module -->"
           . $self->get_module_name . "<--")
-      unless defined $self->{Parameters}->{$prm_name};
+      unless defined $param;
 
     foreach my $opt (keys %options) {
         if ($opt =~ /check_used/i) {
             $self->error("$name: Trying to extract the value of a parameter that was never "
                   . "explicitely declared. Use the \"parameter(Name=>'$prm_name', Val=>...)\" "
                   . "notation to declare a parameter with its default value")
-              unless $self->{Parameters}->{$prm_name}->{State} eq 'Used' || !$options{$opt};
+              unless $param->{State} eq 'Used' || !$options{$opt};
         }
     }
 
     # extract the parameter
-    $prm_val = $self->deep_copy($self->{Parameters}->{$prm_name}->{Val}, $prm_name);
+    $prm_val = $self->deep_copy($param->{Val}, $prm_name);
 
     return $prm_val;
 }
@@ -2308,14 +2399,15 @@ sub set_param {
         } elsif ($self->get_param_priority($prm_name) < $self->{ParametersPriority}) {
             $self->{Parameters}->{$prm_name}->{Val} =
               $self->deep_copy($prm_hash{$prm_name}, $prm_name);
+            my $prev_priority = $self->get_param_priority($prm_name);
             $self->set_param_priority($prm_name, $self->{ParametersPriority});
             print STDERR "$name: Param -->$prm_name<-- already defined but with lower priority.\n\t"
               . "Current priority: "
               . (GENESIS2_PRIORITY)[$self->{ParametersPriority}] . "="
               . $self->{ParametersPriority} . "\n\t"
               . "Previous priority: "
-              . (GENESIS2_PRIORITY)[$self->get_param_priority($prm_name)] . "="
-              . $self->{ParametersPriority}
+              . (GENESIS2_PRIORITY)[$prev_priority] . "="
+              . $prev_priority
               . "\n\tSetting -->$prm_name<-- to -->"
               . $self->internal_get_param($prm_name) . "<--\n"
               if $self->{Debug} & 4;
@@ -2464,8 +2556,10 @@ sub gen_param_abbrevs {
     }
 
     # Calculate the starting word/region pairs
+    my @params = keys %{$self->{PreExecParameters}};
+
     my %wr_pairs;
-    foreach my $param (@{$self->{ParametersList}}) {
+    foreach my $param (@params) {
         my $words   = split_param_name($param);
         my $regions = get_initial_regions($words);
 
@@ -2486,7 +2580,7 @@ sub gen_param_abbrevs {
         print STDERR "  Abbreviations:\n" if $self->{Debug} & 2;
         my %abbrev_srcs;
         map { delete $abbrevs{$_} } keys %abbrevs;
-        foreach my $param (@{$self->{ParametersList}}) {
+        foreach my $param (@params) {
             my ($words, $regions) = @{$wr_pairs{$param}};
             my $abbrev = get_abbrev_from_regions($words, $regions);
             print STDERR "    $param -> $abbrev\n" if $self->{Debug} & 2;
@@ -2582,18 +2676,14 @@ sub get_mod_param_list {
     my $abbrevs = $self->gen_param_abbrevs();
 
     # Create a list of non-default parameters
-    my @nondef_params;
-    foreach my $param (@{$self->{ParametersList}}) {
-        push @nondef_params, $param
-          if ($self->get_param_priority($param) > GENESIS2_DECLARATION_PRIORITY);
-    }
+    my @nondef_params = keys %{$self->{PreExecParameters}};
 
     # Generate the parameter list string
     my $ret = "";
     foreach my $param (sort(@nondef_params)) {
         next if $param =~ /^__/;
         my $abbrev = $abbrevs->{$param};
-        my $val    = $self->internal_get_param($param);
+        my $val    = $self->internal_get_param($param, pre_exec => 1);
         $val = $self->internal_get_ref_param_hash($val) if ref $val;
 
         if (defined $val) {
@@ -2628,6 +2718,7 @@ sub does_generate_same {
 
     # Step 1: check that parameters for the two modules are identical
     $new_inst->fetch_params();
+    $new_inst->populate_pre_exec_params();
     my $new_inst_params = $new_inst->get_mod_param_list();
     my $old_inst_params = $old_inst->get_mod_param_list();
 
@@ -2666,6 +2757,20 @@ sub does_generate_same {
     }
 
     return $match;
+}
+
+## private: gen_override_path_ext
+## Generate an override path extension string to add to the target module name
+sub gen_override_path_ext {
+    my $self = shift;
+    my $name = $self->{BaseModuleName} . "->does_generate_same";
+    caller eq __PACKAGE__
+      or $self->error("$name: Call to a base class private method is not allowed");
+
+    my $base_module_name = shift;
+    $self->{ModuleName_NumDerivs}{$base_module_name} =
+      ($self->{ModuleName_NumDerivs}{$base_module_name} // 0) + 1;
+    return "_unq" . $self->{ModuleName_NumDerivs}{$base_module_name};
 }
 
 #################################################################

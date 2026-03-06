@@ -106,6 +106,12 @@ sub new {
                                         # specializations.
                                         # Numeric value to speed up comparisons.
 
+    $self->{OverridePathPrefixes} = {}; # Path prefixes for instances with
+                                        # parameters being set from XML/config/cmdline.
+
+    $self->{OverridePaths} = {};        # Paths for instances with
+                                        # parameters being set from XML/config/cmdline.
+
     # Bless this package
     bless($self, $package);
 }
@@ -377,12 +383,42 @@ sub SetPrmOverrides {
 ## defined in UniqueModule.pm
 sub SetUnqStyle {
     my $self = shift;
-    my $name = __PACKAGE__ . "->setUnqStyle";
+    my $name = __PACKAGE__ . "->SetUnqStyle";
     caller eq __PACKAGE__ || caller eq 'Genesis2::Manager'
       or $self->error("$name: access restricted to " . __PACKAGE__ . " or Genesis2::Manager");
 
     $self->{UnqStyle} = shift;
     print STDERR "$name: Setting preferred uniquification style: $self->{UnqStyle}\n";
+    1;
+}
+
+## BuildParamPathsMaps
+## Build the maps of parameter paths that are specified via
+## XML, config file, and command line.
+sub BuildParamPathMaps {
+    my $self = shift;
+    my $name = __PACKAGE__ . "->BuildParamPathMaps";
+    caller eq __PACKAGE__ || caller eq 'Genesis2::Manager'
+      or $self->error("$name: access restricted to " . __PACKAGE__ . " or Genesis2::Manager");
+
+    foreach my $path (
+        $self->get_xml_param_paths(),
+        $self->get_cfg_param_paths(),
+        $self->get_prm_override_param_paths()
+      )
+    {
+        $self->{OverridePaths}->{$path} = 1;
+
+        my @elems = split(/\./, $path);
+        pop(@elems);
+
+        my $prefix = "";
+        foreach my $elem (@elems) {
+            $prefix .= $elem;
+            $self->{OverridePathPrefixes}->{$prefix} = 1;
+            $prefix .= ".";
+        }
+    }
     1;
 }
 
@@ -409,6 +445,7 @@ sub Finalize {
     }
     1;
 }
+
 ################################################
 ########### UNIQUE MODULE API FUNCTIONS
 ################################################
@@ -566,6 +603,32 @@ sub GetCmdLnParamBrief {
       or $self->error("$name: access restricted to " . __PACKAGE__ . " or Genesis2::UniqueModule");
     my $item = shift;
     return $item->{Val};
+}
+
+## InstHasOverride
+## Check if the instance path contains a parmater override (XML, config file,
+## or command line)
+sub InstHasOverride {
+    my $self = shift;
+    my $name = __PACKAGE__ . "->InstHasOverride";
+    caller eq __PACKAGE__ || caller eq 'Genesis2::UniqueModule'
+      or $self->error("$name: access restricted to " . __PACKAGE__ . " or Genesis2::UniqueModule");
+
+    my $path = shift;
+    return exists $self->{OverridePaths}->{$path};
+}
+
+## IsInstOnParamOverridePath
+## Check if the instance is on a path containing a parmater override (XML,
+## config file, or command line)
+sub IsInstOnOverridePath {
+    my $self = shift;
+    my $name = __PACKAGE__ . "->IsInstOnOverridePath";
+    caller eq __PACKAGE__ || caller eq 'Genesis2::UniqueModule'
+      or $self->error("$name: access restricted to " . __PACKAGE__ . " or Genesis2::UniqueModule");
+
+    my $path = shift;
+    return exists $self->{OverridePathPrefixes}->{$path};
 }
 
 ################################################################################
@@ -1125,6 +1188,69 @@ sub extract_param_InstPath_from_xml_db {
     return $db;
 }
 
+## Get the paths to parameter overrides from the XML
+sub get_xml_param_paths {
+    my $self = shift;
+    my $name = __PACKAGE__ . "->get_xml_param_paths";
+    caller eq __PACKAGE__
+      or $self->error("$name: Call to a base class private method is not allowed");
+
+    my %paths;
+    my $top;
+
+    # is there a database?
+    if (defined $self->{InXmlDB}) {
+        $top = $self->{InXmlDB};
+    } else {
+        return;
+    }
+
+    # if there was a database, there must also be a 'top'
+    if (defined $top->{HierarchyTop}) {
+        $top = $top->{HierarchyTop};
+    } else {
+        $self->error("$name: Found XML file, but no <HierarchyTop> at root");
+    }
+
+    # iterate through the database, collecting the paths to all parameters that
+    # are specified in the XML
+    my @path;
+    my @queue;
+    push(@queue, [$top]);
+
+    while (@queue) {
+        my $subinsts = pop(@queue);
+        while (@$subinsts) {
+            my $subinst  = shift(@$subinsts);
+            my $instname = $subinst->{InstanceName};
+            my $instpath = join('.', @path) . (@path ? "." : "") . $instname;
+
+            if (exists $subinst->{Parameters} && exists $subinst->{Parameters}->{ParameterItem}) {
+                my @params = @{$subinst->{Parameters}->{ParameterItem}};
+                if (@params) {
+                    $paths{$instpath} = 1;
+                }
+            }
+
+            if (   exists $subinst->{SubInstances}
+                && exists $subinst->{SubInstances}->{SubInstanceItem})
+            {
+                my @subsubinsts = @{$subinst->{SubInstances}->{SubInstanceItem}};
+                if (@subsubinsts) {
+                    push(@path,  $instname);
+                    push(@queue, $subinsts);
+                    $subinsts = \@subsubinsts;
+                }
+            }
+        }
+
+        pop(@path);
+    }
+
+    my @paths = sort keys %paths;
+    return @paths;
+}
+
 ############################################################
 ### Extract Data From Config File
 ############################################################
@@ -1248,6 +1374,7 @@ sub configure {
     $self->{InCfgDB}->{$path}->{$prm}->{FromFile} = fileparse($filename);
     $self->{InCfgDB}->{$path}->{$prm}->{Val}      = $self->deep_copy($val);
     $self->{InCfgDB}->{$path}->{$prm}->{State}    = 'NeverUsed';
+
     1;
 }
 
@@ -1442,6 +1569,32 @@ sub print_configuration {
         print STDERR "\n";
     }
     1;
+}
+
+## Get the paths to parameter overrides from config files
+sub get_cfg_param_paths {
+    my $self = shift;
+    my $name = __PACKAGE__ . "->get_cfg_param_paths";
+    caller eq __PACKAGE__
+      or $self->error("$name: access restricted to " . __PACKAGE__ . " or Genesis2::UniqueModule");
+
+    my @paths = sort keys %{$self->{InCfgDB}};
+    return @paths;
+}
+
+############################################################
+### Extract Data From Command Line Parameter Overrides
+############################################################
+
+## Get the paths to parameter overrides from command line params
+sub get_prm_override_param_paths {
+    my $self = shift;
+    my $name = __PACKAGE__ . "->get_prm_override_param_paths";
+    caller eq __PACKAGE__
+      or $self->error("$name: access restricted to " . __PACKAGE__ . " or Genesis2::UniqueModule");
+
+    my @paths = sort keys %{$self->{PrmOverrides}};
+    return @paths;
 }
 
 sub get_top_name {
@@ -1706,7 +1859,8 @@ sub internal_print_to_string {
 # Deep copy of hash and array structures
 sub deep_copy {
     my $self = shift;
-    my $name = $self->{BaseModuleName} . "->deep_copy";
+    my $name = ($self == $Genesis2::ConfigHandler::myself ? __PACKAGE__ : $self->{BaseModuleName})
+      . "->deep_copy";
     caller eq __PACKAGE__
       or $self->error("$name: Call to a base class private method is not allowed");
 

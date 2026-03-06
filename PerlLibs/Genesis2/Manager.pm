@@ -159,10 +159,8 @@ sub new {
     $self->{GenMode}   = 0;    # should we generate a verilog hierarchy?
 
     # Disable the module cache
-    # Duplicate module detection code doesn't currently handle case where a
-    # parent module is generated multiple times with the same parameters, but a
-    # child module parameter is overridden (e.g., via command line or XML).
-    # This is an escape hatch until that logic is enhanced.
+    # Escape hatch in case someone runs into an issue with the generated module
+    # caching
     $self->{DisableModuleCache} = 0;
 
     # Bless this package
@@ -1010,6 +1008,8 @@ sub gen_verilog {
     $self->{CfgHandler}->ReadCfg();
     $self->{CfgHandler}->ReadXml();
     $self->{CfgHandler}->SetPrmOverrides($self->{PrmOverrides});
+
+    $self->{CfgHandler}->BuildParamPathMaps();
 
     # Set some back and forth pointers
     $self->{TopObj} = $module->new($self);

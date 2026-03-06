@@ -34,15 +34,15 @@ jobs:
     - name: Run the test
       run: cd test/glctest; ./test.sh -debug 15
 
-  module_cache_5s:
-    # This test shows an issue with the module cache: parameter overrides are
-    # currently ignored. Requires the module cache to be disabled.
+  param_override_5s:
+    # This test verifies that parameter overriding is handled correctly; critical
+    # for the module cache and the param name uniquification style.
     runs-on: ubuntu-latest
     steps:
     - name: Check out repository code
       uses: actions/checkout@v2
     - name: Run the test
-      run: cd test/module_cache; ./test.sh -debug 15
+      run: cd test/param_override; ./test.sh -debug 15
 
   func_fail_1m:
     runs-on: ubuntu-latest
