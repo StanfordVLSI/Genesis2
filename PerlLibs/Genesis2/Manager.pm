@@ -52,7 +52,6 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 use Exporter;
 use FileHandle;
 use File::Basename;
-use File::Copy;
 use File::Spec::Functions;
 use Getopt::Long;
 use Pod::Usage;    # used for the fancy "-man" command line option
@@ -162,6 +161,13 @@ sub new {
     # Escape hatch in case someone runs into an issue with the generated module
     # caching
     $self->{DisableModuleCache} = 0;
+
+    # Generate "genesis_raw" directory plus output
+    # Genesis used to output all files here then move to synth/verif dirs.
+    # Update writes directly to synth/verif dirs (bypassing raw) from cache to save moves.
+    # Useful for debugging if Genesis run crashes during generation and you
+    # want to see the generated files up to that point.
+    $self->{GenRawOutput} = 0;
 
     # Bless this package
     bless($self, $package);
@@ -289,6 +295,7 @@ Generating Options:
 	[-unqstyle style]		# Preferred module uniquification style [$unq_styles]
 	[-pathfile filename]		# Generate a path file (list of directories processed)
 	[-no_module_cache]		# Disable the generated module cache: do not skip any generates
+	[-gen_raw]			# Generate "genesis_raw" directory plus output
 
 Help and Debuging Options:
 	[-log filename]			# Name of log file for genesis2 and user stderr messages
@@ -321,10 +328,10 @@ sub parse_command_line {
         "parse"      => \$self->{ParseMode},  # should we parse input file to generate perl modules?
         "top=s"      => \$self->{Top},        # name of top module for generation phase
         "synthtop=s" => \$self->{SynthTop},   # Name of top module for synthesis
-        "generate"   => \$self->{GenMode},    # should we generate a verilog hierarchy?
-        "srcpath|sources=s@"  => $self->{SourcesPath},       # Where to find source files
-        "incpath|includes=s@" => $self->{IncludesPath},      # Where to find include files
-        "input=s{,}"          => $self->{InputFileNames},    # List of files to process
+        "generate|gen"        => \$self->{GenMode},        # should we generate a verilog hierarchy?
+        "srcpath|sources=s@"  => $self->{SourcesPath},     # Where to find source files
+        "incpath|includes=s@" => $self->{IncludesPath},    # Where to find include files
+        "input=s{,}"          => $self->{InputFileNames},  # List of files to process
         "inputlist=s{,}"      =>
           $self->{InputFileLists},    # List of files that each contain a list of files to process
         "perl_modules=s@" => $self->{PerlModules},     # Additional Perl modules to load
@@ -347,8 +354,9 @@ sub parse_command_line {
         "help"    => \$help,                # prints this message
         "man:s"   => \$man,                 # prints the complete man page for Genesis2
                                             # or the specified extenssion
-        "license=s"       => \$self->{LicenseFileName},      # Pointer to license file
-        "no_module_cache" => \$self->{DisableModuleCache}    # Disable the module cache
+        "license=s"       => \$self->{LicenseFileName},       # Pointer to license file
+        "no_module_cache" => \$self->{DisableModuleCache},    # Disable the module cache
+        "gen_raw"         => \$self->{GenRawOutput},          # Generate genesis_raw output
     );
 
     my $res = GetOptions(%options);
@@ -970,12 +978,14 @@ sub gen_verilog {
     $filename = $module . $self->{OutfileSuffix};
 
     # create generated verilog directory
-    unless (-e $self->{RawDir} && -d $self->{RawDir}) {
-        mkdir $self->{RawDir}
-          or
-          $self->error("Cannot find and cannot create folder for generated (raw) verilog files: \""
-              . $self->{RawDir}
-              . "\"");
+    if ($self->{GenRawOutput}) {
+        unless (-e $self->{RawDir} && -d $self->{RawDir}) {
+            mkdir $self->{RawDir}
+              or $self->error(
+                    "Cannot find and cannot create folder for generated (raw) verilog files: \""
+                  . $self->{RawDir}
+                  . "\"");
+        }
     }
 
     # Now import the top module
@@ -1325,33 +1335,41 @@ sub create_product_lists {
               . "\"");
     }
 
-    # Move files to final location; Print the  file lists
+    # Write files from cache to final location; Print the file lists
+    my $content_cache = $self->{TopObj}->{OutfileName_ContentCache};
     foreach my $file (@product_list) {
-        if ($seen{$file} eq 'verif') {
-            print STDERR "Move $file from $self->{RawDir} to $self->{VerifDir}\n"
-              if \$self->{Debug} & 8;
-            move(catfile($self->{RawDir}, $file), catfile($self->{VerifDir}, $file))
-              or
-              $self->error("$name: Couldn't move $file from $self->{RawDir} to $self->{VerifDir}");
-            print {$product_fh} catfile($self->{VerifDir}, $file) . "\n";
-            print {$verif_product_fh} catfile($self->{VerifDir}, $file) . "\n";
+        my $dest_dir  = ($seen{$file} eq 'verif') ? $self->{VerifDir} : $self->{SynthDir};
+        my $dest_path = catfile($dest_dir, $file);
+
+        print STDERR "Write $file to $dest_dir\n" if $self->{Debug} & 8;
+
+        # Write cached content directly to final destination
+        if (exists $content_cache->{$file}) {
+            open(my $fh, ">", $dest_path)
+              or $self->error("$name: Couldn't open $dest_path: $!");
+            print $fh @{$content_cache->{$file}};
+            close($fh)
+              or $self->error("$name: Couldn't close $dest_path: $!");
         } else {
-            print STDERR "Move $file from $self->{RawDir} to $self->{SynthDir}\n"
-              if \$self->{Debug} & 8;
-            move(catfile($self->{RawDir}, $file), catfile($self->{SynthDir}, $file))
-              or
-              $self->error("$name: Couldn't move $file from $self->{RawDir} to $self->{SynthDir}");
-            print {$product_fh} catfile($self->{SynthDir}, $file) . "\n";
-            print {$synth_product_fh} catfile($self->{SynthDir}, $file) . "\n";
-            print {$verif_product_fh} catfile($self->{SynthDir}, $file) . "\n"
-              if ($seen{$file} eq 'synth_and_verif');
+            $self->error("$name: File $file not found in content cache");
         }
+
+        print {$product_fh} $dest_path . "\n";
+        print {$synth_product_fh} $dest_path . "\n" if ($seen{$file} ne 'verif');
+        print {$verif_product_fh} $dest_path . "\n" if ($seen{$file} ne 'synth');
     }
 
     close $product_fh       if defined $product_fh;
     close $synth_product_fh if defined $synth_product_fh;
     close $verif_product_fh if defined $synth_product_fh;
 
+    if ($self->{GenRawOutput}) {
+        my @files = glob("$self->{RawDir}/*");
+        foreach my $file (@files) {
+            unlink($file)
+              or $self->error("$name: Couldn't delete file $file: $!");
+        }
+    }
 }
 
 ## create_clean_file

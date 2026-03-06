@@ -1188,15 +1188,13 @@ sub unique_inst {
     # If not, we get root=<null> and no uniquification maybe
     $self->warning("OutputFileName '$me' != '<root>_unq<num>.<suffix>'") if ($root eq "");
 
-    # Find all files in genesis_raw that match 'root_*'
+    # Find all cached files that match 'root_*'
     # e.g. root=flop  =>  rootfiles=( flop_unq2.sv, flop_D_0_T_RFlop_W_4.sv )
-    my $rootfiles = `cd genesis_raw; /bin/ls ${root}_*`;
-    print STDERR "Found rootfiles '$rootfiles' maybe\n" if ($self->{Debug} & 8);
-
-    my @rootfiles = split(/\n/, $rootfiles);
+    my @rootfiles = grep { /^\Q${root}\E_/ } keys %{$self->{OutfileName_ContentCache}};
+    print STDERR "Found rootfiles '@rootfiles' maybe\n" if ($self->{Debug} & 8);
 
     #####################
-    # Compare against previously generated files in dir 'genesis_raw'
+    # Compare against previously generated files in the content cache
 
     # foreach my $other_file (@rootfiles) {
     $match = 0;
@@ -1235,8 +1233,6 @@ sub unique_inst {
         # NumDerivs not used anymore, but that's okay, right?
         $self->{ModuleName_NumDerivs}{$base_module_name}--;
         $instance->{UniqueModuleName} = $other_module;  # instead, use the previously created module
-        unlink(catfile($instance->{RawDir}, $instance->{OutputFileName}))
-          ;                                             # remove the newly created file
         delete $self->{OutfileName_ContentCache}{$instance->{OutputFileName}}
           ;                                             # Clean the file from the cache
         $instance->{OutputFileName} = $other_file;      # instead, use the previously created file
@@ -1614,8 +1610,6 @@ sub ununique_inst {
     # if a module already exists, ignore new version (since we already established that they match)
     if (defined $self->{UnUniquifiedModules}{$base_module_name}) {
         $instance->{UniqueModuleName} = $other_module;  # instead, use the previously created module
-        unlink(catfile($instance->{RawDir}, $instance->{OutputFileName}))
-          ;                                             # remove the newly created file
         delete $self->{OutfileName_ContentCache}{$instance->{OutputFileName}}
           ;                                             # Clean the file from the cache
         $instance->{OutputFileName} = $other_file;      # instead, use the previously created file
@@ -2118,20 +2112,24 @@ sub execute {
     close($self->{OutfileHandle})
       or $self->error("$name: Can not close in-memory string");
 
-    # write the content to the actual target file
-    my $fullFileName = catfile($self->{RawDir}, $self->{OutputFileName});
-    open(my $fh, ">", $fullFileName)
-      or $self->error("$name: Couldn't open output file $fullFileName: $!");
-    print $fh $content;
-    close($fh)
-      or $self->error("$name: Can not close file \"$fullFileName\"");
+    # write the content to genesis_raw if GenRawOutput is enabled
+    if ($self->{Manager}->{GenRawOutput}) {
 
-    # cache the file
+        # write the content to the actual target file
+        my $fullFileName = catfile($self->{RawDir}, $self->{OutputFileName});
+        open(my $fh, ">", $fullFileName)
+          or $self->error("$name: Couldn't open output file $fullFileName: $!");
+        print $fh $content;
+        close($fh)
+          or $self->error("$name: Can not close file \"$fullFileName\"");
+    }
+
+    # cache the content (written to final destination later by create_product_lists)
     if (!exists $self->{OutfileName_ContentCache}{$self->{OutputFileName}}) {
         my $filename = $self->{OutputFileName};
         @{$self->{OutfileName_ContentCache}{$filename}} = $content;
     } else {
-        $self->error("INTRNAL ERROR: \"$fullFileName\" already cached");
+        $self->error("INTERNAL ERROR: \"$self->{OutputFileName}\" already cached");
     }
 
     1;
