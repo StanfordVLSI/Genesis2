@@ -57,6 +57,7 @@ use Getopt::Long;
 use Pod::Usage;    # used for the fancy "-man" command line option
 use Cwd;
 use Cwd 'abs_path';
+use File::Temp qw(tempdir);
 use Carp;
 $Carp::MaxArgLen  = 16;
 $Carp::MaxArgNums = 1;
@@ -169,6 +170,11 @@ sub new {
     # want to see the generated files up to that point.
     $self->{GenRawOutput} = 0;
 
+    # Use a temporary directory under /tmp for WorkDir (and RawDir if GenRawOutput)
+    $self->{UseTmp}  = 0;
+    $self->{KeepTmp} = 0;
+    $self->{TmpDir}  = undef;
+
     # Bless this package
     bless($self, $package);
 }
@@ -183,6 +189,20 @@ sub execute {
 
     # Parse the command line
     $self->parse_command_line();
+
+    if ($self->{KeepTmp} && !$self->{UseTmp}) {
+        print STDERR "Warning: -keep_tmp specified without -use_tmp; ignoring -keep_tmp.\n";
+        $self->{KeepTmp} = 0;
+    }
+
+    # Set up a temporary directory if requested
+    if ($self->{UseTmp}) {
+        $self->{TmpDir} = tempdir("genesis2_XXXXXXXX", DIR => "/tmp");
+        $self->{WorkDir} = catfile($self->{TmpDir}, $self->{WorkDir});
+        if ($self->{GenRawOutput}) {
+            $self->{RawDir} = catfile($self->{TmpDir}, $self->{RawDir});
+        }
+    }
 
     # Create a genesis_clean.cmd file
     $self->create_clean_file;
@@ -258,6 +278,17 @@ sub execute {
     print STDERR "--- Genesis Finished Generating Your Design ---\n"   if $self->{GenMode};
     print STDERR "-----------------------------------------------\n\n" if $self->{GenMode};
 
+    # Clean up the temporary directory if requested
+    if ($self->{UseTmp} && defined $self->{TmpDir} && -d $self->{TmpDir}) {
+        if ($self->{KeepTmp}) {
+            print STDERR "$name: Keeping temp directory: $self->{TmpDir}\n";
+        } else {
+            require File::Path;
+            File::Path::remove_tree($self->{TmpDir});
+            print STDERR "$name: Removed temp directory: $self->{TmpDir}\n";
+        }
+    }
+
     1;
 }
 
@@ -296,6 +327,8 @@ Generating Options:
 	[-pathfile filename]		# Generate a path file (list of directories processed)
 	[-no_module_cache]		# Disable the generated module cache: do not skip any generates
 	[-gen_raw]			# Generate "genesis_raw" directory plus output
+	[-use_tmp]			# Use a temp directory under /tmp for WorkDir (and RawDir)
+	[-keep_tmp]			# Keep the temp directory after execution (implies -use_tmp)
 
 Help and Debuging Options:
 	[-log filename]			# Name of log file for genesis2 and user stderr messages
@@ -357,6 +390,8 @@ sub parse_command_line {
         "license=s"       => \$self->{LicenseFileName},       # Pointer to license file
         "no_module_cache" => \$self->{DisableModuleCache},    # Disable the module cache
         "gen_raw"         => \$self->{GenRawOutput},          # Generate genesis_raw output
+        "use_tmp"         => \$self->{UseTmp},                # Use a temp directory under /tmp
+        "keep_tmp"        => \$self->{KeepTmp},               # Keep the temp directory after execution
     );
 
     my $res = GetOptions(%options);
