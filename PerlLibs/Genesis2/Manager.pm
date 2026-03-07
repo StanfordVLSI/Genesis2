@@ -1363,11 +1363,18 @@ sub create_product_lists {
     close $synth_product_fh if defined $synth_product_fh;
     close $verif_product_fh if defined $synth_product_fh;
 
+    # Older code used to generate the files into RawDir before moving into
+    # either SynthDir or VerifDir. At the end of this process, RawDir should
+    # not contain any of the files in SynthDir/VerifDir.
+    #
+    # Mimic this behavior by deleting the product_list files from RawDir.
     if ($self->{GenRawOutput}) {
-        my @files = glob("$self->{RawDir}/*");
-        foreach my $file (@files) {
-            unlink($file)
-              or $self->error("$name: Couldn't delete file $file: $!");
+        foreach my $file (@product_list) {
+            my $raw_file = catfile($self->{RawDir}, $file);
+            if (-f $raw_file) {
+                unlink($raw_file)
+                  or $self->error("$name: Couldn't delete file $raw_file $!");
+            }
         }
     }
 }
