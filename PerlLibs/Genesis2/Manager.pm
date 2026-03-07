@@ -197,7 +197,7 @@ sub execute {
 
     # Set up a temporary directory if requested
     if ($self->{UseTmp}) {
-        $self->{TmpDir} = tempdir("genesis2_XXXXXXXX", DIR => "/tmp");
+        $self->{TmpDir}  = tempdir("genesis2_XXXXXXXX", DIR => "/tmp");
         $self->{WorkDir} = catfile($self->{TmpDir}, $self->{WorkDir});
         if ($self->{GenRawOutput}) {
             $self->{RawDir} = catfile($self->{TmpDir}, $self->{RawDir});
@@ -387,11 +387,11 @@ sub parse_command_line {
         "help"    => \$help,                # prints this message
         "man:s"   => \$man,                 # prints the complete man page for Genesis2
                                             # or the specified extenssion
-        "license=s"       => \$self->{LicenseFileName},       # Pointer to license file
-        "no_module_cache" => \$self->{DisableModuleCache},    # Disable the module cache
-        "gen_raw"         => \$self->{GenRawOutput},          # Generate genesis_raw output
-        "use_tmp"         => \$self->{UseTmp},                # Use a temp directory under /tmp
-        "keep_tmp"        => \$self->{KeepTmp},               # Keep the temp directory after execution
+        "license=s"       => \$self->{LicenseFileName},    # Pointer to license file
+        "no_module_cache" => \$self->{DisableModuleCache}, # Disable the module cache
+        "gen_raw"         => \$self->{GenRawOutput},       # Generate genesis_raw output
+        "use_tmp"         => \$self->{UseTmp},             # Use a temp directory under /tmp
+        "keep_tmp"        => \$self->{KeepTmp},            # Keep the temp directory after execution
     );
 
     my $res = GetOptions(%options);
