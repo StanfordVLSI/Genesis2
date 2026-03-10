@@ -3,11 +3,7 @@ name: Gold-Compare and Functional Tests
 # Runs on every push or pull request.
 on:
   push:
-    branches:
-      - master
   pull_request:
-    branches:
-      - master
 
 # StackOverflow 58033366
 env:
@@ -19,12 +15,6 @@ env:
 
 # Jobs arranged in order of which is expected to finish first etc.
 jobs:
-
-#   id:
-#     runs-on: ubuntu-latest
-#     steps:
-#     - name: Action, branch, and repo information.
-#       run: printf "$SHOW_ACTION\n$SHOW_BRANCH\n$SHOW_BNAME\n$SHOW_SHA\n"
 
   quick_local_test_5s:
     runs-on: ubuntu-latest
@@ -59,3 +49,12 @@ jobs:
       uses: actions/checkout@v2
     - name: Run the test
       run: test/garnet.sh $BRANCH_NAME 4x2 apps/pointwise
+
+  # Technically not a gold test maybe I dunno
+  pip-install_30s:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository code
+      uses: actions/checkout@v2
+    - name: Run the test
+      run: pip/genesis2/test/docker-test.sh
