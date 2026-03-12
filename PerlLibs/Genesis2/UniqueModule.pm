@@ -1009,19 +1009,22 @@ sub _get_prod_list_insts {
     my $path        = shift;
     my $synth_top   = shift;
 
-    $path .= "." if defined $self->{Parent};
-    $path .= $self->get_instance_name();
+    if (defined $synth_top) {
+        $path .= "." if defined $self->{Parent};
+        $path .= $self->get_instance_name();
+    }
 
     my $path_len      = length($path);
-    my $synth_top_len = length($synth_top);
+    my $synth_top_len = defined($synth_top) ? length($synth_top) : 0;
 
     # An instance is a synthesis instance if it is at or below synth_top.
-    my $is_synth =
-      $path eq $synth_top || (substr($path, 0, $synth_top_len + 1) eq $synth_top . ".");
+    my $is_synth = defined($synth_top)
+      && ($path eq $synth_top || (substr($path, 0, $synth_top_len + 1) eq $synth_top . "."));
 
     # An instance is on the synthesis path if it is a synthesis instance or if
     # synth_top is below it.
-    my $on_synth_path = $is_synth || ($path . "." eq substr($synth_top, 0, $path_len + 1));
+    my $on_synth_path =
+      defined($synth_top) && ($is_synth || ($path . "." eq substr($synth_top, 0, $path_len + 1)));
 
     my $file = $self->get_out_file_name();
 
