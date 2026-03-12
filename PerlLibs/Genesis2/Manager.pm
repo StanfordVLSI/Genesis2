@@ -1326,8 +1326,8 @@ sub create_product_lists {
     #print { $product_fh } "+incdir+".$self->{SynthDir}." +incdir+".$self->{VerifDir}."\n";
     #print { $synth_product_fh } "+incdir+".$self->{SynthDir}."\n";
 
-    # Get a list of all instances in REVERSED DFS order
-    my @rev_dfs_list = $self->{TopObj}->get_all_insts();
+    # Get the product list instances, obtained by a DFS traversal.
+    my @rev_dfs_list = $self->{TopObj}->get_prod_list_insts($self->{SynthTop});
 
     # Process the list into synth and verif single appearance file list
     my %seen         = ();

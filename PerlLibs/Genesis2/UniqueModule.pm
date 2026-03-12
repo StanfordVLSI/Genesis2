@@ -973,6 +973,84 @@ sub _get_all_insts {
     push(@$results, $self);
 }
 
+## get_prod_list_insts
+## Get list of instances for use by Manager::create_product_list.
+## This returns the first synth instance and first verif instance for each
+## module file name. The list is built via a DFS traversal.
+##
+## Requires the SynthTop path to identify whether an instance is verif or synth.
+sub get_prod_list_insts {
+    my $self      = shift;
+    my $synth_top = shift;
+
+    # Product list
+    my @results;
+
+    # Track the file names of the synth and verif instances that are added to
+    # the list
+    my %synth_files;
+    my %verif_files;
+
+    $self->_get_prod_list_insts(\@results, \%synth_files, \%verif_files, 1000, "", $synth_top);
+    return @results;
+}
+
+## _get_prod_list_insts
+## Internal function used to constrtuct the product list returned by
+## get_prod_list_insts.
+##
+## Passes refernces to the array / hashes to avoid unnecessary copying.
+sub _get_prod_list_insts {
+    my $self        = shift;
+    my $results     = shift;
+    my $synth_files = shift;
+    my $verif_files = shift;
+    my $depth       = shift;
+    my $path        = shift;
+    my $synth_top   = shift;
+
+    $path .= "." if defined $self->{Parent};
+    $path .= $self->get_instance_name();
+
+    my $path_len      = length($path);
+    my $synth_top_len = length($synth_top);
+
+    # An instance is a synthesis instance if it is at or below synth_top.
+    my $is_synth =
+      $path eq $synth_top || (substr($path, 0, $synth_top_len + 1) eq $synth_top . ".");
+
+    # An instance is on the synthesis path if it is a synthesis instance or if
+    # synth_top is below it.
+    my $on_synth_path = $is_synth || ($path . "." eq substr($synth_top, 0, $path_len + 1));
+
+    my $file = $self->get_out_file_name();
+
+# Check if we've already added an instance with this file name to the synth/verif list as appropariate.
+    if (   ($is_synth && exists $synth_files->{$file})
+        || (!$is_synth && exists $verif_files->{$file} && !$on_synth_path))
+    {
+        return;
+    }
+
+    # First time seeing this file for synth/verif
+    if ($is_synth) {
+        $synth_files->{$file} = 1;
+    } else {
+        $verif_files->{$file} = 1;
+    }
+
+    # Recurse into the child nodes
+    if ($depth > 0) {
+        foreach my $inst_name (@{$self->{SubInstanceList}}) {
+            my $subinst = $self->get_subinst($inst_name);
+            $subinst->_get_prod_list_insts($results, $synth_files, $verif_files, $depth - 1, $path,
+                $synth_top);
+        }
+    }
+
+    push(@$results, $self);
+}
+
 ## get_instance_path
 ## API method that returns a complete path to the instance object given
 ## Usage: my $inst_path = $inst_obj->get_instance_path();
