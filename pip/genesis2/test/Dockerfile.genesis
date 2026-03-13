@@ -1,0 +1,31 @@
+FROM docker.io/ubuntu:20.04
+
+# Note "pip install genesis2" uses pypi to fetch wheel (default)
+# "pip install <local-filename" uses <local-filename> as wheel
+ARG PIPFILE=genesis2
+
+RUN \
+    printf "\n\nUPDATE\n" && \
+    apt-get -q update && \
+    printf "\n\nINSTALL\n" && \
+    apt-get install --no-install-recommends -y git python3 python3-pip python3-venv && \
+    printf "\nALTS\n" && \
+    update-alternatives --install /usr/bin/python python /usr/bin/python3 100 && \
+    update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 100 && \
+    mkdir -p /piptest && \
+    printf "DONE setup\n\n\n"
+
+# Switch shell to bash
+SHELL ["/bin/bash", "--login", "-c"]
+
+# Copy any wheels you can find, in case e.g. user specifies "PIPFILE=genesis2-0.0.9.tar.gz"
+COPY ./genesis2*.gz /piptest/
+
+# Awk filter detects if pip install output contains the word "ERROR"
+WORKDIR /piptest
+RUN \
+  printf "\n\nPIP INSTALL $PIPFILE\n"; \
+  python -m venv . && source bin/activate; \
+  pip list -v; \
+  python3 -m pip install $PIPFILE |& awk '{print}/ERROR/{err=1}END{if(err)exit 13}' || exit 13; \
+  printf "DONE pip install\n\n\n"
