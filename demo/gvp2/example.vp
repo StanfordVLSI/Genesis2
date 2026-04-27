@@ -1,0 +1,23 @@
+// gvp2 demo + smoke test: exercises every gvp.pl built-in plus include/pinclude
+`timescale 1ns/1ps
+//;my $WIDTH = parameter(name => 'WIDTH', val => 8);
+//;pinclude("example_lib.pl")
+
+module `mname`_demo (
+    input  wire             clk,
+    input  wire [`$WIDTH-1`:0] din,
+    output reg  [`$WIDTH-1`:0] dout
+);
+
+//;include("example_inc.vph")
+
+//; for (my $i = 0; $i < 4; $i++) {
+    wire [`$WIDTH-1`:0] tap_`pp($i)`;
+//; }
+
+//; my $sub = generate('Sub', 'u_sub', WIDTH => $WIDTH);
+    `instantiate($sub)` (.clk(clk), .d(din), .q(dout));
+
+//;emit("// note: doubled WIDTH = %d\n", double_it($WIDTH));
+//;synonym();
+endmodule
