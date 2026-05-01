@@ -8,8 +8,8 @@ Highlights:
 - `//;`-prefixed Perl lines highlighted via embedded `@perlTop`.
 - Backtick-delimited inline Perl expressions, escape-aware (`` \` ``) and
   excluding Verilog backtick directives (`` `timescale ``, `` `ifdef ``, ...).
-- Sentinel comments (`//; # endforeach`, `//; # endif`, ...) highlighted bold
-  so block-closers stand out.
+- Comment-only Perl lines (`//; # ...`) highlighted bold so they stand out
+  from regular Perl statements.
 
 ## Install
 

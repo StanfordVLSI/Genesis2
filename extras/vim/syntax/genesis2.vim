@@ -25,9 +25,8 @@ unlet! b:current_syntax
 syn include @perlTop syntax/perl.vim
 unlet! b:current_syntax
 
-" //; # ... -- comment-only Perl lines (block-closing sentinels like
-" `# end if`, `# endif`, `# end foreach`). Highlighted as comments but bold so
-" they stand out as structural markers.
+" //; # ... -- comment-only Perl lines. Highlighted as comments but bold so
+" they stand out from regular Perl statements.
 syn match genesis2Sentinel +//;\s*#.*$+ containedin=ALL
 
 " //;<rest> -- the rest of the line is Perl (excluding the sentinel form
