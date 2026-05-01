@@ -3,7 +3,6 @@
 
 HERE  := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 GVP2  ?= $(abspath $(HERE)/../../bin/gvp2.pl)
-GVP   ?= $(abspath $(HERE)/../../gvpy/gvp.pl)
 
 ARGS  := --incdirs . --defparam WIDTH=16 example.vp
 
