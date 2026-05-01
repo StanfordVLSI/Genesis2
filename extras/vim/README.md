@@ -19,11 +19,11 @@ Copy (or symlink) the two directories into your vim runtime:
 
 ```sh
 mkdir -p ~/.vim/after/ftdetect ~/.vim/syntax
-cp after/ftdetect/vp.vim ~/.vim/after/ftdetect/vp.vim
-cp syntax/vp.vim          ~/.vim/syntax/vp.vim
+cp after/ftdetect/genesis2.vim ~/.vim/after/ftdetect/genesis2.vim
+cp syntax/genesis2.vim          ~/.vim/syntax/genesis2.vim
 ```
 
-The ftdetect lives under `after/` and uses `set filetype=vp` (force) so it
+The ftdetect lives under `after/` and uses `set filetype=genesis2` (force) so it
 wins against the `verilog_systemverilog` plugin (and any other plugin) whose
 ftdetect maps `*.vp` to a different filetype and uses `au!` to clear earlier
 autocmds.
@@ -41,6 +41,6 @@ Plug 'Genesis2', { 'rtp': 'vim.vp' }
 (Adjust the source spec for your fork/clone location.)
 
 ## Files
-- `after/ftdetect/vp.vim` — maps `*.vp`, `*.svp`, `*.vph` to filetype `vp`,
+- `after/ftdetect/genesis2.vim` — maps `*.vp`, `*.svp`, `*.vph` to filetype `genesis2`,
   forcing the filetype so it overrides plugins that also claim `*.vp`.
-- `syntax/vp.vim` — syntax rules layered on top of Verilog/SystemVerilog.
+- `syntax/genesis2.vim` — syntax rules layered on top of Verilog/SystemVerilog.

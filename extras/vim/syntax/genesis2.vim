@@ -28,11 +28,11 @@ unlet! b:current_syntax
 " //; # ... -- comment-only Perl lines (block-closing sentinels like
 " `# end if`, `# endif`, `# end foreach`). Highlighted as comments but bold so
 " they stand out as structural markers.
-syn match vpSentinel +//;\s*#.*$+ containedin=ALL
+syn match genesis2Sentinel +//;\s*#.*$+ containedin=ALL
 
 " //;<rest> -- the rest of the line is Perl (excluding the sentinel form
 " above, which is matched separately).
-syn region vpLine matchgroup=vpDelim
+syn region genesis2Line matchgroup=genesis2Delim
     \ start=+//;\(\s*#\)\@!+ end=+$+
     \ keepend containedin=ALL contains=@perlTop
 
@@ -41,74 +41,74 @@ syn region vpLine matchgroup=vpDelim
 "     (\`) does not open or close the region.
 "   * \@! after the start backtick excludes Verilog `directive keywords so
 "     they are not mis-parsed as opening a Perl region.
-syn region vpInline matchgroup=vpDelim
+syn region genesis2Inline matchgroup=genesis2Delim
     \ start=#\\\@<!`\(timescale\|default_nettype\|include\|ifdef\|if\|ifndef\|else\|endif\)\@!#
     \ end=#\\\@<!`#
     \ keepend containedin=ALL contains=@perlTop oneline
 
-hi link vpDelim PreProc
+hi link genesis2Delim PreProc
 
 " Make embedded Perl visually distinct from Verilog (which uses Statement).
-hi vpPlKeyword  cterm=bold gui=bold ctermfg=magenta guifg=magenta
-hi vpPlVar      cterm=NONE gui=NONE ctermfg=cyan  guifg=cyan
-hi vpPlString   cterm=NONE gui=NONE ctermfg=green guifg=green
-hi vpPlFunction cterm=bold gui=bold
+hi genesis2PlKeyword  cterm=bold gui=bold ctermfg=magenta guifg=magenta
+hi genesis2PlVar      cterm=NONE gui=NONE ctermfg=cyan  guifg=cyan
+hi genesis2PlString   cterm=NONE gui=NONE ctermfg=green guifg=green
+hi genesis2PlFunction cterm=bold gui=bold
 
 " Keywords / control flow / built-in statements.
-hi link perlStatement         vpPlKeyword
-hi link perlStatementControl  vpPlKeyword
-hi link perlStatementFlow     vpPlKeyword
-hi link perlStatementInclude  vpPlKeyword
-hi link perlStatementPackage  vpPlKeyword
-hi link perlStatementScalar   vpPlKeyword
-hi link perlStatementList     vpPlKeyword
-hi link perlStatementHash     vpPlKeyword
-hi link perlStatementProc     vpPlKeyword
-hi link perlStatementMisc     vpPlKeyword
-hi link perlStatementIOfunc   vpPlKeyword
-hi link perlStatementFiles    vpPlKeyword
-hi link perlStatementNumeric  vpPlKeyword
-hi link perlStatementRegexp   vpPlKeyword
-hi link perlStatementStorage  vpPlKeyword
-hi link perlConditional       vpPlKeyword
-hi link perlRepeat            vpPlKeyword
-hi link perlOperator          vpPlKeyword
-hi link perlControl           vpPlKeyword
-hi link perlInclude           vpPlKeyword
-hi link perlStorageClass      vpPlKeyword
-hi link perlType              vpPlKeyword
+hi link perlStatement         genesis2PlKeyword
+hi link perlStatementControl  genesis2PlKeyword
+hi link perlStatementFlow     genesis2PlKeyword
+hi link perlStatementInclude  genesis2PlKeyword
+hi link perlStatementPackage  genesis2PlKeyword
+hi link perlStatementScalar   genesis2PlKeyword
+hi link perlStatementList     genesis2PlKeyword
+hi link perlStatementHash     genesis2PlKeyword
+hi link perlStatementProc     genesis2PlKeyword
+hi link perlStatementMisc     genesis2PlKeyword
+hi link perlStatementIOfunc   genesis2PlKeyword
+hi link perlStatementFiles    genesis2PlKeyword
+hi link perlStatementNumeric  genesis2PlKeyword
+hi link perlStatementRegexp   genesis2PlKeyword
+hi link perlStatementStorage  genesis2PlKeyword
+hi link perlConditional       genesis2PlKeyword
+hi link perlRepeat            genesis2PlKeyword
+hi link perlOperator          genesis2PlKeyword
+hi link perlControl           genesis2PlKeyword
+hi link perlInclude           genesis2PlKeyword
+hi link perlStorageClass      genesis2PlKeyword
+hi link perlType              genesis2PlKeyword
 
 " Variables.
-hi link perlVarPlain          vpPlVar
-hi link perlVarPlain2         vpPlVar
-hi link perlVarBlock          vpPlVar
-hi link perlVarMember         vpPlVar
-hi link perlVarSimpleMember   vpPlVar
-hi link perlIdentifier        vpPlVar
-hi link perlSpecialDollar     vpPlVar
+hi link perlVarPlain          genesis2PlVar
+hi link perlVarPlain2         genesis2PlVar
+hi link perlVarBlock          genesis2PlVar
+hi link perlVarMember         genesis2PlVar
+hi link perlVarSimpleMember   genesis2PlVar
+hi link perlIdentifier        genesis2PlVar
+hi link perlSpecialDollar     genesis2PlVar
 
 " Strings / numbers.
-hi link perlString            vpPlString
-hi link perlStringUnexpanded  vpPlString
-hi link perlQQ                vpPlString
+hi link perlString            genesis2PlString
+hi link perlStringUnexpanded  genesis2PlString
+hi link perlQQ                genesis2PlString
 hi link perlNumber            Number
 hi link perlFloat             Float
 
 " Subs / functions.
-hi link perlFunction          vpPlFunction
-hi link perlSubName           vpPlFunction
-hi link perlMethod            vpPlFunction
+hi link perlFunction          genesis2PlFunction
+hi link perlSubName           genesis2PlFunction
+hi link perlMethod            genesis2PlFunction
 
 " Sentinel highlight: same foreground as Comment, but bold. We can't use
 " `:hi link` (it would clobber the bold attribute), so resolve Comment's
 " colours at load time and apply them explicitly.
 let s:_cterm_fg = synIDattr(synIDtrans(hlID('Comment')), 'fg', 'cterm')
 let s:_gui_fg   = synIDattr(synIDtrans(hlID('Comment')), 'fg', 'gui')
-exe 'hi vpSentinel cterm=bold gui=bold'
+exe 'hi genesis2Sentinel cterm=bold gui=bold'
     \ . (!empty(s:_cterm_fg) ? ' ctermfg=' . s:_cterm_fg : '')
     \ . (!empty(s:_gui_fg)   ? ' guifg='   . s:_gui_fg   : '')
 unlet s:_cterm_fg s:_gui_fg
 
-let b:current_syntax = "vp"
+let b:current_syntax = "genesis2"
 
 " vim: set ts=4 sw=4:
