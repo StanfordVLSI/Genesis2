@@ -2,7 +2,7 @@ Genesis2
 ========
 
 The Genesis2 Chip Generator (CG) is a Perl-based design system and meta-programming language for automatically producing custom hardware.
-(There is also a Python version, see [below](#also-see).)
+(There is also a Python version, see [farther below](#also-see).)
 
 Genesis2 is free software as governed by a BSD-style license, see LICENSE.txt for specific terms and conditions.
 
