@@ -49,3 +49,8 @@ To reformat with perltidy, run this command from the root of the repository:
 ```
 make format
 ```
+
+## Also see
+
+* [genesispy:](https://github.com/stfns-s/genesispy) Python port of Genesis2 (https://github.com/StanfordVLSI/Genesis2)
+* [genesis-editors:](https://github.com/stfns-s/genesis-editors) Editor support (vim, emacs, vscode) for genesis2 and genesispy
