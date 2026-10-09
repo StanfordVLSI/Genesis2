@@ -34,6 +34,15 @@ jobs:
     - name: Run the test
       run: cd test/param_override; ./test.sh -debug 15
 
+  gvp2_test_5s:
+    # Smoke test for bin/gvp2.pl via demo/gvp2/Makefile's pattern-match target.
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository code
+      uses: actions/checkout@v2
+    - name: Run the test
+      run: cd test/gvp2test; ./test.sh
+
   func_fail_1m:
     runs-on: ubuntu-latest
     steps:

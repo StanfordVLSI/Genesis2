@@ -1,7 +1,7 @@
 // gvp2 demo + smoke test: exercises every gvp.pl built-in plus include/pinclude
 `timescale 1ns/1ps
-//;my $WIDTH = parameter(name => 'WIDTH', val => 8);
-//;pinclude("example_lib.pl")
+//; my $WIDTH = parameter(name => 'WIDTH', val => 8);
+//; pinclude("example_lib.pl")
 
 module `mname`_demo (
     input  wire             clk,
